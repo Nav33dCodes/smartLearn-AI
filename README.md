@@ -1,7 +1,7 @@
 # 🤖 SmartLearn AI
 
 <p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?color=00F7FF&center=true&vCenter=true&lines=AI+Powered+Learning+Assistant;RAG+Based+Chatbot;FastAPI+%2B+React+System;Built+by+Naveed+Ahmed+%26+Sanan+Malik" />
+  <img src="https://readme-typing-svg.herokuapp.com?color=00F7FF&center=true&vCenter=true&lines=AI+Powered+Learning+Assistant;RAG+Based+Chatbot;FastAPI+%2B+React+System;Built+by+Team+SmartLearn" />
 </p>
 
 <p align="center">
@@ -15,25 +15,26 @@
 
 ## 🧠 Overview
 
-SmartLearn AI is a **full-stack AI-powered learning assistant** that combines modern web technologies with advanced language models and Retrieval-Augmented Generation (RAG).
+**SmartLearn AI** is a modern, full-stack **AI-powered learning assistant** that combines:
 
-It enables users to:
+* ⚡ FastAPI backend
+* 💻 React frontend
+* 🧠 LLMs (Groq - LLaMA 3)
+* 🔍 Retrieval-Augmented Generation (RAG)
 
-* 💬 Chat with AI in real-time
-* 📄 Upload PDFs and ask questions
-* 🧠 Receive accurate, context-aware answers
+It enables users to interact with AI intelligently by combining real-time chat with document-based knowledge.
 
 ---
 
 ## ✨ Key Features
 
-* 💬 AI Chat Interface (Groq - LLaMA 3)
-* 📄 PDF Upload & Processing
-* 🔍 Semantic Search using FAISS
-* 🧠 Retrieval-Augmented Generation (RAG)
-* ⚡ FastAPI Backend
-* 💻 React + Vite Frontend
-* 🎨 Clean, responsive UI
+* 💬 Real-time AI Chat (Groq API - LLaMA 3)
+* 📄 PDF Upload & Intelligent Q&A
+* 🔍 Semantic Search with FAISS
+* 🧠 Context-aware Responses (RAG)
+* ⚡ High-performance FastAPI backend
+* 💻 React + Vite frontend
+* 🎨 Clean & responsive UI
 
 ---
 
@@ -76,26 +77,26 @@ smartlearn/
 * FastAPI
 * Groq API (LLaMA 3)
 * Sentence Transformers
-* FAISS (vector search)
+* FAISS (Vector Search)
 * PyPDF
 
 ---
 
-## 🧠 How It Works (RAG Flow)
+## 🧠 How It Works (RAG Pipeline)
 
-1. Upload PDF
-2. Extract text
-3. Split into chunks
-4. Convert to embeddings
-5. Store in FAISS
-6. Ask a question
-7. Retrieve relevant chunks
-8. Send context to LLM
-9. Generate final answer
+1. 📄 Upload PDF
+2. 🔍 Extract text
+3. ✂️ Split into chunks
+4. 🧠 Convert into embeddings
+5. 💾 Store in FAISS
+6. ❓ Ask a question
+7. 🔎 Retrieve relevant chunks
+8. 🤖 Send context to LLM
+9. 💡 Generate final answer
 
 ---
 
-## 🚀 Setup Guide (Run Locally)
+## 🚀 Setup Guide
 
 ### 🔹 1. Clone Repository
 
@@ -119,23 +120,18 @@ Create `.env` file:
 GROQ_API_KEY=your_api_key_here
 ```
 
-Run server:
+Run backend:
 
 ```bash
 uvicorn main:app --reload
 ```
 
-Backend runs at:
-
-```
+📍 Backend URL:
 http://127.0.0.1:8000
-```
 
 ---
 
 ### 🔹 3. Frontend Setup
-
-Open a new terminal:
 
 ```bash
 cd frontend
@@ -143,17 +139,14 @@ npm install
 npm run dev
 ```
 
-Frontend runs at:
-
-```
+📍 Frontend URL:
 http://localhost:5173
-```
 
 ---
 
 ## 📡 API Endpoints
 
-### POST `/chat`
+### 🔹 POST `/chat`
 
 ```json
 {
@@ -161,48 +154,59 @@ http://localhost:5173
 }
 ```
 
-### POST `/upload`
+### 🔹 POST `/upload`
 
-Upload a PDF for processing
+Upload a PDF file for processing and querying.
 
 ---
 
 ## ⚠️ Important Notes
 
-* `.env` file must remain private
-* `node_modules/` and `__pycache__/` are ignored
-* FAISS data is currently in-memory (not persistent)
+* 🔒 Keep `.env` file private
+* 🚫 `node_modules/` and `__pycache__/` are ignored
+* ⚡ FAISS is currently **in-memory (non-persistent)**
 
 ---
 
 ## 🔮 Roadmap
 
-* [ ] Streaming responses (real-time typing)
-* [ ] PostgreSQL integration (chat history)
-* [ ] Authentication (JWT)
-* [ ] Persistent vector database
-* [ ] Deployment (Render / Railway / Fly.io)
+* [ ] 🔄 Streaming responses (real-time typing)
+* [ ] 🗄️ PostgreSQL integration (chat history)
+* [ ] 🔐 Authentication (JWT)
+* [ ] 💾 Persistent vector database
+* [ ] 🌍 Deployment (Render / Railway / Fly.io)
+* [ ] 📱 Mobile responsiveness improvements
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome:
+Contributions are welcome! 🚀
 
 1. Fork the repository
 2. Create a new branch
-3. Commit changes
-4. Open a pull request
+3. Commit your changes
+4. Open a Pull Request
 
 ---
 
-## 👨‍💻 Authors
+## 👨‍💻 Team SmartLearn
 
-* Naveed Ahmed
 * Sanan Malik
+* Naveed Ahmed
+* Dua Fatima
+* Zeshan Sikandar
+* Shayan Umer
+* Fiza Imran
 
 ---
 
-## 📌 Status
+## 📌 Project Status
 
-🚧 Actively under development
+🚧 **Actively Under Development**
+
+---
+
+## ⭐ Support
+
+If you like this project, consider giving it a ⭐ on GitHub — it really helps!
