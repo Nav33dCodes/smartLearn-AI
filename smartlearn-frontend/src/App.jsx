@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import { Send, Paperclip, Plus, Trash2, Bot, User, Sparkles, MessageSquare, FileText, Loader2, Square, RotateCw } from "lucide-react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import axios from "axios";
-import ReactMarkdown from "react-markdown";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { Moon, Sun, PanelLeftOpen } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+import Sidebar from "./components/Sidebar";
+import ChatWindow from "./components/ChatWindow";
+import InputBox from "./components/InputBox";
 
 const API = "http://localhost:8000";
 
@@ -12,364 +14,395 @@ export default function App() {
   const [activeChatId, setActiveChatId] = useState(null);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [fileName, setFileName] = useState(null);
-  
+  const [attachedFile, setAttachedFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [abortController, setAbortController] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [darkMode, setDarkMode] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
 
-  const chatEndRef = useRef(null);
   const textareaRef = useRef(null);
+  const activeChat = chats.find(c => c.id === activeChatId);
 
-  // Load chats
+  // ── Initialization & Theme ──
   useEffect(() => {
-    const saved = localStorage.getItem("all_chats");
+    const saved = localStorage.getItem("sl_chats_pro");
+    const savedTheme = localStorage.getItem("sl_theme_pro");
+    
+    if (savedTheme !== null) setDarkMode(savedTheme === "true");
     if (saved) {
       const parsed = JSON.parse(saved);
       setChats(parsed);
       if (parsed.length > 0) setActiveChatId(parsed[0].id);
+      else createNewChat(true);
     } else {
-      createNewChat();
+      createNewChat(true);
     }
+
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("all_chats", JSON.stringify(chats));
+    localStorage.setItem("sl_chats_pro", JSON.stringify(chats));
   }, [chats]);
 
-  const createNewChat = () => {
-    const newChat = {
-      id: Date.now(),
-      title: "New Conversation",
-      messages: [],
-    };
-    setChats((prev) => [newChat, ...prev]);
-    setActiveChatId(newChat.id);
-  };
-
-  const deleteChat = (id) => {
-    const filtered = chats.filter((c) => c.id !== id);
-    setChats(filtered);
-    if (filtered.length > 0) setActiveChatId(filtered[0].id);
-    else createNewChat();
-  };
-
-  const activeChat = chats.find((c) => c.id === activeChatId);
-
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [activeChat?.messages, loading]);
+    localStorage.setItem("sl_theme_pro", darkMode);
+    document.documentElement.setAttribute("data-theme", darkMode ? "dark" : "light");
+  }, [darkMode]);
 
-  const updateMessages = (msgs) => {
-    setChats((prev) =>
-      prev.map((chat) =>
-        chat.id === activeChatId ? { ...chat, messages: msgs } : chat
-      )
-    );
+  // ── Chat Management ──
+  const createNewChat = useCallback(() => {
+    const newChat = { id: Date.now(), title: "New chat", messages: [] };
+    setChats(prev => [newChat, ...prev]);
+    setActiveChatId(newChat.id);
+    if (isMobile) setSidebarOpen(false);
+    setInput("");
+    setAttachedFile(null); 
+    textareaRef.current?.focus();
+  }, [isMobile]);
+
+  const deleteChat = useCallback((id, e) => {
+    e.stopPropagation();
+    setChats(prev => {
+      const filtered = prev.filter(c => c.id !== id);
+      if (filtered.length === 0) {
+        const fresh = { id: Date.now(), title: "New chat", messages: [] };
+        setActiveChatId(fresh.id);
+        return [fresh];
+      }
+      if (id === activeChatId) setActiveChatId(filtered[0].id);
+      return filtered;
+    });
+  }, [activeChatId]);
+
+  const updateMessages = useCallback((msgs, chatId) => {
+    setChats(prev => prev.map(chat => chat.id === (chatId || activeChatId) ? { ...chat, messages: msgs } : chat));
+  }, [activeChatId]);
+
+  const editMessage = (msgIndex) => {
+    if (!activeChat || loading) return;
+    const msgToEdit = activeChat.messages[msgIndex];
+    if (msgToEdit.role !== "user") return;
+
+    const newHistory = activeChat.messages.slice(0, msgIndex);
+    updateMessages(newHistory);
+    setInput(msgToEdit.content);
+    setTimeout(() => textareaRef.current?.focus(), 50);
   };
 
-  const handleInput = (e) => {
-    setInput(e.target.value);
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 150)}px`;
-    }
-  };
-
-  const streamText = async (text, controller) => {
+  // ── Core Communication ──
+  const streamText = async (text, controller, chatId) => {
+    const id = chatId || activeChatId;
     let current = "";
-    for (let char of text) {
+    const chunkSize = Math.max(1, Math.floor(text.length / 80)); 
+    for (let i = 0; i < text.length; i += chunkSize) {
       if (controller.signal.aborted) break;
+      current += text.substring(i, i + chunkSize);
       
-      current += char;
-      setChats((prev) =>
-        prev.map((chat) => {
-          if (chat.id === activeChatId) {
-            const newMsgs = [...chat.messages];
-            newMsgs[newMsgs.length - 1] = { role: "assistant", content: current };
-            return { ...chat, messages: newMsgs };
-          }
-          return chat;
-        })
-      );
-      await new Promise((r) => setTimeout(r, 10));
+      setChats(prev => prev.map(chat => {
+        if (chat.id === id) {
+          const msgs = [...chat.messages];
+          msgs[msgs.length - 1] = { role: "assistant", content: current };
+          return { ...chat, messages: msgs };
+        }
+        return chat;
+      }));
+      await new Promise(r => setTimeout(r, 8));
+    }
+    
+    if (!controller.signal.aborted) {
+      setChats(prev => prev.map(chat => chat.id === id ? { 
+        ...chat, 
+        messages: [...chat.messages.slice(0, -1), { role: "assistant", content: text }] 
+      } : chat));
     }
   };
 
-  // 🐛 FIX: Added customHistory parameter to handle asynchronous React state during regeneration
   const sendMessage = async (overrideText = null, customHistory = null) => {
-    const textToSend = overrideText || input;
-    if (!textToSend.trim()) return;
+    const textToSend = overrideText ?? input;
+    if (!textToSend.trim() || loading) return;
 
     const controller = new AbortController();
     setAbortController(controller);
 
-    // 🐛 FIX: Use the injected history (if regenerating), otherwise use current state
-    const baseHistory = customHistory || activeChat.messages;
+    const baseHistory = customHistory ?? activeChat.messages;
+    const validHistory = baseHistory.filter(m => m.content.trim() !== "");
     
-    // 🐛 FIX: Clean the history to strip out UI-only elements before sending to the backend
-    const validHistory = baseHistory
-      .filter(m => m.content.trim() !== "")
-      .map(m => ({ role: m.role, content: m.content }));
+    const currentChatId = activeChatId;
+    updateMessages([...baseHistory, { role: "user", content: textToSend }, { role: "assistant", content: "" }], currentChatId);
 
-    const userMsg = { role: "user", content: textToSend };
-    const newMsgs = [...baseHistory, userMsg, { role: "assistant", content: "" }];
-
-    updateMessages(newMsgs);
     if (!overrideText) {
       setInput("");
-      if (textareaRef.current) textareaRef.current.style.height = "auto";
+      setAttachedFile(null); 
     }
     setLoading(true);
 
     try {
-      // 🐛 FIX: Send 'history' to the backend so Groq remembers the conversation
-      const res = await axios.post(`${API}/chat`, { 
+      const res = await axios.post(`${API}/chat`, {
         message: textToSend,
-        history: validHistory 
+        history: validHistory,
       }, { signal: controller.signal });
-      
-      await streamText(res.data.response, controller);
 
-      if (activeChat.title === "New Conversation" && !controller.signal.aborted) {
-        const title = textToSend.slice(0, 25) + (textToSend.length > 25 ? "..." : "");
-        setChats((prev) => prev.map((c) => (c.id === activeChatId ? { ...c, title } : c)));
-      }
+      await streamText(res.data.response, controller, currentChatId);
+
+      setChats(prev => prev.map(c => {
+        if (c.id === currentChatId && c.title === "New chat" && !controller.signal.aborted) {
+          return { ...c, title: textToSend.slice(0, 30) + (textToSend.length > 30 ? "..." : "") };
+        }
+        return c;
+      }));
     } catch (err) {
-      if (axios.isCancel(err)) {
-        console.log("Request canceled");
-      } else {
-        await streamText("⚠️ Sorry, I encountered an error. Please try again.", controller);
+      if (!axios.isCancel(err)) {
+        await streamText("⚠️ An error occurred. Please try again.", controller, currentChatId);
       }
     }
 
     setLoading(false);
     setAbortController(null);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
+    if (!isMobile) setTimeout(() => textareaRef.current?.focus(), 100);
   };
 
   const stopGeneration = () => {
-    if (abortController) {
-      abortController.abort();
-      setLoading(false);
-      setAbortController(null);
-    }
+    abortController?.abort();
+    setLoading(false);
+    setAbortController(null);
   };
 
   const regenerateLastMessage = () => {
-    if (activeChat.messages.length < 2) return;
-    
-    const lastUserMsgIndex = activeChat.messages.map(m => m.role).lastIndexOf("user");
-    if (lastUserMsgIndex === -1) return;
-    
-    const lastUserMsg = activeChat.messages[lastUserMsgIndex];
-    
-    // 🐛 FIX: Capture the exact history right before the regenerated prompt
-    const historyBeforeRegenerate = activeChat.messages.slice(0, lastUserMsgIndex);
-    
-    updateMessages(historyBeforeRegenerate);
-    
-    // 🐛 FIX: Pass the precise history directly to bypass React's async state delay
-    sendMessage(lastUserMsg.content, historyBeforeRegenerate);
+    if (!activeChat || activeChat.messages.length < 2) return;
+    const lastUserIdx = [...activeChat.messages].map(m => m.role).lastIndexOf("user");
+    if (lastUserIdx === -1) return;
+    const historyBefore = activeChat.messages.slice(0, lastUserIdx);
+    updateMessages(historyBefore);
+    sendMessage(activeChat.messages[lastUserIdx].content, historyBefore);
   };
 
   const handleUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setFileName(file.name);
+    setIsUploading(true);
+    setAttachedFile({ name: file.name, size: file.size });
     const formData = new FormData();
     formData.append("file", file);
-
-    updateMessages([...activeChat.messages, { role: "assistant", content: "📄 Processing your document..." }]);
+    const currentChatId = activeChatId;
 
     try {
       await axios.post(`${API}/upload`, formData);
-      updateMessages([...activeChat.messages, { role: "assistant", content: "✅ Document uploaded and ready! Ask me anything about it." }]);
+      setChats(prev => prev.map(chat => {
+        if (chat.id === currentChatId) {
+          return { ...chat, messages: [...chat.messages, { role: "assistant", content: `✅ **${file.name}** is uploaded and processed! You can now ask questions about it.` }] };
+        }
+        return chat;
+      }));
     } catch {
-      updateMessages([...activeChat.messages, { role: "assistant", content: "❌ Upload Failed. Please check the server." }]);
-      setFileName(null);
+      setChats(prev => prev.map(chat => {
+        if (chat.id === currentChatId) {
+          return { ...chat, messages: [...chat.messages, { role: "assistant", content: `❌ Failed to upload **${file.name}**. Please ensure the backend server is running.` }] };
+        }
+        return chat;
+      }));
+    } finally {
+      setIsUploading(false);
+      setAttachedFile(null); 
     }
   };
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC] font-sans text-slate-800 overflow-hidden">
-      
-      {/* --- SIDEBAR --- */}
-      <aside className="w-72 bg-white border-r border-slate-200 flex flex-col shadow-sm z-20 hidden md:flex">
-        <div className="p-5 border-b border-slate-100 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-200">
-            <Sparkles size={18} className="animate-pulse" />
-          </div>
-          <h1 className="font-bold text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600">
-            SmartLearn AI
-          </h1>
-        </div>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-        <div className="p-4">
-          <button onClick={createNewChat} className="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg active:scale-95">
-            <Plus size={18} />
-            <span className="font-medium text-sm">New Conversation</span>
-          </button>
-        </div>
+        :root {
+          --bg-main: #ffffff; --bg-sidebar: #f9f9f9; --bg-input: #ffffff;
+          --bg-user-bubble: #f3f4f6; --bg-hover: #f3f4f6; --bg-header: rgba(255, 255, 255, 0.85);
+          --text-primary: #111827; --text-secondary: #374151; --text-muted: #6b7280;
+          --border-color: #e5e7eb; --accent-color: #10a37f;
+          --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          --shadow-input: 0 0 15px rgba(0,0,0,0.08);
+        }
 
-        <div className="flex-1 overflow-y-auto px-3 pb-4 space-y-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full">
-          <p className="px-2 pb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider mt-2">Recent Chats</p>
-          {chats.map((chat) => (
-            <div key={chat.id} onClick={() => setActiveChatId(chat.id)} className={`group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 ${chat.id === activeChatId ? "bg-emerald-50 text-emerald-700 font-medium" : "hover:bg-slate-100 text-slate-600"}`}>
-              <div className="flex items-center gap-3 overflow-hidden">
-                <MessageSquare size={16} className={chat.id === activeChatId ? "text-emerald-500" : "text-slate-400"} />
-                <span className="text-sm truncate select-none">{chat.title}</span>
-              </div>
-              <button onClick={(e) => { e.stopPropagation(); deleteChat(chat.id); }} className={`opacity-0 group-hover:opacity-100 p-1.5 hover:bg-slate-200 rounded-md transition-all ${chat.id === activeChatId ? "hover:bg-emerald-100 text-emerald-600" : "text-slate-400 hover:text-red-500"}`}>
-                <Trash2 size={14} />
-              </button>
-            </div>
-          ))}
-        </div>
-      </aside>
+        [data-theme="dark"] {
+          --bg-main: #212121; --bg-sidebar: #171717; --bg-input: #2f2f2f;
+          --bg-user-bubble: #2f2f2f; --bg-hover: #2a2a2a; --bg-header: rgba(33, 33, 33, 0.85);
+          --text-primary: #ececec; --text-secondary: #b4b4b4; --text-muted: #666666;
+          --border-color: #333333; --accent-color: #10a37f;
+          --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+          --shadow-input: 0 0 20px rgba(0,0,0,0.3);
+        }
 
-      {/* --- MAIN CHAT AREA --- */}
-      <main className="flex-1 flex flex-col relative bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-50 via-slate-50 to-emerald-50/20">
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-primary); height: 100vh; overflow: hidden; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        .app-container { display: flex; height: 100vh; position: relative; }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .spinner { animation: spin 1s linear infinite; color: var(--text-muted); }
+
+        /* ── SIDEBAR ── */
+        .sidebar { background-color: var(--bg-sidebar); display: flex; flex-direction: column; z-index: 50; border-right: 1px solid var(--border-color); overflow: hidden; }
+        .sidebar-top { padding: 16px 12px; display: flex; justify-content: space-between; align-items: center; width: 260px; }
+        .sidebar-brand { display: flex; align-items: center; gap: 10px; padding-left: 6px; }
+        .brand-text { font-size: 1.05rem; font-weight: 600; color: var(--text-primary); letter-spacing: -0.01em; }
+        .sidebar-actions { display: flex; align-items: center; gap: 2px; }
+
+        .search-container { padding: 0 12px 12px; width: 260px; }
+        .search-box { display: flex; align-items: center; gap: 8px; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; transition: all 0.2s; }
+        .search-box:focus-within { border-color: var(--text-muted); box-shadow: var(--shadow-sm); }
+        .search-box input { flex: 1; background: transparent; border: none; color: var(--text-primary); font-size: 0.85rem; outline: none; }
         
-        <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-8 pb-40 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full">
-          
-          {activeChat?.messages.length === 0 && (
-            <div className="h-full flex flex-col items-center justify-center text-center opacity-80 mt-10">
-              <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mb-6">
-                <Sparkles className="text-emerald-400" size={32} />
-              </div>
-              <h2 className="text-2xl font-bold text-slate-700 mb-2">How can I help you today?</h2>
-              <p className="text-slate-500 max-w-md">Upload a document or type a message below to start learning and exploring.</p>
-            </div>
-          )}
+        .chat-list { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 0 12px 20px; width: 260px; }
+        .chat-list::-webkit-scrollbar { width: 0; }
+        .chat-list:hover::-webkit-scrollbar { width: 4px; }
+        .chat-list::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        .chat-list-title { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); padding: 12px 8px 8px; margin-top: 8px; }
+        .chat-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; cursor: pointer; color: var(--text-secondary); font-size: 0.875rem; transition: background-color 0.2s; position: relative; }
+        .chat-item:hover, .chat-item.active { background-color: var(--bg-hover); color: var(--text-primary); }
+        .chat-item-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .btn-delete { opacity: 0; border: none; background: transparent; color: var(--text-muted); cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s; }
+        .chat-item:hover .btn-delete { opacity: 1; }
+        .btn-delete:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
 
-          <div className="max-w-4xl mx-auto space-y-6">
-            {activeChat?.messages.map((msg, i) => {
-              const isUser = msg.role === "user";
-              const isLastMsg = i === activeChat.messages.length - 1;
-              if (!isUser && !msg.content && loading && isLastMsg) return null; 
+        /* ── MAIN AREA ── */
+        .main-content { flex: 1; display: flex; flex-direction: column; position: relative; background-color: var(--bg-main); min-width: 0; }
+        .header { height: 60px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; position: absolute; top: 0; left: 0; right: 0; z-index: 10; background: var(--bg-header); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0,0,0,0.02); }
+        .btn-icon { background: transparent; border: none; color: var(--text-secondary); padding: 8px; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; display: flex; align-items: center; justify-content: center; }
+        .btn-icon:hover { background-color: var(--bg-hover); color: var(--text-primary); }
 
-              return (
-                <div key={i} className={`flex gap-4 ${isUser ? "flex-row-reverse" : "flex-row"} group`}>
-                  <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center shadow-sm ${isUser ? "bg-slate-800 text-white" : "bg-white border border-slate-200 text-emerald-500"}`}>
-                    {isUser ? <User size={18} /> : <Bot size={20} />}
-                  </div>
+        .messages-scroll-area { flex: 1; overflow-y: auto; padding: 60px 0 160px 0; scroll-behavior: smooth; }
+        .messages-scroll-area::-webkit-scrollbar { width: 6px; }
+        .messages-scroll-area::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 6px; }
+        .messages-container { max-width: 800px; margin: 0 auto; padding: 0 24px; display: flex; flex-direction: column; }
 
-                  <div className={`px-5 py-3.5 max-w-[85%] rounded-2xl leading-relaxed text-sm sm:text-base shadow-sm overflow-x-auto ${isUser ? "bg-gradient-to-br from-emerald-500 to-teal-500 text-white rounded-tr-sm shadow-emerald-500/20" : "bg-white border border-slate-100 text-slate-700 rounded-tl-sm"}`}>
-                    {isUser ? (
-                      <div className="whitespace-pre-wrap">{msg.content}</div>
-                    ) : (
-                      <ReactMarkdown
-                        components={{
-                          code({ node, inline, className, children, ...props }) {
-                            const match = /language-(\w+)/.exec(className || "");
-                            return !inline && match ? (
-                              <div className="rounded-lg overflow-hidden my-3 border border-slate-200">
-                                <div className="bg-slate-800 px-4 py-1 text-xs text-slate-400 flex justify-between items-center">
-                                  <span>{match[1]}</span>
-                                </div>
-                                <SyntaxHighlighter style={vscDarkPlus} language={match[1]} PreTag="div" customStyle={{ margin: 0, padding: '1rem' }} {...props}>
-                                  {String(children).replace(/\n$/, "")}
-                                </SyntaxHighlighter>
-                              </div>
-                            ) : (
-                              <code className="bg-slate-100 text-emerald-600 px-1.5 py-0.5 rounded-md font-mono text-sm" {...props}>
-                                {children}
-                              </code>
-                            );
-                          },
-                        }}
-                      >
-                        {msg.content}
-                      </ReactMarkdown>
-                    )}
-                    
-                    {!isUser && isLastMsg && !loading && (
-                      <div className="mt-2 pt-2 border-t border-slate-100 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={regenerateLastMessage} className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-emerald-500 transition-colors">
-                          <RotateCw size={12} /> Regenerate
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+        .welcome-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 65vh; text-align: center; }
+        .welcome-logo { width: 64px; height: 64px; border-radius: 50%; background: var(--bg-input); display: flex; align-items: center; justify-content: center; margin-bottom: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+        .welcome-title { font-size: 2rem; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.02em; color: var(--text-primary); }
+        .welcome-subtitle { color: var(--text-muted); margin-bottom: 32px; font-size: 1.05rem; }
+        .suggestions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; max-width: 640px; }
+        @media (max-width: 600px) { .suggestions-grid { grid-template-columns: 1fr; } }
+        .suggestion-card { padding: 16px; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 12px; font-size: 0.9rem; color: var(--text-secondary); text-align: left; cursor: pointer; box-shadow: var(--shadow-sm); transition: 0.2s; }
+        .suggestion-card:hover { background: var(--bg-hover); color: var(--text-primary); box-shadow: var(--shadow-md); }
 
-            {loading && (
-              <div className="flex gap-4 flex-row">
-                <div className="w-10 h-10 shrink-0 rounded-full bg-white border border-slate-200 text-emerald-500 flex items-center justify-center shadow-sm">
-                  <Bot size={20} />
-                </div>
-                <div className="px-5 py-4 bg-white border border-slate-100 rounded-2xl rounded-tl-sm shadow-sm flex items-center gap-2">
-                  <Loader2 size={16} className="animate-spin text-emerald-500" />
-                  <span className="text-sm text-slate-500 font-medium">SmartLearn is thinking...</span>
-                </div>
-              </div>
-            )}
-            
-            <div ref={chatEndRef} className="h-4" />
-          </div>
-        </div>
+        .message-wrapper { margin-bottom: 24px; display: flex; flex-direction: column; }
+        .message-user-container { display: flex; justify-content: flex-end; width: 100%; }
+        .message-user-bubble { background-color: var(--bg-user-bubble); color: var(--text-primary); padding: 12px 20px; border-radius: 20px; border-bottom-right-radius: 4px; max-width: 75%; font-size: 1rem; line-height: 1.5; font-weight: 400; }
+        .message-ai-container { display: flex; gap: 16px; width: 100%; }
+        .ai-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); }
+        .ai-content { flex: 1; min-width: 0; font-size: 1rem; line-height: 1.65; color: var(--text-primary); padding-top: 4px; }
+        
+        .msg-actions { display: flex; gap: 8px; margin-top: 6px; opacity: 0; transition: opacity 0.2s; }
+        .message-wrapper:hover .msg-actions { opacity: 1; }
+        .action-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
+        .action-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
 
-        {/* --- FLOATING INPUT DOCK --- */}
-        <div className="absolute bottom-0 w-full bg-gradient-to-t from-slate-50 via-slate-50 to-transparent pt-10 pb-6 px-4 sm:px-8">
-          <div className="max-w-4xl mx-auto flex flex-col items-center">
-            
-            {loading && (
-              <button 
-                onClick={stopGeneration}
-                className="mb-4 bg-white border border-slate-200 shadow-sm px-4 py-2 rounded-full text-xs font-medium text-slate-600 flex items-center gap-2 hover:bg-slate-50 hover:text-red-500 transition-colors"
-              >
-                <Square size={12} className="fill-current" /> Stop generating
-              </button>
-            )}
+        .typing-indicator { display: flex; gap: 4px; padding: 8px 0; align-items: center; }
+        .typing-indicator span { width: 6px; height: 6px; border-radius: 50%; background-color: var(--text-muted); animation: bounce 1.4s infinite ease-in-out both; }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
 
-            <div className="w-full bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-200/50 flex flex-col overflow-hidden focus-within:ring-2 ring-emerald-500/20 transition-all duration-300">
-              {fileName && (
-                <div className="px-4 py-2 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2 text-xs font-medium text-emerald-700">
-                  <FileText size={14} /> Attached: {fileName}
-                  <button onClick={() => setFileName(null)} className="ml-auto hover:text-red-500">Remove</button>
-                </div>
-              )}
+        /* ── INPUT DOCK ── */
+        .input-dock { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(180deg, transparent, var(--bg-main) 40%); padding: 0 24px 24px; }
+        .input-container-inner { max-width: 800px; margin: 0 auto; position: relative; }
+        
+        .stop-wrapper { display: flex; justify-content: center; margin-bottom: 12px; }
+        .btn-stop { display: flex; align-items: center; gap: 6px; background: var(--bg-main); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); cursor: pointer; box-shadow: var(--shadow-sm); transition: all 0.2s; }
+        .btn-stop:hover { background: var(--bg-hover); color: var(--text-primary); box-shadow: var(--shadow-md); }
+        
+        .composer { background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: 24px; display: flex; flex-direction: column; box-shadow: var(--shadow-input); overflow: hidden; }
+        .composer:focus-within { border-color: var(--text-muted); box-shadow: var(--shadow-md); }
+        .composer.has-attachment { border-radius: 16px; }
 
-              <div className="flex items-end gap-2 p-2">
-                <label className="cursor-pointer p-3 mb-1 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-xl transition-colors">
-                  <Paperclip size={20} />
-                  <input type="file" hidden onChange={handleUpload} />
-                </label>
+        .attachment-zone { padding: 12px 16px 0 16px; border-bottom: 1px solid transparent; }
+        .file-card { display: flex; align-items: center; gap: 12px; background: var(--bg-main); border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 12px; width: max-content; max-width: 100%; box-shadow: var(--shadow-sm); }
+        .file-icon-wrapper { width: 40px; height: 40px; border-radius: 8px; background: var(--bg-hover); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .file-details { display: flex; flex-direction: column; overflow: hidden; }
+        .file-name { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+        .file-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+        .btn-remove-file { background: var(--bg-hover); border: none; color: var(--text-muted); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; margin-left: 8px; flex-shrink: 0; }
+        .btn-remove-file:hover { background: #fee2e2; color: #ef4444; }
 
-                <textarea
-                  ref={textareaRef}
-                  value={input}
-                  onChange={handleInput}
-                  onKeyDown={handleKeyDown}
-                  className="flex-1 bg-transparent border-0 py-3.5 px-2 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-0 text-base resize-none max-h-[150px] overflow-y-auto"
-                  placeholder="Ask anything or explore a topic... (Shift + Enter for new line)"
-                  rows={1}
-                  disabled={loading}
-                />
+        .composer-row { padding: 8px 12px; display: flex; align-items: flex-end; gap: 8px; }
+        .btn-attach { background: transparent; border: none; color: var(--text-secondary); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; margin-bottom: 4px; }
+        .btn-attach:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .composer-textarea { flex: 1; background: transparent; border: none; outline: none; color: var(--text-primary); font-family: inherit; font-size: 1rem; padding: 10px 4px; resize: none; max-height: 200px; overflow-y: auto; line-height: 1.5; }
+        .composer-textarea::placeholder { color: var(--text-muted); }
+        .composer-textarea::-webkit-scrollbar { width: 0; }
+        
+        .btn-send { width: 36px; height: 36px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; margin-bottom: 4px; cursor: pointer; flex-shrink: 0; }
+        .btn-send.active { background-color: var(--text-primary); color: var(--bg-main); }
+        .btn-send.inactive { background-color: var(--bg-hover); color: var(--text-muted); cursor: not-allowed; }
+        
+        .footer-text { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 12px; }
 
-                <button
-                  onClick={() => sendMessage()}
-                  disabled={!input.trim() || loading}
-                  className={`p-3 mb-1 rounded-xl flex items-center justify-center transition-all duration-200 ${
-                    input.trim() && !loading
-                      ? "bg-emerald-500 text-white shadow-md hover:bg-emerald-600 hover:shadow-lg active:scale-95"
-                      : "bg-slate-100 text-slate-400 cursor-not-allowed"
-                  }`}
+        /* ── MARKDOWN STYLES ── */
+        .md-p { margin-bottom: 1.125rem; }
+        .md-p:last-child { margin-bottom: 0; }
+        .md-ul, .md-ol { padding-left: 1.5rem; margin-bottom: 1.125rem; }
+        .md-li { margin-bottom: 0.5rem; }
+        .md-h1, .md-h2, .md-h3 { font-weight: 600; margin-top: 1.75rem; margin-bottom: 0.75rem; color: var(--text-primary); }
+        .md-bq { border-left: 4px solid var(--border-color); padding-left: 1rem; margin: 1.125rem 0; color: var(--text-secondary); font-style: italic; }
+        .md-link { color: var(--accent-color); text-decoration: none; font-weight: 500; }
+        .md-link:hover { text-decoration: underline; }
+        .table-wrap { overflow-x: auto; margin: 1.125rem 0; border: 1px solid var(--border-color); border-radius: 8px; box-shadow: var(--shadow-sm); }
+        .md-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .md-table th, .md-table td { border-bottom: 1px solid var(--border-color); padding: 12px 16px; text-align: left; }
+        .md-table th { background-color: var(--bg-input); font-weight: 600; }
+        .inline-code { background-color: var(--bg-input); border: 1px solid var(--border-color); padding: 0.2em 0.4em; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; }
+        .code-block-wrapper { margin: 1.125rem 0; border-radius: 8px; overflow: hidden; background: #0d0d0d; box-shadow: var(--shadow-md); }
+        .code-block-header { display: flex; align-items: center; justify-content: space-between; background: #212121; padding: 8px 16px; border-bottom: 1px solid #333; }
+        .code-lang { font-size: 0.75rem; color: #b4b4b4; font-family: 'Inter', sans-serif; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; }
+        .code-copy-btn { background: transparent; border: none; color: #b4b4b4; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 500; }
+
+        .mobile-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 40; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+
+        @media (max-width: 768px) {
+          .sidebar { position: fixed; height: 100%; }
+          .messages-container { padding: 0 16px; }
+          .message-user-bubble { max-width: 90%; }
+          .input-dock { padding: 0 16px 16px; }
+        }
+      `}</style>
+
+      <div className="app-container">
+        <Sidebar 
+          chats={chats} activeChatId={activeChatId} setActiveChatId={setActiveChatId}
+          sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} createNewChat={createNewChat}
+          deleteChat={deleteChat} searchQuery={searchQuery} setSearchQuery={setSearchQuery} isMobile={isMobile}
+        />
+
+        <main className="main-content">
+          <header className="header">
+            <AnimatePresence>
+              {!sidebarOpen && (
+                <motion.button 
+                  initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }}
+                  className="btn-icon" onClick={() => setSidebarOpen(true)}
                 >
-                  <Send size={18} className={input.trim() && !loading ? "translate-x-0.5" : ""} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-    </div>
+                  <PanelLeftOpen size={20} />
+                </motion.button>
+              )}
+            </AnimatePresence>
+            <div style={{ flex: 1 }} />
+            <motion.button whileTap={{ scale: 0.9 }} className="btn-icon" onClick={() => setDarkMode(!darkMode)}>
+              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </motion.button>
+          </header>
+
+          <ChatWindow 
+            activeChat={activeChat} loading={loading} editMessage={editMessage}
+            regenerateLastMessage={regenerateLastMessage} setInput={setInput} textareaRef={textareaRef}
+          />
+
+          <InputBox 
+            input={input} setInput={setInput} loading={loading} sendMessage={sendMessage}
+            stopGeneration={stopGeneration} handleUpload={handleUpload} attachedFile={attachedFile}
+            setAttachedFile={setAttachedFile} isUploading={isUploading} textareaRef={textareaRef}
+          />
+        </main>
+      </div>
+    </>
   );
 }
