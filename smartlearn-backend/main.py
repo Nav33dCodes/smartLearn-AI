@@ -16,7 +16,7 @@ app.add_middleware(
 )
 
 # ------------------------
-# CHAT WITH RAG
+# CHAT WITH A  RAG
 # ------------------------
 @app.post("/chat")
 async def chat(data: dict):
