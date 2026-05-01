@@ -10,7 +10,7 @@ It allows users to:
 
 ---
 
-## 🚀 Features
+## 🚀 Featur
 
 * 💬 AI Chat using Groq (LLaMA 3)
 * 📄 PDF Upload & Processing
