@@ -1,84 +1,101 @@
 # 🤖 SmartLearn AI
 
+<p align="center">
+  <img src="https://readme-typing-svg.herokuapp.com?color=00F7FF&center=true&vCenter=true&lines=AI+Powered+Learning+Assistant;RAG+Based+Chatbot;FastAPI+%2B+React+System;Built+by+Naveed+%26+Team" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Frontend-React-blue?style=for-the-badge&logo=react" />
+  <img src="https://img.shields.io/badge/Backend-FastAPI-green?style=for-the-badge&logo=fastapi" />
+  <img src="https://img.shields.io/badge/AI-Groq-orange?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/VectorDB-FAISS-purple?style=for-the-badge" />
+</p>
+
+---
+
+## 🧠 Overview
+
 SmartLearn AI is a **full-stack AI-powered learning assistant** that combines modern web technologies with advanced language models and Retrieval-Augmented Generation (RAG).
 
-It enables users to interact with intelligent AI, upload documents, and receive **context-aware, accurate answers** in real time.
+It allows users to:
+
+* 💬 Chat with AI in real-time
+* 📄 Upload PDFs and ask questions
+* 🧠 Receive intelligent, context-aware answers
 
 ---
 
 ## ✨ Key Features
 
-* 💬 **AI Chat Interface** powered by Groq (LLaMA 3)
-* 📄 **PDF Upload & Processing**
-* 🔍 **Semantic Search** using FAISS vector database
-* 🧠 **Retrieval-Augmented Generation (RAG)**
-* ⚡ **FastAPI Backend** for high performance
-* 💻 **Modern Frontend** built with React + Vite
-* 🎨 Clean, responsive, and user-friendly UI
+* 💬 AI Chat Interface (Groq - LLaMA 3)
+* 📄 PDF Upload & Processing
+* 🔍 Semantic Search (FAISS)
+* 🧠 RAG Pipeline Integration
+* ⚡ FastAPI Backend
+* 💻 React + Vite Frontend
+* 🎨 Clean, modern UI
 
 ---
 
-## 🏗️ Architecture Overview
+## 🎥 Preview (Add Screenshot Here)
 
-```
+<p align="center">
+  <img src="https://via.placeholder.com/800x400.png?text=SmartLearn+Preview" />
+</p>
+
+---
+
+## 🏗️ Architecture
+
+```bash
 smartlearn/
 │
 ├── frontend/                 # React + Vite frontend
-│   ├── src/
-│   ├── public/
-│   ├── package.json
-│   ├── vite.config.js
-│
 ├── backend/                  # FastAPI backend
-│   ├── main.py
 │   ├── services/
-│   │   ├── llm.py            # Groq API integration
-│   │   ├── rag.py            # FAISS + embeddings
-│   │   ├── pdf.py            # PDF processing
-│   │
-│   ├── requirements.txt
-│
-├── .gitignore
-├── README.md
+│   │   ├── llm.py
+│   │   ├── rag.py
+│   │   ├── pdf.py
 ```
 
 ---
 
 ## ⚙️ Tech Stack
 
-### Frontend
+### 💻 Frontend
 
 * React (Vite)
-* Tailwind CSS *(optional but recommended)*
+* Tailwind CSS
 * Axios
 
-### Backend
+### ⚙️ Backend
 
 * FastAPI
 * Groq API (LLaMA 3)
 * Sentence Transformers
-* FAISS (vector similarity search)
+* FAISS
 * PyPDF
 
 ---
 
-## 🧠 How It Works (RAG Pipeline)
+## 🧠 RAG Workflow
 
-1. User uploads a PDF document
-2. Text is extracted and cleaned
-3. Content is split into smaller chunks
-4. Each chunk is converted into embeddings
-5. Stored in FAISS vector index
-6. User submits a query
-7. Relevant chunks are retrieved
-8. Context + query sent to LLM
-9. AI generates a precise, contextual response
+```mermaid
+graph TD;
+    A[Upload PDF] --> B[Extract Text];
+    B --> C[Chunking];
+    C --> D[Embeddings];
+    D --> E[FAISS Index];
+    F[User Query] --> G[Retrieve Chunks];
+    G --> H[LLM (Groq)];
+    H --> I[Final Answer];
+```
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Setup Guide (Step-by-Step)
 
-### 1️⃣ Clone the Repository
+### 🖥️ 1. Clone Repository
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/smartlearn.git
@@ -87,15 +104,31 @@ cd smartlearn
 
 ---
 
-### 2️⃣ Backend Setup
+### ⚙️ 2. Backend Setup
 
 ```bash
 cd backend
+```
+
+#### Install dependencies
+
+```bash
 pip install -r requirements.txt
+```
+
+#### Create `.env`
+
+```env
+GROQ_API_KEY=your_api_key_here
+```
+
+#### Run server
+
+```bash
 uvicorn main:app --reload
 ```
 
-Backend runs at:
+📍 Backend URL:
 
 ```
 http://127.0.0.1:8000
@@ -103,7 +136,9 @@ http://127.0.0.1:8000
 
 ---
 
-### 3️⃣ Frontend Setup
+### 💻 3. Frontend Setup
+
+Open new terminal:
 
 ```bash
 cd frontend
@@ -111,7 +146,7 @@ npm install
 npm run dev
 ```
 
-Frontend runs at:
+📍 Frontend URL:
 
 ```
 http://localhost:5173
@@ -119,75 +154,37 @@ http://localhost:5173
 
 ---
 
-## 🔐 Environment Variables
-
-Create a `.env` file inside the `backend/` directory:
-
-```env
-GROQ_API_KEY=your_api_key_here
-```
-
-> ⚠️ Never commit your `.env` file to version control.
-
----
-
 ## 📡 API Endpoints
 
-### POST `/chat`
-
-Send a message to the AI:
+### 🔹 POST `/chat`
 
 ```json
 {
-  "message": "Explain machine learning"
+  "message": "Explain AI"
 }
 ```
 
----
+### 🔹 POST `/upload`
 
-### POST `/upload`
-
-Upload a PDF document for processing and indexing.
+Upload PDF for processing
 
 ---
 
-## 🧪 Usage
+## ⚠️ Notes
 
-1. Start backend server
-2. Start frontend application
-3. Open the app in your browser
-4. Chat with the AI or upload a PDF
-5. Ask context-based questions
-
----
-
-## ⚠️ Important Notes
-
-* `node_modules/` and `__pycache__/` are ignored
-* `.env` is private and must not be shared
-* FAISS index is currently **in-memory (non-persistent)**
+* `.env` must remain private
+* FAISS is currently in-memory
+* Not production-ready yet
 
 ---
 
 ## 🔮 Roadmap
 
-* [ ] Streaming responses (real-time typing)
-* [ ] PostgreSQL integration (chat history)
-* [ ] Authentication (JWT-based)
-* [ ] Persistent vector database (e.g., Pinecone / Weaviate)
-* [ ] Deployment (Render / Railway / Fly.io)
-* [ ] UI/UX improvements
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome!
-
-1. Fork the repository
-2. Create a new branch
-3. Commit your changes
-4. Submit a pull request
+* [ ] ⚡ Streaming responses (ChatGPT-like)
+* [ ] 🗄️ PostgreSQL (chat history)
+* [ ] 🔐 Authentication (JWT)
+* [ ] ☁️ Deployment (Render / Railway)
+* [ ] 📦 Persistent vector DB
 
 ---
 
@@ -198,13 +195,14 @@ Contributions are welcome!
 
 ---
 
-## 📌 Project Status
+## 📊 GitHub Stats
 
-🚧 Actively under development
-🔥 Continuously improving performance and features
+<p align="center">
+  <img src="https://github-readme-stats.vercel.app/api?username=YOUR_USERNAME&show_icons=true&theme=tokyonight" />
+</p>
 
 ---
 
 ## ⭐ Support
 
-If you find this project useful, consider giving it a ⭐ on GitHub!
+If you like this project, give it a ⭐ on GitHub!
