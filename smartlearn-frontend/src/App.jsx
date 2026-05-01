@@ -94,7 +94,7 @@ export default function App() {
     }
   };
 
-  // 🐛 FIX: Addedd customHistory parameter to handle asynchronous React state during regeneration
+  // 🐛 FIX: Added customHistory parameter to handle asynchronous React state during regeneration
   const sendMessage = async (overrideText = null, customHistory = null) => {
     const textToSend = overrideText || input;
     if (!textToSend.trim()) return;
