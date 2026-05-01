@@ -1,7 +1,7 @@
 # 🤖 SmartLearn AI
 
 <p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?color=00F7FF&center=true&vCenter=true&lines=AI+Powered+Learning+Assistant;RAG+Based+Chatbot;FastAPI+%2B+React+System;Built+by+Naveed+%26+Team" />
+  <img src="https://readme-typing-svg.herokuapp.com?color=00F7FF&center=true&vCenter=true&lines=AI+Powered+Learning+Assistant;RAG+Based+Chatbot;FastAPI+%2B+React+System;Built+by+Naveed+Ahmed+%26+Sanan+Malik" />
 </p>
 
 <p align="center">
@@ -198,8 +198,8 @@ Contributions are welcome:
 
 ## 👨‍💻 Authors
 
-* Sanan Malik
 * Naveed Ahmed
+* Sanan Malik
 
 ---
 
