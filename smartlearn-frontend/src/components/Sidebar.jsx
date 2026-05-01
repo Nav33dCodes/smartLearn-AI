@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Plus, Trash2, MessageSquare, Search, PanelLeftClose } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Logo from "./Logo";
@@ -15,9 +15,19 @@ export default function Sidebar({
   setSearchQuery,
   isMobile
 }) {
-  const filteredChats = searchQuery.trim()
-    ? chats.filter(c => c.title.toLowerCase().includes(searchQuery.toLowerCase()))
-    : chats;
+  // 1. Performance: Memoize the search filter to prevent unnecessary recalculations on every render
+  const filteredChats = useMemo(() => {
+    if (!chats) return [];
+    return searchQuery.trim()
+      ? chats.filter(c => c.title.toLowerCase().includes(searchQuery.toLowerCase()))
+      : chats;
+  }, [chats, searchQuery]);
+
+  // Helper function to keep JSX clean
+  const handleSelectChat = (id) => {
+    setActiveChatId(id);
+    if (isMobile) setSidebarOpen(false);
+  };
 
   return (
     <>
@@ -29,7 +39,17 @@ export default function Sidebar({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="mobile-overlay active" 
-            onClick={() => setSidebarOpen(false)} 
+            onClick={() => setSidebarOpen(false)}
+            // Accessibility: Make overlay keyboard friendly
+            role="button"
+            tabIndex={0}
+            aria-label="Close sidebar overlay"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setSidebarOpen(false);
+              }
+            }}
           />
         )}
       </AnimatePresence>
@@ -42,6 +62,7 @@ export default function Sidebar({
         }}
         transition={{ type: "spring", stiffness: 350, damping: 35 }}
         className="sidebar"
+        aria-hidden={!sidebarOpen && isMobile} // Hide from screen readers when closed on mobile
       >
         <div className="sidebar-top">
           <div className="sidebar-brand">
@@ -49,10 +70,22 @@ export default function Sidebar({
             <span className="brand-text">SmartLearn</span>
           </div>
           <div className="sidebar-actions">
-            <motion.button whileTap={{ scale: 0.9 }} className="btn-icon" onClick={() => createNewChat()} title="New chat">
+            <motion.button 
+              whileTap={{ scale: 0.9 }} 
+              className="btn-icon" 
+              onClick={() => createNewChat()} 
+              title="New chat"
+              aria-label="Create new chat"
+            >
               <Plus size={18} />
             </motion.button>
-            <motion.button whileTap={{ scale: 0.9 }} className="btn-icon" onClick={() => setSidebarOpen(false)} title="Close sidebar">
+            <motion.button 
+              whileTap={{ scale: 0.9 }} 
+              className="btn-icon" 
+              onClick={() => setSidebarOpen(false)} 
+              title="Close sidebar"
+              aria-label="Close sidebar"
+            >
               <PanelLeftClose size={18} />
             </motion.button>
           </div>
@@ -60,18 +93,27 @@ export default function Sidebar({
 
         <div className="search-container">
           <div className="search-box">
-            <Search size={14} color="var(--text-muted)" />
+            <Search size={14} color="var(--text-muted)" aria-hidden="true" />
             <input 
               placeholder="Search history..." 
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
+              aria-label="Search chat history"
             />
           </div>
         </div>
 
         <div className="chat-list">
           <div className="chat-list-title">Recent Chats</div>
-          <AnimatePresence>
+          
+          {/* 2. UX: Handle empty states gracefully */}
+          {filteredChats.length === 0 && (
+            <div className="empty-chat-message" style={{ padding: '12px 20px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+              {searchQuery ? "No matching chats found." : "No recent chats."}
+            </div>
+          )}
+
+          <AnimatePresence mode="popLayout">
             {filteredChats.map(chat => (
               <motion.div 
                 key={chat.id} 
@@ -82,12 +124,31 @@ export default function Sidebar({
               >
                 <div 
                   className={`chat-item ${chat.id === activeChatId ? "active" : ""}`}
-                  onClick={() => { setActiveChatId(chat.id); if(isMobile) setSidebarOpen(false); }}
+                  onClick={() => handleSelectChat(chat.id)}
+                  // Accessibility: Make individual chat buttons keyboard navigable
+                  role="button"
+                  tabIndex={0}
+                  aria-current={chat.id === activeChatId ? "page" : undefined}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleSelectChat(chat.id);
+                    }
+                  }}
                 >
-                  <MessageSquare size={16} />
+                  <MessageSquare size={16} aria-hidden="true" />
                   <span className="chat-item-text">{chat.title}</span>
-                  <button className="btn-delete" onClick={(e) => deleteChat(chat.id, e)}>
-                    <Trash2 size={14} />
+                  
+                  <button 
+                    className="btn-delete" 
+                    onClick={(e) => {
+                      // 3. UX: Prevent clicking delete from opening the chat
+                      e.stopPropagation(); 
+                      deleteChat(chat.id, e);
+                    }}
+                    aria-label={`Delete chat: ${chat.title}`}
+                  >
+                    <Trash2 size={14} aria-hidden="true" />
                   </button>
                 </div>
               </motion.div>
