@@ -17,11 +17,11 @@
 
 SmartLearn AI is a **full-stack AI-powered learning assistant** that combines modern web technologies with advanced language models and Retrieval-Augmented Generation (RAG).
 
-It allows users to:
+It enables users to:
 
 * 💬 Chat with AI in real-time
 * 📄 Upload PDFs and ask questions
-* 🧠 Receive intelligent, context-aware answers
+* 🧠 Receive accurate, context-aware answers
 
 ---
 
@@ -29,33 +29,36 @@ It allows users to:
 
 * 💬 AI Chat Interface (Groq - LLaMA 3)
 * 📄 PDF Upload & Processing
-* 🔍 Semantic Search (FAISS)
-* 🧠 RAG Pipeline Integration
+* 🔍 Semantic Search using FAISS
+* 🧠 Retrieval-Augmented Generation (RAG)
 * ⚡ FastAPI Backend
 * 💻 React + Vite Frontend
-* 🎨 Clean, modern UI
+* 🎨 Clean, responsive UI
 
 ---
 
-## 🎥 Preview (Add Screenshot Here)
-
-<p align="center">
-  <img src="https://via.placeholder.com/800x400.png?text=SmartLearn+Preview" />
-</p>
-
----
-
-## 🏗️ Architecture
+## 🏗️ Project Structure
 
 ```bash
 smartlearn/
 │
 ├── frontend/                 # React + Vite frontend
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   ├── vite.config.js
+│
 ├── backend/                  # FastAPI backend
+│   ├── main.py
 │   ├── services/
-│   │   ├── llm.py
-│   │   ├── rag.py
-│   │   ├── pdf.py
+│   │   ├── llm.py            # Groq API integration
+│   │   ├── rag.py            # FAISS + embeddings
+│   │   ├── pdf.py            # PDF processing
+│   │
+│   ├── requirements.txt
+│
+├── .gitignore
+├── README.md
 ```
 
 ---
@@ -65,7 +68,7 @@ smartlearn/
 ### 💻 Frontend
 
 * React (Vite)
-* Tailwind CSS
+* Tailwind CSS *(optional)*
 * Axios
 
 ### ⚙️ Backend
@@ -73,29 +76,28 @@ smartlearn/
 * FastAPI
 * Groq API (LLaMA 3)
 * Sentence Transformers
-* FAISS
+* FAISS (vector search)
 * PyPDF
 
 ---
 
-## 🧠 RAG Workflow
+## 🧠 How It Works (RAG Flow)
 
-```mermaid
-graph TD;
-    A[Upload PDF] --> B[Extract Text];
-    B --> C[Chunking];
-    C --> D[Embeddings];
-    D --> E[FAISS Index];
-    F[User Query] --> G[Retrieve Chunks];
-    G --> H[LLM (Groq)];
-    H --> I[Final Answer];
-```
+1. Upload PDF
+2. Extract text
+3. Split into chunks
+4. Convert to embeddings
+5. Store in FAISS
+6. Ask a question
+7. Retrieve relevant chunks
+8. Send context to LLM
+9. Generate final answer
 
 ---
 
-## 🚀 Setup Guide (Step-by-Step)
+## 🚀 Setup Guide (Run Locally)
 
-### 🖥️ 1. Clone Repository
+### 🔹 1. Clone Repository
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/smartlearn.git
@@ -104,31 +106,26 @@ cd smartlearn
 
 ---
 
-### ⚙️ 2. Backend Setup
+### 🔹 2. Backend Setup
 
 ```bash
 cd backend
-```
-
-#### Install dependencies
-
-```bash
 pip install -r requirements.txt
 ```
 
-#### Create `.env`
+Create `.env` file:
 
 ```env
 GROQ_API_KEY=your_api_key_here
 ```
 
-#### Run server
+Run server:
 
 ```bash
 uvicorn main:app --reload
 ```
 
-📍 Backend URL:
+Backend runs at:
 
 ```
 http://127.0.0.1:8000
@@ -136,9 +133,9 @@ http://127.0.0.1:8000
 
 ---
 
-### 💻 3. Frontend Setup
+### 🔹 3. Frontend Setup
 
-Open new terminal:
+Open a new terminal:
 
 ```bash
 cd frontend
@@ -146,7 +143,7 @@ npm install
 npm run dev
 ```
 
-📍 Frontend URL:
+Frontend runs at:
 
 ```
 http://localhost:5173
@@ -156,53 +153,56 @@ http://localhost:5173
 
 ## 📡 API Endpoints
 
-### 🔹 POST `/chat`
+### POST `/chat`
 
 ```json
 {
-  "message": "Explain AI"
+  "message": "Explain machine learning"
 }
 ```
 
-### 🔹 POST `/upload`
+### POST `/upload`
 
-Upload PDF for processing
+Upload a PDF for processing
 
 ---
 
-## ⚠️ Notes
+## ⚠️ Important Notes
 
-* `.env` must remain private
-* FAISS is currently in-memory
-* Not production-ready yet
+* `.env` file must remain private
+* `node_modules/` and `__pycache__/` are ignored
+* FAISS data is currently in-memory (not persistent)
 
 ---
 
 ## 🔮 Roadmap
 
-* [ ] ⚡ Streaming responses (ChatGPT-like)
-* [ ] 🗄️ PostgreSQL (chat history)
-* [ ] 🔐 Authentication (JWT)
-* [ ] ☁️ Deployment (Render / Railway)
-* [ ] 📦 Persistent vector DB
+* [ ] Streaming responses (real-time typing)
+* [ ] PostgreSQL integration (chat history)
+* [ ] Authentication (JWT)
+* [ ] Persistent vector database
+* [ ] Deployment (Render / Railway / Fly.io)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome:
+
+1. Fork the repository
+2. Create a new branch
+3. Commit changes
+4. Open a pull request
 
 ---
 
 ## 👨‍💻 Authors
 
-* **Sanan Malik**
-* **Naveed Ahmed**
+* Sanan Malik
+* Naveed Ahmed
 
 ---
 
-## 📊 GitHub Stats
+## 📌 Status
 
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=YOUR_USERNAME&show_icons=true&theme=tokyonight" />
-</p>
-
----
-
-## ⭐ Support
-
-If you like this project, give it a ⭐ on GitHub!
+🚧 Actively under development
