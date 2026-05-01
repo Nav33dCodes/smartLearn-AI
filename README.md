@@ -192,7 +192,7 @@ Contributions are welcome! 🚀
 
 ## 👨‍💻 Team SmartLearn
 
-* Sanan Malik
+* Sanan Malik (Leader)
 * Naveed Ahmed
 * Dua Fatima
 * Zeshan Sikandar
