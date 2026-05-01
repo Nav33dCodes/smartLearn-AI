@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Send, Paperclip, Square, FileText, X, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -6,18 +6,30 @@ export default function InputBox({
   input, setInput, loading, sendMessage, stopGeneration, handleUpload, 
   attachedFile, setAttachedFile, isUploading, textareaRef
 }) {
+  const fileInputRef = useRef(null);
   
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
       textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
     }
-  }, [input, attachedFile]); 
+  }, [input, attachedFile, textareaRef]); 
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      sendMessage();
+      // Prevent sending empty messages or sending while loading/uploading
+      if (input.trim() && !loading && !isUploading) {
+        sendMessage();
+      }
+    }
+  };
+
+  const handleAttachmentKeyDown = (e) => {
+    // Allow keyboard users to trigger the file upload with Enter or Space
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      fileInputRef.current?.click();
     }
   };
 
@@ -26,6 +38,9 @@ export default function InputBox({
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
     return (bytes / (1024 * 1024)).toFixed(2) + " MB";
   };
+
+  // Determine if scrollbar should show (prevents jitter during auto-resize)
+  const showScrollbar = textareaRef.current && textareaRef.current.scrollHeight > 200;
 
   return (
     <div className="input-dock">
@@ -44,8 +59,7 @@ export default function InputBox({
           )}
         </AnimatePresence>
 
-        {/* The layout prop makes the container stretch smoothly */}
-        <motion.div layout className={`composer ${attachedFile || isUploading ? 'has-attachment' : ''}`}>
+        <motion.layout className={`composer ${attachedFile || isUploading ? 'has-attachment' : ''}`}>
           
           <AnimatePresence>
             {(attachedFile || isUploading) && (
@@ -66,7 +80,7 @@ export default function InputBox({
                     </span>
                   </div>
                   {!isUploading && (
-                    <button className="btn-remove-file" onClick={() => setAttachedFile(null)}>
+                    <button className="btn-remove-file" onClick={() => setAttachedFile(null)} aria-label="Remove attachment">
                       <X size={16} />
                     </button>
                   )}
@@ -76,12 +90,21 @@ export default function InputBox({
           </AnimatePresence>
 
           <motion.div layout className="composer-row">
-            <label className="btn-attach">
+            <label 
+              className="btn-attach" 
+              tabIndex={0} 
+              onKeyDown={handleAttachmentKeyDown}
+              aria-label="Attach file"
+            >
               <Paperclip size={20} />
               <input 
-                type="file" hidden accept=".pdf,.doc,.docx,.txt,application/pdf" 
+                ref={fileInputRef}
+                type="file" 
+                hidden 
+                accept=".pdf,.doc,.docx,.txt,application/pdf" 
                 onChange={(e) => { handleUpload(e); e.target.value = null; }} 
                 disabled={isUploading || loading}
+                tabIndex={-1}
               />
             </label>
 
@@ -94,6 +117,7 @@ export default function InputBox({
               placeholder="Message SmartLearn AI..."
               rows={1}
               disabled={loading || isUploading}
+              style={{ overflowY: showScrollbar ? 'auto' : 'hidden' }}
             />
 
             <motion.button
@@ -101,11 +125,12 @@ export default function InputBox({
               onClick={() => sendMessage()}
               disabled={!input.trim() || loading || isUploading}
               className={`btn-send ${input.trim() && !loading && !isUploading ? "active" : "inactive"}`}
+              aria-label="Send message"
             >
               <Send size={18} />
             </motion.button>
           </motion.div>
-        </motion.div>
+        </motion.layout>
         
         <div className="footer-text">
           SmartLearn AI can make mistakes. Consider verifying important information.
