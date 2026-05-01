@@ -8,3 +8,6 @@ def extract_text(file):
         text += page.extract_text() or ""
 
     return text
+
+
+

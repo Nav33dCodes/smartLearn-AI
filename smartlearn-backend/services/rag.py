@@ -15,7 +15,7 @@ def create_chunks(text, size=500):
 
 
 # ------------------------
-# STORE PDF
+# STORE  PDF
 # ------------------------
 def store_pdf(text):
     global index, chunks
