@@ -6,27 +6,40 @@ from services.rag import store_pdf, search
 
 app = FastAPI()
 
-# CORS
+# ------------------------
+# HEALTH CHECK (IMPORTANT FOR RAILWAY)
+# ------------------------
+@app.get("/")
+def root():
+    return {"status": "SmartLearn Backend Running 🚀"}
+
+# ------------------------
+# CORS (for frontend connection)
+# ------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # later replace with frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # ------------------------
-# CHAT WITH A  RAG
+# CHAT WITH RAG
 # ------------------------
 @app.post("/chat")
 async def chat(data: dict):
-    message = data["message"]
+    try:
+        message = data.get("message", "")
 
-    # 🔍 Search from RAG
-    context = search(message)
+        if not message:
+            return {"error": "Message is required"}
 
-    # 🧠 Build prompt
-    prompt = f"""
+        # 🔍 RAG search
+        context = search(message)
+
+        # 🧠 Prompt
+        prompt = f"""
 You are SmartLearn AI.
 
 Use the context below to answer.
@@ -39,21 +52,27 @@ User Question:
 {message}
 """
 
-    response = get_llm_response(prompt)
+        response = get_llm_response(prompt)
 
-    return {"response": response}
+        return {"response": response}
 
+    except Exception as e:
+        return {"error": str(e)}
 
 # ------------------------
-# PDF UPLOAD + STORE IN RAG
+# PDF UPLOAD
 # ------------------------
 @app.post("/upload")
 async def upload(file: UploadFile = File(...)):
-    text = extract_text(file.file)
+    try:
+        text = extract_text(file.file)
 
-    if not text.strip():
-        return {"error": "No text found in PDF"}
+        if not text or not text.strip():
+            return {"error": "No text found in PDF"}
 
-    store_pdf(text)
+        store_pdf(text)
 
-    return {"status": "PDF processed and stored"}
+        return {"status": "PDF processed and stored"}
+
+    except Exception as e:
+        return {"error": str(e)}
