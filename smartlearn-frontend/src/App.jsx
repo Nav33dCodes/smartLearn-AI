@@ -8,8 +8,7 @@ import ChatWindow from "./components/ChatWindow";
 import InputBox from "./components/InputBox";
 
 // const API = "http://localhost:8000";
-
-const API = import.meta.env.VITE_API_URL;
+ const API = "https://smartlearn-backend.onrender.com";
 
 export default function App() {
   const [chats, setChats] = useState([]);
