@@ -110,7 +110,7 @@ cd smartlearn
 ### 🔹 2. Backend Setup
 
 ```bash
-cd backend
+cd smartlearn-backend
 pip install -r requirements.txt
 ```
 
@@ -134,7 +134,7 @@ http://127.0.0.1:8000
 ### 🔹 3. Frontend Setup
 
 ```bash
-cd frontend
+cd smartlearn-frontend
 npm install
 npm run dev
 ```
