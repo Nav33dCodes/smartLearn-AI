@@ -8,7 +8,8 @@ import ChatWindow from "./components/ChatWindow";
 import InputBox from "./components/InputBox";
 
 // const API = "http://localhost:8000";
- const API = "https://smartlearn-ai-production.up.railway.app";
+//  const API = "https://smartlearn-ai-production.up.railway.app";
+const API = import.meta.env.VITE_API_URL;
 
 export default function App() {
   const [chats, setChats] = useState([]);
