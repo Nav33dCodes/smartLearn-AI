@@ -7,8 +7,8 @@ import Sidebar from "./components/Sidebar";
 import ChatWindow from "./components/ChatWindow";
 import InputBox from "./components/InputBox";
 
-const API = "http://localhost:8000";
-//  const API = "https://smartlearn-ai-production.up.railway.app";
+// const API = "http://localhost:8000";
+ const API = "https://smartlearn-ai-production.up.railway.app";
 
 export default function App() {
   const [chats, setChats] = useState([]);
