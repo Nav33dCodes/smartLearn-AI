@@ -36,7 +36,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "https://smartlearn-ai-sigma.vercel.app"
+        "https://smartlearn-ai-xi.vercel.app/"
     ],
     allow_credentials=True,
     allow_methods=["*"],
