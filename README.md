@@ -59,15 +59,11 @@ smartlearn/
 │   ├── src/
 │   │   ├── App.jsx
 │   │   └── components/
-│   ├── .env.local                # local dev config (git-ignored)
-│   ├── .env.production           # production config (safe to commit)
-│   └── .env.example              # template for new teammates
 │
 ├── smartlearn-backend/           # FastAPI backend
 │   ├── main.py
 │   ├── database.py
 │   ├── .env                      # secrets (git-ignored, never commit)
-│   ├── .env.example              # template for new teammates
 │   └── services/
 │       ├── llm.py
 │       ├── rag.py
@@ -144,32 +140,6 @@ cd smartlearn-frontend
 npm install
 ```
 
-#### Create `smartlearn-frontend/.env.local`
-
-```env
-VITE_API_URL=http://localhost:8000
-```
-
-> This file is **git-ignored** — every teammate must create it once on their machine.
-
-#### `smartlearn-frontend/.env.production` (already in repo)
-
-```env
-VITE_API_URL=https://smartlearn-ai-production.up.railway.app
-```
-
-> Vercel reads this automatically during build. Safe to commit — no secrets inside.
-
-#### Update `App.jsx`
-
-Make sure your API base URL line is:
-
-```js
-const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
-```
-
-This uses the `.env` variable when available, and falls back to localhost automatically if the file is missing.
-
 #### Run Frontend
 
 ```bash
@@ -190,26 +160,18 @@ npm run dev
 | `DATABASE_URL` | Railway **public** PostgreSQL URL | `postgresql://postgres:xxxx@monorail...` |
 | `ENV` | Environment flag for CORS | `development` or `production` |
 
-### Frontend (`smartlearn-frontend/.env.local`)
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `VITE_API_URL` | Backend base URL | `http://localhost:8000` |
-
-> 🔒 **Rule:** Never put `GROQ_API_KEY` or `DATABASE_URL` in frontend `.env` files — they get bundled into the browser JS and become public.
+> 🔒 **Rule:** Never put `GROQ_API_KEY` or `DATABASE_URL` in frontend code — keep all secrets in the backend only.
 
 ---
 
 ## 🌍 How Environment Switching Works
 
-| Where | Environment | API URL used |
+| Where | Environment | CORS policy |
 |-------|-------------|-------------|
-| Local (`npm run dev`) | development | `http://localhost:8000` |
-| Vercel (build) | production | Railway backend URL |
-| Railway backend | production | `ENV=production` → strict CORS |
+| Local (`uvicorn --reload`) | development | allows localhost + Vercel |
+| Railway (deployed) | production | allows Vercel only |
 
-**Frontend** auto-detects via `import.meta.env.VITE_API_URL`.
-**Backend** reads `ENV` variable to decide which origins CORS allows:
+The backend reads the `ENV` variable to decide which origins CORS allows:
 - `development` → allows localhost + Vercel
 - `production` → allows Vercel only (no wildcard `*`)
 
@@ -267,7 +229,7 @@ CREATE TABLE chats (
 
 ## ⚠️ Important Notes
 
-* 🔒 Never commit `.env` or `.env.local` — add them to `.gitignore`
+* 🔒 Never commit `.env` — add it to `.gitignore`
 * ⚡ FAISS is in-memory — vector index resets on server restart
 * 🌐 Use `DATABASE_PUBLIC_URL` from Railway for local dev, not the internal URL
 * 🔐 Keep `GROQ_API_KEY` and `DATABASE_URL` in backend only — never frontend
