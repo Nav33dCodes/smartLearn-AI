@@ -43,7 +43,7 @@ SessionLocal = sessionmaker(
 Base = declarative_base()
 
 # ========================
-# 👤 USER MODEL (NEW)
+# 👤 USER MODEL
 # ========================
 class User(Base):
     __tablename__ = "users"
@@ -55,21 +55,30 @@ class User(Base):
     is_verified = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    # 🔗 relationship
-    chats = relationship("Chat", back_populates="user", cascade="all, delete")
+    # 🔗 FIXED cascade
+    chats = relationship(
+        "Chat",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
 
 # ========================
-# 💬 CHAT MODEL (UPDATED)
+# 💬 CHAT MODEL
 # ========================
 class Chat(Base):
     __tablename__ = "chats"
 
     id = Column(Integer, primary_key=True, index=True)
 
-    chat_id = Column(Text, index=True)   # session id (frontend)
-    
-    # 🔥 NEW: link to user
-    user_id = Column(Integer, ForeignKey("users.id"))
+    chat_id = Column(Text, index=True)
+
+    # 🔥 FIXED (important for auth)
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=False,
+        index=True
+    )
 
     message = Column(Text)
     response = Column(Text)

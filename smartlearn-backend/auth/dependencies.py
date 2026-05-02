@@ -7,12 +7,14 @@ from auth.jwt_handler import decode_token
 
 security = HTTPBearer()
 
+
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
 
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
@@ -21,7 +23,11 @@ def get_current_user(
     try:
         token = credentials.credentials
         payload = decode_token(token)
-        user_id = payload.get("user_id")
+
+        if not payload:
+            raise HTTPException(status_code=401, detail="Invalid token")
+
+        user_id = int(payload.get("sub"))  # 🔥 FIXED
 
         user = db.query(User).filter(User.id == user_id).first()
 

@@ -1,12 +1,14 @@
-from fastapi import FastAPI, UploadFile, File, Depends
+from fastapi import FastAPI, UploadFile, File, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from datetime import datetime
+import uuid
 
 from services.llm import get_llm_response
 from services.pdf import extract_text
 from services.rag import store_pdf, search
 
-from database import SessionLocal, Chat, User
+from database import Chat, User
 
 # 🔐 AUTH IMPORTS
 from auth.schemas import UserSignup, UserLogin
@@ -30,8 +32,8 @@ def root():
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://smartlearn-ai-sigma.vercel.app",
-        "http://localhost:5173"
+        "http://localhost:5173",
+        "https://smartlearn-ai-sigma.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -44,21 +46,24 @@ app.add_middleware(
 
 @app.post("/signup")
 async def signup(data: UserSignup, db: Session = Depends(get_db)):
-    existing = db.query(User).filter(User.email == data.email).first()
+    email = data.email.lower()
+
+    existing = db.query(User).filter(User.email == email).first()
     if existing:
-        return {"error": "User already exists"}
+        raise HTTPException(status_code=400, detail="User already exists")
 
     new_user = User(
-        email=data.email,
+        email=email,
         password=hash_password(data.password)
     )
 
     db.add(new_user)
     db.commit()
+    db.refresh(new_user)
 
-    # 📧 send welcome email
+    # 📧 non-blocking email
     try:
-        await send_welcome_email(data.email)
+        await send_welcome_email(email)
     except Exception as e:
         print("Email error:", e)
 
@@ -67,14 +72,20 @@ async def signup(data: UserSignup, db: Session = Depends(get_db)):
 
 @app.post("/login")
 def login(data: UserLogin, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == data.email).first()
+    email = data.email.lower()
+
+    user = db.query(User).filter(User.email == email).first()
 
     if not user or not verify_password(data.password, user.password):
-        return {"error": "Invalid credentials"}
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    token = create_token({"user_id": user.id})
+    # 🔥 FIXED
+    token = create_token(user.id)
 
-    return {"token": token}
+    return {
+        "access_token": token,
+        "token_type": "bearer"
+    }
 
 
 # ========================
@@ -87,17 +98,16 @@ async def chat(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    try:
-        message = data.get("message", "")
-        chat_id = str(data.get("chat_id", "default"))
+    message = data.get("message")
 
-        if not message:
-            return {"error": "Message is required"}
+    if not message:
+        raise HTTPException(status_code=400, detail="Message is required")
 
-        # 🔍 RAG
-        context = search(message)
+    chat_id = str(data.get("chat_id") or uuid.uuid4())
 
-        prompt = f"""
+    context = search(message)
+
+    prompt = f"""
 You are SmartLearn AI.
 
 Context:
@@ -107,23 +117,19 @@ User:
 {message}
 """
 
-        response = get_llm_response(prompt)
+    response = get_llm_response(prompt)
 
-        # ✅ SAVE WITH USER
-        new_chat = Chat(
-            chat_id=chat_id,
-            user_id=current_user.id,
-            message=message,
-            response=response
-        )
+    new_chat = Chat(
+        chat_id=chat_id,
+        user_id=current_user.id,
+        message=message,
+        response=response
+    )
 
-        db.add(new_chat)
-        db.commit()
+    db.add(new_chat)
+    db.commit()
 
-        return {"response": response}
-
-    except Exception as e:
-        return {"error": str(e)}
+    return {"response": response}
 
 
 # ========================
@@ -137,7 +143,7 @@ def get_chats(
 ):
     chats = db.query(Chat)\
         .filter(Chat.user_id == current_user.id)\
-        .order_by(Chat.id.asc())\
+        .order_by(Chat.id.desc())\
         .all()
 
     grouped = {}
@@ -146,14 +152,8 @@ def get_chats(
         if c.chat_id not in grouped:
             grouped[c.chat_id] = []
 
-        grouped[c.chat_id].append({
-            "role": "user",
-            "content": c.message
-        })
-        grouped[c.chat_id].append({
-            "role": "assistant",
-            "content": c.response
-        })
+        grouped[c.chat_id].append({"role": "user", "content": c.message})
+        grouped[c.chat_id].append({"role": "assistant", "content": c.response})
 
     return {"chats": grouped}
 
@@ -168,35 +168,30 @@ def delete_chat(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    try:
-        db.query(Chat)\
-            .filter(Chat.chat_id == chat_id)\
-            .filter(Chat.user_id == current_user.id)\
-            .delete()
+    db.query(Chat)\
+        .filter(Chat.chat_id == chat_id)\
+        .filter(Chat.user_id == current_user.id)\
+        .delete()
 
-        db.commit()
+    db.commit()
 
-        return {"status": "deleted"}
-
-    except Exception as e:
-        return {"error": str(e)}
+    return {"status": "deleted"}
 
 
 # ========================
-# 📄 PDF UPLOAD
+# 📄 PDF UPLOAD (PROTECTED)
 # ========================
 
 @app.post("/upload")
-async def upload(file: UploadFile = File(...)):
-    try:
-        text = extract_text(file.file)
+async def upload(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user)
+):
+    text = extract_text(file.file)
 
-        if not text or not text.strip():
-            return {"error": "No text found in PDF"}
+    if not text or not text.strip():
+        raise HTTPException(status_code=400, detail="No text found in PDF")
 
-        store_pdf(text)
+    store_pdf(text)
 
-        return {"status": "PDF processed and stored"}
-
-    except Exception as e:
-        return {"error": str(e)}
+    return {"status": "PDF processed and stored"}

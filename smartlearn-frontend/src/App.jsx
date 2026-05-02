@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import axios from "axios";
 import { Moon, Sun, PanelLeftOpen } from "lucide-react";
@@ -21,16 +22,8 @@ const API = import.meta.env.DEV
     Authorization: `Bearer ${localStorage.getItem("token")}`
   }
 });
-axios.interceptors.response.use(
-  res => res,
-  err => {
-    if (err.response?.status === 401) {
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-    }
-    return Promise.reject(err);
-  }
-);
+// put ABOVE App() function
+
 export default function App() {
   const [chats, setChats] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
@@ -47,14 +40,36 @@ export default function App() {
   const textareaRef = useRef(null);
   const activeChat = chats.find(c => c.id === activeChatId);
 
+
+
+const navigate = useNavigate();
+const [authChecked, setAuthChecked] = useState(false);
+
+
+useEffect(() => {
+  const interceptor = axios.interceptors.response.use(
+    res => res,
+    err => {
+      if (err.response?.status === 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+      }
+      return Promise.reject(err);
+    }
+  );
+
+  return () => axios.interceptors.response.eject(interceptor);
+}, []);
+
 useEffect(() => {
   const token = localStorage.getItem("token");
 
   if (!token) {
-    window.location.href = "/login";
+    navigate("/login");
+  } else {
+    setAuthChecked(true);
   }
 }, []);
-
 
 
   // ── Initialization & Theme ──
@@ -76,7 +91,7 @@ useEffect(() => {
   messages
 }));
 
-const sorted = formatted.sort((a, b) => Number(b.id) - Number(a.id));
+const sorted = formatted;
 
 if (sorted.length > 0) {
   setChats(sorted);
@@ -197,8 +212,11 @@ const deleteChat = useCallback(async (id, e) => {
 
     const controller = new AbortController();
     setAbortController(controller);
-
-    const baseHistory = customHistory ?? activeChat.messages;
+if (!localStorage.getItem("token")) {
+  navigate("/login");
+  return;
+}
+   const baseHistory = customHistory ?? activeChat?.messages ?? [];
     const validHistory = baseHistory.filter(m => m.content.trim() !== "");
     
     const currentChatId = activeChatId;

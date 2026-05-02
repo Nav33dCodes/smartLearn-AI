@@ -1,45 +1,46 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
+import re
 
-# 🔐 Common base (reuse)
 class UserBase(BaseModel):
     email: EmailStr
 
+    @field_validator("email")
+    def normalize_email(cls, v):
+        return v.lower()
 
-# 📝 Signup Schema
+
 class UserSignup(UserBase):
-    password: str = Field(
-        ...,
-        min_length=6,
-        max_length=128,
-        description="Password must be at least 6 characters"
-    )
+    password: str = Field(..., min_length=6, max_length=72)
+
+    @field_validator("password")
+    def validate_password(cls, v):
+        if not re.search(r"[A-Z]", v):
+            raise ValueError("Must contain uppercase letter")
+        if not re.search(r"[0-9]", v):
+            raise ValueError("Must contain number")
+        return v
 
 
-# 🔑 Login Schema
 class UserLogin(UserBase):
-    password: str = Field(..., min_length=6)
+    password: str = Field(..., min_length=6, max_length=72)
 
 
-# 📤 Response Schema (safe - no password)
 class UserResponse(UserBase):
     id: int
 
     class Config:
-        from_attributes = True  # SQLAlchemy support
+        from_attributes = True
 
 
-# 🔐 Token Response
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
 
-# 📧 Optional (for future features)
 class EmailSchema(BaseModel):
     email: EmailStr
 
 
-# 🔄 Reset Password (future)
 class ResetPassword(BaseModel):
     token: str
-    new_password: str = Field(..., min_length=6)
+    new_password: str = Field(..., min_length=6, max_length=72)
