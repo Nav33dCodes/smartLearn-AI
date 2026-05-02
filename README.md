@@ -1,12 +1,13 @@
 # 🤖 SmartLearn AI
 
 <p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?color=00F7FF&center=true&vCenter=true&lines=AI+Powered+Learning+Assistant;RAG+Based+Chatbot;FastAPI+%2B+React+System;Built+by+Team+SmartLearn" />
+  <img src="https://readme-typing-svg.herokuapp.com?color=00F7FF&center=true&vCenter=true&lines=AI+Powered+Learning+Assistant;RAG+Based+Chatbot;FastAPI+%2B+React+System;PostgreSQL+Chat+History;Built+by+Team+SmartLearn" />
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Frontend-React-blue?style=for-the-badge&logo=react" />
   <img src="https://img.shields.io/badge/Backend-FastAPI-green?style=for-the-badge&logo=fastapi" />
+  <img src="https://img.shields.io/badge/Database-PostgreSQL-blue?style=for-the-badge&logo=postgresql" />
   <img src="https://img.shields.io/badge/AI-Groq-orange?style=for-the-badge" />
   <img src="https://img.shields.io/badge/VectorDB-FAISS-purple?style=for-the-badge" />
 </p>
@@ -15,26 +16,28 @@
 
 ## 🧠 Overview
 
-**SmartLearn AI** is a modern, full-stack **AI-powered learning assistant** that combines:
+**SmartLearn AI** is a modern full-stack **AI-powered learning assistant** that combines:
 
 * ⚡ FastAPI backend
-* 💻 React frontend
+* 💻 React frontend (Vite)
 * 🧠 LLMs (Groq - LLaMA 3)
-* 🔍 Retrieval-Augmented Generation (RAG)
+* 🔍 RAG (Retrieval-Augmented Generation)
+* 🗄️ PostgreSQL (persistent chat history)
 
-It enables users to interact with AI intelligently by combining real-time chat with document-based knowledge.
+👉 It allows users to chat with AI and ask questions from uploaded PDFs with context-aware responses.
 
 ---
 
 ## ✨ Key Features
 
-* 💬 Real-time AI Chat (Groq API - LLaMA 3)
-* 📄 PDF Upload & Intelligent Q&A
-* 🔍 Semantic Search with FAISS
-* 🧠 Context-aware Responses (RAG)
-* ⚡ High-performance FastAPI backend
-* 💻 React + Vite frontend
-* 🎨 Clean & responsive UI
+* 💬 Real-time AI Chat (Groq API)
+* 📄 PDF Upload + Q&A
+* 🔍 Semantic Search (FAISS)
+* 🧠 Context-aware answers (RAG pipeline)
+* 🗄️ Persistent chat history (PostgreSQL)
+* 🧹 Chat deletion & multi-chat support
+* ⚡ FastAPI high-performance backend
+* 🎨 Clean ChatGPT-like UI
 
 ---
 
@@ -45,21 +48,19 @@ smartlearn/
 │
 ├── frontend/                 # React + Vite frontend
 │   ├── src/
-│   ├── public/
-│   ├── package.json
-│   ├── vite.config.js
+│   ├── components/
+│   ├── App.jsx
 │
-├── backend/                  # FastAPI backend
+├── backend/                 # FastAPI backend
 │   ├── main.py
+│   ├── database.py
 │   ├── services/
-│   │   ├── llm.py            # Groq API integration
-│   │   ├── rag.py            # FAISS + embeddings
-│   │   ├── pdf.py            # PDF processing
-│   │
-│   ├── requirements.txt
+│   │   ├── llm.py
+│   │   ├── rag.py
+│   │   ├── pdf.py
 │
-├── .gitignore
 ├── README.md
+├── .gitignore
 ```
 
 ---
@@ -69,36 +70,37 @@ smartlearn/
 ### 💻 Frontend
 
 * React (Vite)
-* Tailwind CSS *(optional)*
 * Axios
+* Tailwind (optional)
+* Framer Motion
 
 ### ⚙️ Backend
 
 * FastAPI
 * Groq API (LLaMA 3)
 * Sentence Transformers
-* FAISS (Vector Search)
-* PyPDF
+* FAISS
+* PostgreSQL (SQLAlchemy)
 
 ---
 
-## 🧠 How It Works (RAG Pipeline)
+## 🧠 How It Works (RAG + DB Flow)
 
 1. 📄 Upload PDF
 2. 🔍 Extract text
-3. ✂️ Split into chunks
-4. 🧠 Convert into embeddings
+3. ✂️ Chunking
+4. 🧠 Embeddings
 5. 💾 Store in FAISS
-6. ❓ Ask a question
-7. 🔎 Retrieve relevant chunks
-8. 🤖 Send context to LLM
-9. 💡 Generate final answer
+6. ❓ User asks question
+7. 🔎 Retrieve context
+8. 🤖 Generate answer
+9. 🗄️ Save chat in PostgreSQL
 
 ---
 
 ## 🚀 Setup Guide
 
-### 🔹 1. Clone Repository
+## 🔹 1. Clone Repo
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/smartlearn.git
@@ -107,40 +109,41 @@ cd smartlearn
 
 ---
 
-### 🔹 2. Backend Setup
+## 🔹 2. Backend Setup
 
 ```bash
-cd smartlearn-backend
+cd backend
 pip install -r requirements.txt
 ```
 
-Create `.env` file:
+### Create `.env`
 
 ```env
-GROQ_API_KEY=your_api_key_here
+GROQ_API_KEY=your_api_key
+DATABASE_URL=your_postgresql_url
 ```
 
-Run backend:
+---
+
+### Run Backend
 
 ```bash
 uvicorn main:app --reload
 ```
 
-📍 Backend URL:
-http://127.0.0.1:8000
+📍 http://127.0.0.1:8000
 
 ---
 
-### 🔹 3. Frontend Setup
+## 🔹 3. Frontend Setup
 
 ```bash
-cd smartlearn-frontend
+cd frontend
 npm install
 npm run dev
 ```
 
-📍 Frontend URL:
-http://localhost:5173
+📍 http://localhost:5173
 
 ---
 
@@ -150,43 +153,70 @@ http://localhost:5173
 
 ```json
 {
-  "message": "Explain machine learning"
+  "message": "Explain AI",
+  "chat_id": "12345"
 }
 ```
 
+---
+
+### 🔹 GET `/chats`
+
+Returns grouped chat history.
+
+---
+
+### 🔹 DELETE `/chat/{chat_id}`
+
+Deletes full chat session.
+
+---
+
 ### 🔹 POST `/upload`
 
-Upload a PDF file for processing and querying.
+Upload PDF for RAG.
+
+---
+
+## 🗄️ Database (PostgreSQL)
+
+* Stores chat history
+* Supports multi-chat sessions
+* Linked via `chat_id`
+
+Example table:
+
+```sql
+id | chat_id | message | response
+```
 
 ---
 
 ## ⚠️ Important Notes
 
-* 🔒 Keep `.env` file private
-* 🚫 `node_modules/` and `__pycache__/` are ignored
-* ⚡ FAISS is currently **in-memory (non-persistent)**
+* 🔒 Never commit `.env`
+* ⚡ FAISS is in-memory (temporary)
+* 🧠 Chat history stored in PostgreSQL
+* 🌐 CORS must match frontend URL
 
 ---
 
 ## 🔮 Roadmap
 
-* [ ] 🔄 Streaming responses (real-time typing)
-* [ ] 🗄️ PostgreSQL integration (chat history)
+* [ ] 🔄 Real-time streaming (SSE/WebSocket)
 * [ ] 🔐 Authentication (JWT)
-* [ ] 💾 Persistent vector database
-* [ ] 🌍 Deployment (Render / Railway / Fly.io)
-* [ ] 📱 Mobile responsiveness improvements
+* [ ] 🧠 Long-term memory
+* [ ] 📱 Mobile optimization
+* [ ] ☁️ Full cloud deployment
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! 🚀
-
-1. Fork the repository
-2. Create a new branch
-3. Commit your changes
-4. Open a Pull Request
+1. Fork repo
+2. Create branch
+3. Commit changes
+4. Open PR
 
 ---
 
@@ -201,12 +231,21 @@ Contributions are welcome! 🚀
 
 ---
 
-## 📌 Project Status
+## 📌 Status
 
-🚧 **Actively Under Development**
+🚧 Actively Developing
 
 ---
 
 ## ⭐ Support
 
-If you like this project, consider giving it a ⭐ on GitHub — it really helps!
+If you like this project, give it a ⭐ on GitHub!
+
+---
+
+## 🌐 Live Demo
+
+Frontend: https://smartlearn-ai-liard.vercel.app
+Backend: https://smartlearn-ai-production.up.railway.app
+
+---
