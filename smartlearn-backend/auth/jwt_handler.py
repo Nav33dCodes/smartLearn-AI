@@ -1,7 +1,8 @@
 import os
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
-
+from dotenv import load_dotenv
+load_dotenv()
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
 if not SECRET_KEY:
