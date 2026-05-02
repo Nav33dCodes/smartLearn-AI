@@ -43,14 +43,20 @@ useEffect(() => {
       const backendChats = res.data.chats;
 
       if (backendChats && Object.keys(backendChats).length > 0) {
-    const formatted = Object.entries(backendChats).map(([chatId, messages]) => ({
+     const formatted = Object.entries(backendChats).map(([chatId, messages]) => ({
   id: chatId,
   title: messages[0]?.content?.slice(0, 30) || "Chat",
-  messages: [...messages].reverse()  
+  messages
 }));
 
-        setChats(formatted);
-        setActiveChatId(formatted[0].id);
+const sorted = formatted.sort((a, b) => Number(b.id) - Number(a.id));
+
+if (sorted.length > 0) {
+  setChats(sorted);
+  setActiveChatId(sorted[0].id);
+} else {
+  createNewChat();
+}
       } else {
         createNewChat();
       }
@@ -93,11 +99,12 @@ const newChat = { id: Date.now().toString(), title: "New chat", messages: [] };
 const deleteChat = useCallback(async (id, e) => {
   e.stopPropagation();
 
-  try {
-    await axios.delete(`${API}/chat/${id}`); // 🔥 backend delete
-  } catch (err) {
-    console.log("Delete failed", err);
-  }
+ try {
+  await axios.delete(`${API}/chat/${id}`);
+} catch (err) {
+  console.log("Delete failed", err);
+  return; // ❌ stop UI delete if backend fail
+}
 
   setChats(prev => {
     const filtered = prev.filter(c => c.id !== id);
