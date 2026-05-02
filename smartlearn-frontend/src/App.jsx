@@ -15,6 +15,22 @@ const API = import.meta.env.DEV
   ? "http://localhost:8000"          // npm run dev
   : "https://smartlearn-ai-production.up.railway.app";  // vercel build
 
+
+  const getAuthHeaders = () => ({
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`
+  }
+});
+axios.interceptors.response.use(
+  res => res,
+  err => {
+    if (err.response?.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
+    return Promise.reject(err);
+  }
+);
 export default function App() {
   const [chats, setChats] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
@@ -31,7 +47,13 @@ export default function App() {
   const textareaRef = useRef(null);
   const activeChat = chats.find(c => c.id === activeChatId);
 
+useEffect(() => {
+  const token = localStorage.getItem("token");
 
+  if (!token) {
+    window.location.href = "/login";
+  }
+}, []);
 
 
 
@@ -44,7 +66,7 @@ useEffect(() => {
       const savedTheme = localStorage.getItem("sl_theme_pro");
       if (savedTheme !== null) setDarkMode(savedTheme === "true");
 
-      const res = await axios.get(`${API}/chats`);
+      const res = await axios.get(`${API}/chats`, getAuthHeaders());
       const backendChats = res.data.chats;
 
       if (backendChats && Object.keys(backendChats).length > 0) {
@@ -105,7 +127,7 @@ const deleteChat = useCallback(async (id, e) => {
   e.stopPropagation();
 
  try {
-  await axios.delete(`${API}/chat/${id}`);
+  await axios.delete(`${API}/chat/${id}`, getAuthHeaders());
 } catch (err) {
   console.log("Delete failed", err);
   return; // ❌ stop UI delete if backend fail
@@ -189,10 +211,17 @@ const deleteChat = useCallback(async (id, e) => {
     setLoading(true);
 
     try {
-     const res = await axios.post(`${API}/chat`, {
-  message: textToSend,
-  chat_id: activeChatId
-}, { signal: controller.signal });
+const res = await axios.post(
+  `${API}/chat`,
+  {
+    message: textToSend,
+    chat_id: activeChatId || Date.now().toString()
+  },
+  {
+    signal: controller.signal,
+    ...getAuthHeaders()
+  }
+);
       await streamText(res.data.response, controller, currentChatId);
 
       setChats(prev => prev.map(c => {
@@ -237,7 +266,7 @@ const deleteChat = useCallback(async (id, e) => {
     const currentChatId = activeChatId;
 
     try {
-      await axios.post(`${API}/upload`, formData);
+      await axios.post(`${API}/upload`, formData, getAuthHeaders());
       setChats(prev => prev.map(chat => {
         if (chat.id === currentChatId) {
           return { ...chat, messages: [...chat.messages, { role: "assistant", content: `✅ **${file.name}** is uploaded and processed! You can now ask questions about it.` }] };
