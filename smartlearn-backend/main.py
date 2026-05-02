@@ -19,7 +19,7 @@ def root():
 # ------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # later replace with frontend URL
+    allow_origins=["https://smartlearn-ai-liard.vercel.app"],  # later replace with frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
