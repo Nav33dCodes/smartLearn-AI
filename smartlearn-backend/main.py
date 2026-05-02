@@ -19,7 +19,7 @@ def root():
 # ------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://smartlearn-ai-liard.vercel.app"],  # later replace with frontend URL
+    allow_origins=["https://smartlearn-ai-liard.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -30,6 +30,7 @@ app.add_middleware(
 # ------------------------
 @app.post("/chat")
 async def chat(data: dict):
+    db = SessionLocal()   # 🔥 moved outside try for safety
     try:
         message = data.get("message", "")
 
@@ -55,17 +56,42 @@ User Question:
 
         response = get_llm_response(prompt)
 
-        # ✅ SAVE TO DATABASE (THIS IS NEW)
-        db = SessionLocal()
+        # ✅ SAVE TO DATABASE
         new_chat = Chat(message=message, response=response)
         db.add(new_chat)
         db.commit()
-        db.close()
 
         return {"response": response}
 
     except Exception as e:
         return {"error": str(e)}
+
+    finally:
+        db.close()   # 🔥 always close connection
+
+
+# ------------------------
+# GET CHAT HISTORY (NEW)
+# ------------------------
+@app.get("/chats")
+def get_chats():
+    db = SessionLocal()
+    try:
+        chats = db.query(Chat).order_by(Chat.id.asc()).all()
+
+        data = [
+            {"message": c.message, "response": c.response}
+            for c in chats
+        ]
+
+        return {"chats": data}
+
+    except Exception as e:
+        return {"error": str(e)}
+
+    finally:
+        db.close()
+
 
 # ------------------------
 # PDF UPLOAD
