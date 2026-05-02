@@ -30,34 +30,35 @@ app.add_middleware(
 # ------------------------
 @app.post("/chat")
 async def chat(data: dict):
-    db = SessionLocal()   # 🔥 moved outside try for safety
+    db = SessionLocal()
     try:
         message = data.get("message", "")
+        chat_id = str(data.get("chat_id", "default"))  # ensure string
 
         if not message:
             return {"error": "Message is required"}
 
-        # 🔍 RAG search
         context = search(message)
 
-        # 🧠 Prompt
         prompt = f"""
 You are SmartLearn AI.
-
-Use the context below to answer.
-If context is empty, answer normally.
 
 Context:
 {context}
 
-User Question:
+User:
 {message}
 """
 
         response = get_llm_response(prompt)
 
-        # ✅ SAVE TO DATABASE
-        new_chat = Chat(message=message, response=response)
+        # ✅ SAVE
+        new_chat = Chat(
+            chat_id=chat_id,
+            message=message,
+            response=response
+        )
+
         db.add(new_chat)
         db.commit()
 
@@ -67,11 +68,11 @@ User Question:
         return {"error": str(e)}
 
     finally:
-        db.close()   # 🔥 always close connection
+        db.close()
 
 
 # ------------------------
-# GET CHAT HISTORY (NEW)
+# GET ALL CHATS (GROUPED BY CHAT_ID)
 # ------------------------
 @app.get("/chats")
 def get_chats():
@@ -79,16 +80,38 @@ def get_chats():
     try:
         chats = db.query(Chat).order_by(Chat.id.asc()).all()
 
-        data = [
-            {"message": c.message, "response": c.response}
-            for c in chats
-        ]
+        grouped = {}
 
-        return {"chats": data}
+        for c in chats:
+            if c.chat_id not in grouped:
+                grouped[c.chat_id] = []
 
+            grouped[c.chat_id].append({
+                "role": "user",
+                "content": c.message
+            })
+            grouped[c.chat_id].append({
+                "role": "assistant",
+                "content": c.response
+            })
+
+        return {"chats": grouped}
+
+    finally:
+        db.close()
+
+# ------------------------
+# DELETE CHAT BY CHAT_ID
+# ------------------------
+@app.delete("/chat/{chat_id}")
+def delete_chat(chat_id: str):
+    db = SessionLocal()
+    try:
+        db.query(Chat).filter(Chat.chat_id == chat_id).delete()
+        db.commit()
+        return {"status": "deleted"}
     except Exception as e:
         return {"error": str(e)}
-
     finally:
         db.close()
 

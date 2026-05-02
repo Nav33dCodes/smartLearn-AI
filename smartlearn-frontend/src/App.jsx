@@ -31,70 +31,43 @@ export default function App() {
 
 
   // ── Initialization & Theme ──
- useEffect(() => {
-  const loadInitialData = async () => {
+useEffect(() => {
+  const handleResize = () => setIsMobile(window.innerWidth <= 768);
+
+  const loadChats = async () => {
     try {
       const savedTheme = localStorage.getItem("sl_theme_pro");
       if (savedTheme !== null) setDarkMode(savedTheme === "true");
 
-      // 🔥 TRY LOAD FROM DATABASE FIRST
       const res = await axios.get(`${API}/chats`);
+      const backendChats = res.data.chats;
 
-      if (res.data.chats && res.data.chats.length > 0) {
-        const formatted = res.data.chats.flatMap(chat => [
-          { role: "user", content: chat.message },
-          { role: "assistant", content: chat.response }
-        ]);
+      if (backendChats && Object.keys(backendChats).length > 0) {
+        const formatted = Object.entries(backendChats).map(([chatId, messages]) => ({
+          id: chatId,
+          title: messages[0]?.content?.slice(0, 30) || "Chat",
+          messages
+        }));
 
-        const chatId = Date.now();
-
-        setChats([
-          {
-            id: chatId,
-            title: "History",
-            messages: formatted
-          }
-        ]);
-
-        setActiveChatId(chatId);
+        setChats(formatted);
+        setActiveChatId(formatted[0].id);
       } else {
-        // fallback to localStorage
-        const saved = localStorage.getItem("sl_chats_pro");
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          setChats(parsed);
-          if (parsed.length > 0) setActiveChatId(parsed[0].id);
-          else createNewChat(true);
-        } else {
-          createNewChat(true);
-        }
+        createNewChat();
       }
 
     } catch (err) {
       console.log("History load failed", err);
-
-      // fallback to localStorage
-      const saved = localStorage.getItem("sl_chats_pro");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setChats(parsed);
-        if (parsed.length > 0) setActiveChatId(parsed[0].id);
-        else createNewChat(true);
-      } else {
-        createNewChat(true);
-      }
+      createNewChat();
     }
 
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
     handleResize();
     window.addEventListener("resize", handleResize);
   };
 
-  loadInitialData();
+  loadChats();
 
-  return () => window.removeEventListener("resize", () => {});
+  return () => window.removeEventListener("resize", handleResize);
 }, []);
-
 
 
 
@@ -109,7 +82,7 @@ export default function App() {
 
   // ── Chat Management ──
   const createNewChat = useCallback(() => {
-    const newChat = { id: Date.now(), title: "New chat", messages: [] };
+const newChat = { id: Date.now().toString(), title: "New chat", messages: [] };
     setChats(prev => [newChat, ...prev]);
     setActiveChatId(newChat.id);
     if (isMobile) setSidebarOpen(false);
@@ -117,20 +90,29 @@ export default function App() {
     setAttachedFile(null); 
     textareaRef.current?.focus();
   }, [isMobile]);
+const deleteChat = useCallback(async (id, e) => {
+  e.stopPropagation();
 
-  const deleteChat = useCallback((id, e) => {
-    e.stopPropagation();
-    setChats(prev => {
-      const filtered = prev.filter(c => c.id !== id);
-      if (filtered.length === 0) {
-        const fresh = { id: Date.now(), title: "New chat", messages: [] };
-        setActiveChatId(fresh.id);
-        return [fresh];
-      }
-      if (id === activeChatId) setActiveChatId(filtered[0].id);
-      return filtered;
-    });
-  }, [activeChatId]);
+  try {
+    await axios.delete(`${API}/chat/${id}`); // 🔥 backend delete
+  } catch (err) {
+    console.log("Delete failed", err);
+  }
+
+  setChats(prev => {
+    const filtered = prev.filter(c => c.id !== id);
+
+    if (filtered.length === 0) {
+     const fresh = { id: Date.now().toString(), title: "New chat", messages: [] };
+      setActiveChatId(fresh.id);
+      return [fresh];
+    }
+
+    if (id === activeChatId) setActiveChatId(filtered[0].id);
+
+    return filtered;
+  });
+}, [activeChatId]);
 
   const updateMessages = useCallback((msgs, chatId) => {
     setChats(prev => prev.map(chat => chat.id === (chatId || activeChatId) ? { ...chat, messages: msgs } : chat));
@@ -195,11 +177,10 @@ export default function App() {
     setLoading(true);
 
     try {
-      const res = await axios.post(`${API}/chat`, {
-        message: textToSend,
-        history: validHistory,
-      }, { signal: controller.signal });
-
+     const res = await axios.post(`${API}/chat`, {
+  message: textToSend,
+  chat_id: activeChatId
+}, { signal: controller.signal });
       await streamText(res.data.response, controller, currentChatId);
 
       setChats(prev => prev.map(c => {
