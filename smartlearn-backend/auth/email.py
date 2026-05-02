@@ -1,9 +1,12 @@
+from dotenv import load_dotenv
+load_dotenv()
+
+
 import os
 import asyncio
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
-from dotenv import load_dotenv
-load_dotenv()
-# khud lagaya
+
+
 def get_mail_config():
     required = ["MAIL_USERNAME", "MAIL_PASSWORD", "MAIL_FROM"]
 
@@ -48,16 +51,12 @@ async def send_welcome_email(email: str):
         subtype="html"
     )
 
-    fm = FastMail(conf)
-
-    async def send():
-        try:
-            await fm.send_message(message)
-            print(f"✅ Email sent to {email}")
-        except Exception as e:
-            print(f"❌ Email failed: {e}")
-
-    asyncio.create_task(send())
+    try:
+        fm = FastMail(conf)
+        await fm.send_message(message)   # ✅ FIX HERE
+        print(f"✅ Email sent to {email}")
+    except Exception as e:
+        print(f"❌ Email failed: {e}")
 
 
 # ========================
@@ -81,7 +80,7 @@ async def send_reset_email(email: str, token: str):
 <h3>Password Reset</h3>
 <p>Click below to reset your password:</p>
 
-<a href="{reset_link}" 
+<a href="{reset_link}"
 style="
 display:inline-block;
 padding:10px 20px;
@@ -98,13 +97,9 @@ Reset Password
         subtype="html"
     )
 
-    fm = FastMail(conf)
-
-    async def send():
-        try:
-            await fm.send_message(message)
-            print(f"✅ Reset email sent to {email}")
-        except Exception as e:
-            print("❌ Email error:", e)
-
-    asyncio.create_task(send())
+    try:
+        fm = FastMail(conf)
+        await fm.send_message(message)   # ✅ FIX HERE
+        print(f"✅ Reset email sent to {email}")
+    except Exception as e:
+        print("❌ Email error:", e)
