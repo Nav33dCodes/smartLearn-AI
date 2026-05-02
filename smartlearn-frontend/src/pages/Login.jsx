@@ -62,14 +62,18 @@ export default function Login() {
           onKeyDown={(e) => e.key === "Enter" && handleLogin()}
         />
 
-        <input
-          style={styles.input}
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-        />
+   <div style={{ textAlign: "right", marginTop: 6 }}>
+  <span
+    style={{
+      fontSize: 12,
+      color: "#10a37f",
+      cursor: "pointer"
+    }}
+    onClick={() => navigate("/forgot-password")}
+  >
+    Forgot Password?
+  </span>
+</div>
 
         <button
           style={{
