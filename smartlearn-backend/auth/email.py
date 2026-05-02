@@ -1,8 +1,9 @@
 import os
 import asyncio
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
-
-
+from dotenv import load_dotenv
+load_dotenv()
+# khud lagaya
 def get_mail_config():
     required = ["MAIL_USERNAME", "MAIL_PASSWORD", "MAIL_FROM"]
 

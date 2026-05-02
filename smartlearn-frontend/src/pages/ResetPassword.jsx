@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -16,8 +16,15 @@ export default function ResetPassword() {
 
   const token = params.get("token");
 
+  // ✅ FIX: include token + navigate in deps
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+    }
+  }, [token, navigate]);
+
   const handleReset = async () => {
-    if (!password) return alert("Enter password");
+    if (!password) return setMsg("Enter password");
 
     setLoading(true);
 
@@ -27,7 +34,8 @@ export default function ResetPassword() {
         new_password: password
       });
 
-      setMsg("✅ Password updated!");
+      setMsg("✅ Password updated — redirecting...");
+
       setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
       setMsg(err.response?.data?.detail || "❌ Failed");
@@ -45,6 +53,7 @@ export default function ResetPassword() {
           style={styles.input}
           type="password"
           placeholder="New password"
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
@@ -59,8 +68,38 @@ export default function ResetPassword() {
 }
 
 const styles = {
-  container: { height: "100vh", display: "flex", justifyContent: "center", alignItems: "center", background: "#111" },
-  card: { background: "#1e1e1e", padding: 30, borderRadius: 12, width: 300, textAlign: "center", color: "#fff" },
-  input: { width: "100%", padding: 10, marginTop: 10, borderRadius: 8, border: "1px solid #333", background: "#2a2a2a", color: "#fff" },
-  button: { width: "100%", padding: 10, marginTop: 15, borderRadius: 8, border: "none", background: "#10a37f", color: "#fff" }
+  container: {
+    height: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    background: "#111"
+  },
+  card: {
+    background: "#1e1e1e",
+    padding: 30,
+    borderRadius: 12,
+    width: 300,
+    textAlign: "center",
+    color: "#fff"
+  },
+  input: {
+    width: "100%",
+    padding: 10,
+    marginTop: 10,
+    borderRadius: 8,
+    border: "1px solid #333",
+    background: "#2a2a2a",
+    color: "#fff"
+  },
+  button: {
+    width: "100%",
+    padding: 10,
+    marginTop: 15,
+    borderRadius: 8,
+    border: "none",
+    background: "#10a37f",
+    color: "#fff",
+    cursor: "pointer"
+  }
 };
