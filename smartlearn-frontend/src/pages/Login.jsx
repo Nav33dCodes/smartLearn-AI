@@ -54,15 +54,24 @@ export default function Login() {
 
         {error && <div style={styles.error}>{error}</div>}
 
-        <input
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-        />
+   <input
+  style={styles.input}
+  placeholder="Email"
+  value={email}
+  onChange={e => setEmail(e.target.value)}
+  onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+/>
 
-   <div style={{ textAlign: "right", marginTop: 6 }}>
+<input
+  style={styles.input}
+  type="password"
+  placeholder="Password"
+  value={password}
+  onChange={e => setPassword(e.target.value)}
+  onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+/>
+
+<div style={{ textAlign: "right", marginTop: 6 }}>
   <span
     style={{
       fontSize: 12,
