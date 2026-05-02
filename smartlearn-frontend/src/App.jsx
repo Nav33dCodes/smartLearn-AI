@@ -26,26 +26,77 @@ export default function App() {
   const textareaRef = useRef(null);
   const activeChat = chats.find(c => c.id === activeChatId);
 
+
+
+
+
   // ── Initialization & Theme ──
-  useEffect(() => {
-    const saved = localStorage.getItem("sl_chats_pro");
-    const savedTheme = localStorage.getItem("sl_theme_pro");
-    
-    if (savedTheme !== null) setDarkMode(savedTheme === "true");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setChats(parsed);
-      if (parsed.length > 0) setActiveChatId(parsed[0].id);
-      else createNewChat(true);
-    } else {
-      createNewChat(true);
+ useEffect(() => {
+  const loadInitialData = async () => {
+    try {
+      const savedTheme = localStorage.getItem("sl_theme_pro");
+      if (savedTheme !== null) setDarkMode(savedTheme === "true");
+
+      // 🔥 TRY LOAD FROM DATABASE FIRST
+      const res = await axios.get(`${API}/chats`);
+
+      if (res.data.chats && res.data.chats.length > 0) {
+        const formatted = res.data.chats.flatMap(chat => [
+          { role: "user", content: chat.message },
+          { role: "assistant", content: chat.response }
+        ]);
+
+        const chatId = Date.now();
+
+        setChats([
+          {
+            id: chatId,
+            title: "History",
+            messages: formatted
+          }
+        ]);
+
+        setActiveChatId(chatId);
+      } else {
+        // fallback to localStorage
+        const saved = localStorage.getItem("sl_chats_pro");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setChats(parsed);
+          if (parsed.length > 0) setActiveChatId(parsed[0].id);
+          else createNewChat(true);
+        } else {
+          createNewChat(true);
+        }
+      }
+
+    } catch (err) {
+      console.log("History load failed", err);
+
+      // fallback to localStorage
+      const saved = localStorage.getItem("sl_chats_pro");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setChats(parsed);
+        if (parsed.length > 0) setActiveChatId(parsed[0].id);
+        else createNewChat(true);
+      } else {
+        createNewChat(true);
+      }
     }
 
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     handleResize();
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  };
+
+  loadInitialData();
+
+  return () => window.removeEventListener("resize", () => {});
+}, []);
+
+
+
 
   useEffect(() => {
     localStorage.setItem("sl_chats_pro", JSON.stringify(chats));
