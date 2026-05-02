@@ -21,3 +21,9 @@ langchain-text-splitters==0.2.1
 requests==2.31.0
 numpy==1.26.4
 psycopg2-binary
+
+passlib[bcrypt]
+python-jose
+python-multipart
+email-validator
+fastapi-mail
