@@ -45,7 +45,7 @@
 
 | Service  | URL |
 |----------|-----|
-| Frontend | https://smartlearn-ai-liard.vercel.app |
+| Frontend | https://smartlearn-ai-sigma.vercel.app |
 | Backend  | https://smartlearn-ai-production.up.railway.app |
 
 ---
