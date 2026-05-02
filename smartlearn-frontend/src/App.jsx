@@ -9,7 +9,9 @@ import InputBox from "./components/InputBox";
 
 // const API = "http://localhost:8000";
 //  const API = "https://smartlearn-ai-production.up.railway.app";
-const API = import.meta.env.VITE_API_URL;
+const API = import.meta.env.DEV
+  ? "http://localhost:8000"          // npm run dev
+  : "https://smartlearn-ai-production.up.railway.app";  // vercel build
 
 export default function App() {
   const [chats, setChats] = useState([]);
