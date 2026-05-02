@@ -48,7 +48,12 @@ export default function Signup() {
       setTimeout(() => navigate("/login"), 1500);
 
     } catch (err) {
-      setError(err.response?.data?.detail || "Signup failed");
+    if (Array.isArray(err.response?.data?.detail)) {
+  const messages = err.response.data.detail.map(e => e.msg).join(", ");
+  setError(messages);
+} else {
+  setError(err.response?.data?.detail || "Signup failed");
+}
     } finally {
       setLoading(false);
     }
