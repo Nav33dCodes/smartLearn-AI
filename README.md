@@ -150,19 +150,7 @@ npm run dev
 
 ---
 
-## 🔐 Environment Variables Reference
 
-### Backend (`smartlearn-backend/.env`)
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `GROQ_API_KEY` | Your Groq API key | `gsk_xxxx` |
-| `DATABASE_URL` | Railway **public** PostgreSQL URL | `postgresql://postgres:xxxx@monorail...` |
-| `ENV` | Environment flag for CORS | `development` or `production` |
-
-> 🔒 **Rule:** Never put `GROQ_API_KEY` or `DATABASE_URL` in frontend code — keep all secrets in the backend only.
-
----
 
 ## 🌍 How Environment Switching Works
 
