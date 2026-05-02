@@ -112,7 +112,7 @@ cd smartlearn
 ## 🔹 2. Backend Setup
 
 ```bash
-cd backend
+cd smartlearn-backend
 pip install -r requirements.txt
 ```
 
@@ -138,7 +138,7 @@ uvicorn main:app --reload
 ## 🔹 3. Frontend Setup
 
 ```bash
-cd frontend
+cd smartlearn-frontend
 npm install
 npm run dev
 ```
