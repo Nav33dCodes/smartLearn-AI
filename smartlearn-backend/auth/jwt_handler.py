@@ -12,20 +12,38 @@ ACCESS_TOKEN_EXPIRE_DAYS = 7
 
 
 def create_token(user_id: int):
-    to_encode = {
-        "sub": str(user_id)
+    expire = datetime.now(timezone.utc) + timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
+
+    payload = {
+        "sub": str(user_id),
+        "type": "access",
+        "exp": expire
     }
 
-    expire = datetime.now(timezone.utc) + timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
-    to_encode.update({"exp": expire})
-
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
-def decode_token(token: str):
+def create_reset_token(email: str):
+    expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+
+    payload = {
+        "sub": email,
+        "type": "reset",
+        "exp": expire
+    }
+
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def decode_token(token: str, expected_type: str = None):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+        if expected_type and payload.get("type") != expected_type:
+            return None
+
         return payload
+
     except JWTError as e:
         print(f"❌ Token error: {e}")
         return None

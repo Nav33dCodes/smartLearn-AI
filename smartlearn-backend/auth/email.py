@@ -23,13 +23,15 @@ def get_mail_config():
     )
 
 
+# ========================
+# 📧 WELCOME EMAIL
+# ========================
 async def send_welcome_email(email: str):
     if "@" not in email:
         print("❌ Invalid email")
         return
 
     conf = get_mail_config()
-
     if not conf:
         print("⚠️ Email skipped (missing env vars)")
         return
@@ -54,5 +56,54 @@ async def send_welcome_email(email: str):
         except Exception as e:
             print(f"❌ Email failed: {e}")
 
-    loop = asyncio.get_event_loop()
-    loop.create_task(send())
+    asyncio.create_task(send())
+
+
+# ========================
+# 🔐 RESET PASSWORD EMAIL
+# ========================
+async def send_reset_email(email: str, token: str):
+    conf = get_mail_config()
+
+    if not conf:
+        print("⚠️ Email skipped")
+        return
+
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+
+    reset_link = f"{FRONTEND_URL}/reset-password?token={token}"
+
+    message = MessageSchema(
+        subject="Reset Your Password 🔐",
+        recipients=[email],
+        body=f"""
+<h3>Password Reset</h3>
+<p>Click below to reset your password:</p>
+
+<a href="{reset_link}" 
+style="
+display:inline-block;
+padding:10px 20px;
+background:#10a37f;
+color:white;
+text-decoration:none;
+border-radius:6px;
+">
+Reset Password
+</a>
+
+<p>This link expires in 15 minutes.</p>
+""",
+        subtype="html"
+    )
+
+    fm = FastMail(conf)
+
+    async def send():
+        try:
+            await fm.send_message(message)
+            print(f"✅ Reset email sent to {email}")
+        except Exception as e:
+            print("❌ Email error:", e)
+
+    asyncio.create_task(send())

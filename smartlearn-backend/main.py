@@ -1,3 +1,6 @@
+from auth.schemas import ForgotPassword, ResetPassword
+from auth.jwt_handler import create_reset_token, decode_token
+from auth.email import send_reset_email
 from fastapi import FastAPI, UploadFile, File, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -86,7 +89,43 @@ def login(data: UserLogin, db: Session = Depends(get_db)):
         "access_token": token,
         "token_type": "bearer"
     }
+@app.post("/forgot-password")
+async def forgot_password(data: ForgotPassword, db: Session = Depends(get_db)):
+    email = data.email.lower()
 
+    user = db.query(User).filter(User.email == email).first()
+
+    # 🔐 security: don't reveal if user exists
+    if not user:
+        return {"message": "If email exists, reset link sent"}
+
+    token = create_reset_token(email)
+
+    try:
+        await send_reset_email(email, token)
+    except Exception as e:
+        print("Email error:", e)
+
+    return {"message": "Reset link sent to email"}
+
+@app.post("/reset-password")
+def reset_password(data: ResetPassword, db: Session = Depends(get_db)):
+    payload = decode_token(data.token, expected_type="reset")
+
+    if not payload:
+        raise HTTPException(status_code=400, detail="Invalid or expired token")
+
+    email = payload.get("sub")
+
+    user = db.query(User).filter(User.email == email).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user.password = hash_password(data.new_password)
+    db.commit()
+
+    return {"message": "Password updated successfully"}
 
 # ========================
 # 💬 CHAT (PROTECTED)
