@@ -3,29 +3,30 @@ from fastapi.middleware.cors import CORSMiddleware
 from services.llm import get_llm_response
 from services.pdf import extract_text
 from services.rag import store_pdf, search
+from database import SessionLocal, Chat  
 
 app = FastAPI()
 
 # ------------------------
-# HEALTH CHECK (IMPORTANT FOR RAILWAY)
+# HEALTH CHECK
 # ------------------------
 @app.get("/")
 def root():
     return {"status": "SmartLearn Backend Running 🚀"}
 
 # ------------------------
-# CORS (for frontend connection)
+# CORS
 # ------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://smartlearn-ai-liard.vercel.app"],  # later replace with frontend URL
+    allow_origins=["*"],  # later replace with frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # ------------------------
-# CHAT WITH RAG
+# CHAT WITH RAG + SAVE TO DB
 # ------------------------
 @app.post("/chat")
 async def chat(data: dict):
@@ -53,6 +54,13 @@ User Question:
 """
 
         response = get_llm_response(prompt)
+
+        # ✅ SAVE TO DATABASE (THIS IS NEW)
+        db = SessionLocal()
+        new_chat = Chat(message=message, response=response)
+        db.add(new_chat)
+        db.commit()
+        db.close()
 
         return {"response": response}
 
