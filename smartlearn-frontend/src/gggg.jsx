@@ -48,11 +48,15 @@ export default function App() {
           const sorted = formatted.sort((a, b) => Number(b.id) - Number(a.id));
 
           if (sorted.length > 0) {
+            // ── FIX: ALWAYS START WITH A BLANK CANVAS ──
             const topChat = sorted[0];
+            
+            // If the top chat in history is already empty, just use it
             if (topChat.messages.length === 0) {
               setChats(sorted);
               setActiveChatId(topChat.id);
             } else {
+              // Otherwise, create a fresh blank chat and put it at the top of the list
               const freshChat = { id: Date.now().toString(), title: "New chat", messages: [] };
               setChats([freshChat, ...sorted]);
               setActiveChatId(freshChat.id);
@@ -132,6 +136,33 @@ export default function App() {
     setTimeout(() => textareaRef.current?.focus(), 50);
   };
 
+  const streamText = async (text, controller, chatId) => {
+    const id = chatId || activeChatId;
+    let current = "";
+    const chunkSize = Math.max(1, Math.floor(text.length / 80));
+    for (let i = 0; i < text.length; i += chunkSize) {
+      if (controller.signal.aborted) break;
+      current += text.substring(i, i + chunkSize);
+      setChats(prev => prev.map(chat => {
+        if (chat.id === id) {
+          const msgs = [...chat.messages];
+          msgs[msgs.length - 1] = { role: "assistant", content: current };
+          return { ...chat, messages: msgs };
+        }
+        return chat;
+      }));
+      await new Promise(r => setTimeout(r, 8));
+    }
+    if (!controller.signal.aborted) {
+      setChats(prev => prev.map(chat =>
+        chat.id === id ? {
+          ...chat,
+          messages: [...chat.messages.slice(0, -1), { role: "assistant", content: text }]
+        } : chat
+      ));
+    }
+  };
+
   const sendMessage = async (overrideText = null, customHistory = null) => {
     const textToSend = overrideText ?? input;
     if (!textToSend.trim() || loading) return;
@@ -142,6 +173,7 @@ export default function App() {
     const baseHistory = customHistory ?? activeChat.messages;
     const currentChatId = activeChatId;
 
+    // Add user message + empty AI bubble immediately
     updateMessages(
       [...baseHistory,
        { role: "user", content: textToSend },
@@ -160,51 +192,52 @@ export default function App() {
         signal: controller.signal,
       });
 
-      if (!res.ok) throw new Error(`Server error: ${res.status}`);
-
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let accumulated = "";
-      let buffer = "";
+      
+      let renderBuffer = ""; 
       let lastRenderTime = Date.now();
 
       while (true) {
         const { done, value } = await reader.read();
-
+        
         if (done) {
-          // Final flush
-          if (accumulated) {
-            setChats(prev => prev.map(chat => {
-              if (chat.id !== currentChatId) return chat;
-              const msgs = [...chat.messages];
-              msgs[msgs.length - 1] = { role: "assistant", content: accumulated };
-              return { ...chat, messages: msgs };
-            }));
+          // Final flush to ensure no text is left behind
+          if (renderBuffer) {
+             setChats(prev => prev.map(chat => {
+               if (chat.id !== currentChatId) return chat;
+               const msgs = [...chat.messages];
+               msgs[msgs.length - 1] = { role: "assistant", content: accumulated };
+               return { ...chat, messages: msgs };
+             }));
           }
           break;
         }
 
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop(); // keep incomplete line
+        const text = decoder.decode(value);
+        const lines = text.split("\n");
 
         for (const line of lines) {
           if (!line.startsWith("data: ")) continue;
           try {
-            const parsed = JSON.parse(line.slice(6));
-            if (parsed.done) break;
-            if (parsed.token) {
-              accumulated += parsed.token;
+            const json = JSON.parse(line.slice(6));
+            if (json.done) break;
+            
+            if (json.token) {
+              accumulated += json.token;
+              renderBuffer += json.token;
 
-              // Throttle UI updates to every 50ms for smooth rendering
+              // Only update the UI every 50ms, or on punctuation
               const now = Date.now();
-              if (now - lastRenderTime > 50 || parsed.token.includes('\n')) {
+              if (now - lastRenderTime > 50 || json.token.includes('\n')) {
                 setChats(prev => prev.map(chat => {
                   if (chat.id !== currentChatId) return chat;
                   const msgs = [...chat.messages];
                   msgs[msgs.length - 1] = { role: "assistant", content: accumulated };
                   return { ...chat, messages: msgs };
                 }));
+                renderBuffer = ""; // Clear buffer
                 lastRenderTime = now;
               }
             }
@@ -214,7 +247,7 @@ export default function App() {
 
       // Update chat title
       setChats(prev => prev.map(c => {
-        if (c.id === currentChatId && c.title === "New chat" && !controller.signal.aborted) {
+        if (c.id === currentChatId && c.title === "New chat") {
           return { ...c, title: textToSend.slice(0, 30) + (textToSend.length > 30 ? "..." : "") };
         }
         return c;
@@ -225,7 +258,7 @@ export default function App() {
         setChats(prev => prev.map(chat => {
           if (chat.id !== currentChatId) return chat;
           const msgs = [...chat.messages];
-          msgs[msgs.length - 1] = { role: "assistant", content: "⚠️ An error occurred. Please try again." };
+          msgs[msgs.length - 1] = { role: "assistant", content: "⚠️ Error. Please try again." };
           return { ...chat, messages: msgs };
         }));
       }
@@ -261,9 +294,7 @@ export default function App() {
     const currentChatId = activeChatId;
 
     try {
-      // ✅ CRITICAL FIX: send chat_id so PDF is stored under correct session
-      // Without this, PDF stores as "default" but chat uses a real chat_id = RAG never finds it
-      await axios.post(`${API}/upload?chat_id=${currentChatId}`, formData);
+      await axios.post(`${API}/upload`, formData);
       setChats(prev => prev.map(chat => {
         if (chat.id === currentChatId) {
           return { ...chat, messages: [...chat.messages, { role: "assistant", content: `✅ **${file.name}** is uploaded and processed! You can now ask questions about it.` }] };
@@ -1041,6 +1072,7 @@ export default function App() {
           -webkit-backdrop-filter: blur(3px);
         }
 
+        /* Shortcut badge */
         .kbd-badge {
           display: inline-flex;
           align-items: center;
