@@ -1,23 +1,22 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from services.llm import stream_llm_response          # ← streaming
+from services.llm import get_llm_response
 from services.pdf import extract_text, get_pdf_metadata
 from services.rag import store_pdf, search, clear_session, has_context, get_stats
 from database import SessionLocal, Chat
 
 import io
-import json
 
 # ────────────────────────────────────────────────────
 # APP SETUP
-# ──────────────────────────────────────────────────── 
+# ────────────────────────────────────────────────────
 app = FastAPI(
     title="SmartLearn AI Backend",
-    description="Groq-powered learning assistant with RAG, streaming, and PDF support",
-    version="2.1.0"
+    description="Groq-powered learning assistant with RAG and PDF support",
+    version="2.0.0"
 )
 
 app.add_middleware(
@@ -48,8 +47,8 @@ class ChatRequest(BaseModel):
 def root():
     return {
         "status": "SmartLearn Backend Running 🚀",
-        "version": "2.1.0",
-        "features": ["groq-streaming", "rag", "pdf-upload", "chat-history"]
+        "version": "2.0.0",
+        "features": ["groq-llm", "rag", "pdf-upload", "chat-history"]
     }
 
 @app.get("/health")
@@ -58,22 +57,24 @@ def health():
 
 
 # ────────────────────────────────────────────────────
-# CHAT  — true SSE streaming
+# CHAT  (RAG-aware, session-isolated)
 # ────────────────────────────────────────────────────
 @app.post("/chat")
 async def chat(data: ChatRequest):
-    message = data.message.strip()
-    chat_id = str(data.chat_id)
+    db = SessionLocal()
+    try:
+        message = data.message.strip()
+        chat_id = str(data.chat_id)
 
-    if not message:
-        raise HTTPException(status_code=400, detail="Message is required")
+        if not message:
+            raise HTTPException(status_code=400, detail="Message is required")
 
-    # ── RAG context (session-aware) ──
-    context = search(message, chat_id=chat_id)
+        # ── Pull context from RAG (session-aware) ──
+        context = search(message, chat_id=chat_id)
 
-    # ── Build prompt ──
-    if context:
-        prompt = f"""The student has uploaded a document. Use this context to answer:
+        # ── Build smarter prompt ──
+        if context:
+            prompt = f"""The student has uploaded a document. Use this context to answer:
 
 --- DOCUMENT CONTEXT ---
 {context}
@@ -82,74 +83,47 @@ async def chat(data: ChatRequest):
 Student's question: {message}
 
 Answer based on the context above. If the answer isn't in the context, say so and offer what you know generally."""
-    else:
-        prompt = message
+        else:
+            prompt = message
 
-    # ── SSE generator ──
-    def token_generator():
-        full_response = []
+        # ── Get LLM response ──
+        response = get_llm_response(prompt)
 
-        try:
-            for token in stream_llm_response(prompt):
-                full_response.append(token)
-                # SSE format — each line must be: data: {...}\n\n
-                yield f"data: {json.dumps({'token': token})}\n\n"
+        # ── Save to DB ──
+        db.add(Chat(chat_id=chat_id, message=message, response=response))
+        db.commit()
 
-        except Exception as e:
-            err_token = f"\n\n⚠️ Stream error: {str(e)}"
-            full_response.append(err_token)
-            yield f"data: {json.dumps({'token': err_token})}\n\n"
+        return {"response": response}
 
-        finally:
-            # ── Save complete response to DB ──
-            complete = "".join(full_response)
-            if complete.strip():
-                db = SessionLocal()
-                try:
-                    db.add(Chat(
-                        chat_id=chat_id,
-                        message=message,
-                        response=complete
-                    ))
-                    db.commit()
-                except Exception:
-                    db.rollback()
-                finally:
-                    db.close()
-
-            # ── Signal end of stream ──
-            yield f"data: {json.dumps({'done': True})}\n\n"
-
-    return StreamingResponse(
-        token_generator(),
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-            "X-Accel-Buffering": "no",   # disables nginx buffering (Railway)
-        }
-    )
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Chat failed: {str(e)}"}
+        )
+    finally:
+        db.close()
 
 
 # ────────────────────────────────────────────────────
-# GET CHATS (Optimized: Fetches only the requested chat_id)
+# GET ALL CHATS  (grouped by chat_id)
 # ────────────────────────────────────────────────────
 @app.get("/chats")
-def get_chats(chat_id: str = "default"):
-    """
-    Railway Memory Fix: Now requires a chat_id query parameter.
-    Prevents loading the entire database into RAM.
-    """
+def get_chats():
     db = SessionLocal()
     try:
-        chats = db.query(Chat).filter(Chat.chat_id == chat_id).order_by(Chat.id.asc()).all()
+        chats = db.query(Chat).order_by(Chat.id.asc()).all()
 
-        formatted_chats = []
+        grouped: dict = {}
         for c in chats:
-            formatted_chats.append({"role": "user",      "content": c.message})
-            formatted_chats.append({"role": "assistant", "content": c.response})
+            if c.chat_id not in grouped:
+                grouped[c.chat_id] = []
+            grouped[c.chat_id].append({"role": "user",      "content": c.message})
+            grouped[c.chat_id].append({"role": "assistant", "content": c.response})
 
-        return {"chats": {chat_id: formatted_chats}}
+        return {"chats": grouped}
 
     finally:
         db.close()
@@ -164,7 +138,10 @@ def delete_chat(chat_id: str):
     try:
         deleted = db.query(Chat).filter(Chat.chat_id == chat_id).delete()
         db.commit()
+
+        # Also clear RAG session for this chat
         clear_session(chat_id)
+
         return {"status": "deleted", "rows": deleted}
     except Exception as e:
         db.rollback()
@@ -174,28 +151,33 @@ def delete_chat(chat_id: str):
 
 
 # ────────────────────────────────────────────────────
-# PDF UPLOAD (Optimized: Stream directly, no file.read())
+# PDF UPLOAD  (session-aware, with metadata)
 # ────────────────────────────────────────────────────
 @app.post("/upload")
 async def upload(file: UploadFile = File(...), chat_id: str = "default"):
     try:
+        # Validate file type
         if file.content_type not in ("application/pdf", "text/plain") and \
            not (file.filename or "").lower().endswith((".pdf", ".txt", ".doc", ".docx")):
             raise HTTPException(status_code=400, detail="Only PDF and text files are supported")
 
-        # FIX: Pass the raw file stream directly to our optimized extract_text function.
-        # This prevents the 50MB+ RAM spike when users upload large files.
-        text = extract_text(file.file)
+        file_bytes = await file.read()
+
+        if len(file_bytes) == 0:
+            raise HTTPException(status_code=400, detail="Uploaded file is empty")
+
+        # Extract text
+        text = extract_text(io.BytesIO(file_bytes))
 
         if not text or not text.strip():
             raise HTTPException(status_code=422, detail="No readable text found in this file")
 
+        # Store in RAG with session isolation
         chunk_count = store_pdf(text, chat_id=chat_id)
 
+        # Get metadata
         try:
-            # Must reset the stream position before reading metadata
-            file.file.seek(0)
-            meta = get_pdf_metadata(file.file)
+            meta = get_pdf_metadata(io.BytesIO(file_bytes))
         except Exception:
             meta = {"pages": "?", "title": "", "author": ""}
 
@@ -214,7 +196,7 @@ async def upload(file: UploadFile = File(...), chat_id: str = "default"):
 
 
 # ────────────────────────────────────────────────────
-# RAG STATUS
+# RAG STATUS  (useful for frontend to show context badge)
 # ────────────────────────────────────────────────────
 @app.get("/rag-status")
 def rag_status(chat_id: str = "default"):
@@ -222,7 +204,7 @@ def rag_status(chat_id: str = "default"):
 
 
 # ────────────────────────────────────────────────────
-# STATS
+# STATS  (optional dashboard endpoint)
 # ────────────────────────────────────────────────────
 @app.get("/stats")
 def stats():
