@@ -40,8 +40,6 @@ export default function ChatWindow({
     
     if (force || distFromBottom < 120) {
       messagesEndRef.current?.scrollIntoView({ 
-        // Use "smooth" ONLY if the user clicked the button (force = true)
-        // Otherwise, use "auto" for instant snapping during streaming
         behavior: force ? "smooth" : "auto" 
       });
     }
@@ -52,8 +50,9 @@ export default function ChatWindow({
     const container = scrollContainerRef.current;
     if (!container) return;
     const distFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
-    // FIX: Increased threshold to 350 so it doesn't flash during fast streaming
-    setShowScrollBtn(distFromBottom > 350);
+    
+    // Adjusted threshold so it appears naturally when scrolling up
+    setShowScrollBtn(distFromBottom > 250);
   }, []);
 
   useEffect(() => {
@@ -206,38 +205,35 @@ export default function ChatWindow({
         <div ref={messagesEndRef} style={{ height: 1 }} />
       </div>
 
-      {/* Scroll to bottom button */}
+      {/* Scroll to bottom button - REDESIGNED */}
       <AnimatePresence>
         {showScrollBtn && (
           <motion.button
-            initial={{ opacity: 0, y: 10, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.9 }}
-            transition={{ duration: 0.18 }}
+            initial={{ opacity: 0, scale: 0.6 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.6 }}
+            transition={{ type: "spring", stiffness: 400, damping: 25 }}
             onClick={() => scrollToBottom(true)}
+            title="Scroll to bottom"
             style={{
-              position: "sticky",
-              bottom: 130, // FIX: Lowered from 180 to sit neatly above the input box
-              left: "50%",
-              transform: "translateX(-50%)",
+              position: "absolute", // FIX: Floats over the UI, detached from text
+              bottom: "130px",      // Above the input box
+              right: "32px",        // FIX: Moved to the SIDE
               display: "flex",
               alignItems: "center",
-              gap: 6,
+              justifyContent: "center",
+              width: "42px",        // FIX: Makes it a perfect circle
+              height: "42px",
               background: "var(--bg-input)",
               border: "1px solid var(--border-color)",
-              borderRadius: 20,
-              padding: "7px 16px",
-              fontSize: "0.75rem",
-              fontWeight: 500,
+              borderRadius: "50%",  // FIX: Circular design
               color: "var(--text-secondary)",
               cursor: "pointer",
-              boxShadow: "var(--shadow-md)",
-              fontFamily: "'Sora', sans-serif",
-              zIndex: 5,
-              whiteSpace: "nowrap",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.15)", // Deep professional shadow
+              zIndex: 100,
             }}
           >
-            <ChevronDown size={14} /> Scroll to bottom
+            <ChevronDown size={22} />
           </motion.button>
         )}
       </AnimatePresence>
