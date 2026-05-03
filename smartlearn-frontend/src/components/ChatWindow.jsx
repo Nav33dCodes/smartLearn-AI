@@ -33,7 +33,6 @@ export default function ChatWindow({
   const [showScrollBtn, setShowScrollBtn] = useState(false);
 
   // Smart scroll — only auto-scroll if near bottom
-// Smart scroll — only auto-scroll if near bottom
   const scrollToBottom = useCallback((force = false) => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -53,7 +52,8 @@ export default function ChatWindow({
     const container = scrollContainerRef.current;
     if (!container) return;
     const distFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
-    setShowScrollBtn(distFromBottom > 200);
+    // FIX: Increased threshold to 350 so it doesn't flash during fast streaming
+    setShowScrollBtn(distFromBottom > 350);
   }, []);
 
   useEffect(() => {
@@ -217,7 +217,7 @@ export default function ChatWindow({
             onClick={() => scrollToBottom(true)}
             style={{
               position: "sticky",
-              bottom: 180,
+              bottom: 130, // FIX: Lowered from 180 to sit neatly above the input box
               left: "50%",
               transform: "translateX(-50%)",
               display: "flex",

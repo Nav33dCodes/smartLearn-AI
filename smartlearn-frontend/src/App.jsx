@@ -184,12 +184,27 @@ export default function App() {
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let accumulated = "";
+      
+      // THROW FIX: Render throttle variables
+      let renderBuffer = ""; 
+      let lastRenderTime = Date.now();
 
       while (true) {
         const { done, value } = await reader.read();
-        if (done) break;
+        
+        if (done) {
+          // Final flush to ensure no text is left behind
+          if (renderBuffer) {
+             setChats(prev => prev.map(chat => {
+               if (chat.id !== currentChatId) return chat;
+               const msgs = [...chat.messages];
+               msgs[msgs.length - 1] = { role: "assistant", content: accumulated };
+               return { ...chat, messages: msgs };
+             }));
+          }
+          break;
+        }
 
-        // Parse SSE chunks
         const text = decoder.decode(value);
         const lines = text.split("\n");
 
@@ -198,19 +213,23 @@ export default function App() {
           try {
             const json = JSON.parse(line.slice(6));
             if (json.done) break;
+            
             if (json.token) {
               accumulated += json.token;
+              renderBuffer += json.token;
 
-              // Update the last message (AI bubble) live
-              setChats(prev => prev.map(chat => {
-                if (chat.id !== currentChatId) return chat;
-                const msgs = [...chat.messages];
-                msgs[msgs.length - 1] = {
-                  role: "assistant",
-                  content: accumulated
-                };
-                return { ...chat, messages: msgs };
-              }));
+              // THROW FIX: Only update the UI every 50ms, or on punctuation (like newlines)
+              const now = Date.now();
+              if (now - lastRenderTime > 50 || json.token.includes('\n')) {
+                setChats(prev => prev.map(chat => {
+                  if (chat.id !== currentChatId) return chat;
+                  const msgs = [...chat.messages];
+                  msgs[msgs.length - 1] = { role: "assistant", content: accumulated };
+                  return { ...chat, messages: msgs };
+                }));
+                renderBuffer = ""; // Clear buffer
+                lastRenderTime = now;
+              }
             }
           } catch {}
         }
@@ -225,7 +244,7 @@ export default function App() {
       }));
 
     } catch (err) {
-      if (!err.name === "AbortError") {
+      if (err.name !== "AbortError") {
         setChats(prev => prev.map(chat => {
           if (chat.id !== currentChatId) return chat;
           const msgs = [...chat.messages];
@@ -556,6 +575,7 @@ export default function App() {
           overflow-y: auto;
           padding: 58px 0 168px 0;
           scroll-behavior: smooth;
+          overflow-anchor: auto; /* 👈 THROW FIX: Prevents vertical layout shift */
         }
 
         .messages-scroll-area::-webkit-scrollbar { width: 5px; }
@@ -689,6 +709,14 @@ export default function App() {
           line-height: 1.8;
           color: var(--text-primary);
           padding-top: 2px;
+        }
+
+        /* 👈 THROW FIX: Word wrap prevents text from pushing width unexpectedly */
+        .ai-content, .message-user-bubble {
+          overflow-wrap: break-word;
+          word-wrap: break-word;
+          word-break: break-word;
+          hyphens: auto;
         }
 
         .msg-actions {
