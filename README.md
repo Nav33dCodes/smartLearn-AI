@@ -226,11 +226,9 @@ CREATE TABLE chats (
 
 ## 🔮 Roadmap
 
-* [ ] 🔄 Real-time streaming (SSE/WebSocket)
-* [ ] 🔐 Authentication (JWT)
+* [ ] 🔐 Authentication (JWT/OAUth)
 * [ ] 🧠 Long-term memory
-* [ ] 📱 Mobile optimization
-* [ ] ☁️ Full cloud deployment
+* [ ] 📱 Mobile Optimization
 * [ ] 💾 Persistent FAISS index
 
 ---
