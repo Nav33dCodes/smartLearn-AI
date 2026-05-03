@@ -7,10 +7,10 @@ import Logo from "./Logo";
 
 // UPGRADE: Modernized suggestions with icons
 const SUGGESTIONS = [
-  { text: "Explain quantum entanglement", icon: <Sparkles size={18} /> },
-  { text: "Write a Python binary search", icon: <Code size={18} /> },
-  { text: "Summarise an uploaded document", icon: <FileText size={18} /> },
-  { text: "Compare React vs Vue in 2025", icon: <Zap size={18} /> }
+  { text: "Teach me like I'm a beginner", icon: <Sparkles size={18} /> },
+  { text: "Solve a coding problem with steps", icon: <Code size={18} /> },
+  { text: "Turn this into short notes", icon: <FileText size={18} /> },
+  { text: "Quick comparison between topics", icon: <Zap size={18} /> }
 ];
 
 const containerVariants = {
