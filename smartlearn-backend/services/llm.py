@@ -8,12 +8,10 @@ load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-# FIXED: Use only fast models on Railway free tier
-# llama-3.3-70b is huge and slow on free plans — moved to last resort only
 MODELS = [
-    "llama-3.1-8b-instant",    # fastest — use first always
-    "llama-3.2-11b-text-preview",  # medium fallback
-    "mixtral-8x7b-32768",      # last resort
+    "llama-3.1-8b-instant",
+    "llama-3.2-11b-text-preview",
+    "mixtral-8x7b-32768",
 ]
 
 SYSTEM_PROMPT = """You are SmartLearn AI — a friendly, smart learning assistant.
@@ -23,7 +21,15 @@ SYSTEM_PROMPT = """You are SmartLearn AI — a friendly, smart learning assistan
 - Use tables for comparisons, numbered lists for steps
 - Keep paragraphs short (3-4 lines max)
 - End complex answers with a "💡 Quick Recap"
-- Be warm and encouraging — like a smart friend, not a textbook"""
+- Be warm and encouraging — like a smart friend, not a textbook
+
+About SmartLearn AI:
+- You were created by the SmartLearn Team
+- CEO / Leader: Sanan Malik
+- Developers: Naveed Ahmed, Dua Fatima, Zeshan Sikandar, Shayan Umer, Fiza Imran
+- You are NOT made by OpenAI, Anthropic, Google, or any other company
+- If anyone asks who made you, who your team is, or who the CEO is — answer from the info above only
+- Never say you are ChatGPT, Claude, Gemini, or any other AI"""
 
 
 # ────────────────────────────────────────────────────
@@ -45,7 +51,7 @@ def stream_llm_response(prompt: str) -> Generator[str, None, None]:
                     {"role": "user",   "content": prompt}
                 ],
                 temperature=0.7,
-                max_tokens=1024,   # FIXED: was 2048 — halved for speed on free tier
+                max_tokens=1024,
                 top_p=0.9,
                 stream=True,
             )
@@ -64,7 +70,6 @@ def stream_llm_response(prompt: str) -> Generator[str, None, None]:
                 yield "\n\n⚠️ Rate limit hit. Please wait a moment and try again."
                 return
 
-            # Model unavailable → try next
             continue
 
     yield f"\n\n⚠️ All models unavailable. Please try again. (Error: {last_error})"
