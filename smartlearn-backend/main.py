@@ -83,7 +83,7 @@ class ChatRequest(BaseModel):
 # ────────────────────────────────────────────────────
 @app.get("/")
 def root():
-    return {"status": "SmartLearn AI Running 🚀", "version": "81.7.8"}
+    return {"status": "SmartLearn AI Running 🚀", "version": "9.2.2"}
 
 @app.get("/health")
 def health():
