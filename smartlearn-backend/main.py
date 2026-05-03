@@ -2,7 +2,8 @@ import logging
 import io
 import json
 import gc
-
+import time
+from datetime import datetime, timezone
 from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -26,7 +27,7 @@ logger = logging.getLogger(__name__)
 # ────────────────────────────────────────────────────
 # APP
 # ────────────────────────────────────────────────────
-app = FastAPI(title="SmartLearn AI", version="81.7.8")
+app = FastAPI(title="SmartLearn AI", version="9.2.2")
 
 app.add_middleware(
     CORSMiddleware,
