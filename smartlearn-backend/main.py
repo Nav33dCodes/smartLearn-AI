@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 # ────────────────────────────────────────────────────
 # APP
 # ────────────────────────────────────────────────────
-app = FastAPI(title="SmartLearn AI", version="2.2.0")
+app = FastAPI(title="SmartLearn AI", version="81.7.8")
 
 app.add_middleware(
     CORSMiddleware,
@@ -83,7 +83,7 @@ class ChatRequest(BaseModel):
 # ────────────────────────────────────────────────────
 @app.get("/")
 def root():
-    return {"status": "SmartLearn AI Running 🚀", "version": "2.2.0"}
+    return {"status": "SmartLearn AI Running 🚀", "version": "81.7.8"}
 
 @app.get("/health")
 def health():
