@@ -48,8 +48,19 @@ export default function App() {
           const sorted = formatted.sort((a, b) => Number(b.id) - Number(a.id));
 
           if (sorted.length > 0) {
-            setChats(sorted);
-            setActiveChatId(sorted[0].id);
+            // ── FIX: ALWAYS START WITH A BLANK CANVAS ──
+            const topChat = sorted[0];
+            
+            // If the top chat in history is already empty, just use it
+            if (topChat.messages.length === 0) {
+              setChats(sorted);
+              setActiveChatId(topChat.id);
+            } else {
+              // Otherwise, create a fresh blank chat and put it at the top of the list
+              const freshChat = { id: Date.now().toString(), title: "New chat", messages: [] };
+              setChats([freshChat, ...sorted]);
+              setActiveChatId(freshChat.id);
+            }
           } else {
             createNewChat();
           }
@@ -185,7 +196,6 @@ export default function App() {
       const decoder = new TextDecoder();
       let accumulated = "";
       
-      // THROW FIX: Render throttle variables
       let renderBuffer = ""; 
       let lastRenderTime = Date.now();
 
@@ -218,7 +228,7 @@ export default function App() {
               accumulated += json.token;
               renderBuffer += json.token;
 
-              // THROW FIX: Only update the UI every 50ms, or on punctuation (like newlines)
+              // Only update the UI every 50ms, or on punctuation
               const now = Date.now();
               if (now - lastRenderTime > 50 || json.token.includes('\n')) {
                 setChats(prev => prev.map(chat => {
@@ -575,7 +585,7 @@ export default function App() {
           overflow-y: auto;
           padding: 58px 0 168px 0;
           scroll-behavior: smooth;
-          overflow-anchor: auto; /* 👈 THROW FIX: Prevents vertical layout shift */
+          overflow-anchor: auto;
         }
 
         .messages-scroll-area::-webkit-scrollbar { width: 5px; }
@@ -711,7 +721,6 @@ export default function App() {
           padding-top: 2px;
         }
 
-        /* 👈 THROW FIX: Word wrap prevents text from pushing width unexpectedly */
         .ai-content, .message-user-bubble {
           overflow-wrap: break-word;
           word-wrap: break-word;
