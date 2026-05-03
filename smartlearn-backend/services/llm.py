@@ -153,4 +153,4 @@ def stream_llm_response(prompt: str, retries: int = 2) -> Generator[str, None, N
 
     # All models and retries failed
     logger.error("Streaming failed across all models.")
-    yield f"\n\n⚠️ SmartLearn AI is temporarily unavailable. (Error: {last_error})"
+    yield f"\n\n⚠️ SmartLearn AI is temporarily unavailable. (Error: {last_error})
