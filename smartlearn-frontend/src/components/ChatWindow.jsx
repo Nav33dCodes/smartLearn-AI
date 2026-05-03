@@ -1,26 +1,28 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Pencil, CheckCircle2, Copy, RotateCw, ChevronDown } from "lucide-react";
+// Added Sparkles, Code, FileText, and Zap icons for the modern suggestions
+import { Pencil, CheckCircle2, Copy, RotateCw, ChevronDown, Sparkles, Code, FileText, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AIMessage from "./AIMessage";
 import Logo from "./Logo";
 
+// UPGRADE: Modernized suggestions with icons
 const SUGGESTIONS = [
-  "Explain quantum entanglement simply",
-  "Write a Python binary search",
-  "Summarise an uploaded document",
-  "Compare React vs Vue in 2025"
+  { text: "Explain quantum entanglement", icon: <Sparkles size={18} /> },
+  { text: "Write a Python binary search", icon: <Code size={18} /> },
+  { text: "Summarise an uploaded document", icon: <FileText size={18} /> },
+  { text: "Compare React vs Vue in 2025", icon: <Zap size={18} /> }
 ];
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.08 } }
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 18 },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1, y: 0,
-    transition: { type: "spring", stiffness: 380, damping: 28 }
+    transition: { type: "spring", stiffness: 350, damping: 30 }
   }
 };
 
@@ -50,8 +52,6 @@ export default function ChatWindow({
     const container = scrollContainerRef.current;
     if (!container) return;
     const distFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
-    
-    // Adjusted threshold so it appears naturally when scrolling up
     setShowScrollBtn(distFromBottom > 250);
   }, []);
 
@@ -83,39 +83,79 @@ export default function ChatWindow({
     <div className="messages-scroll-area" ref={scrollContainerRef}>
       <div className="messages-container">
 
-        {/* Welcome */}
+        {/* ── REDESIGNED WELCOME SCREEN (ChatGPT / Gemini Style) ── */}
         {isEmpty && (
           <motion.div
             className="welcome-screen"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: "8vh", // Pushes it perfectly to the visual center
+              padding: "0 20px"
+            }}
           >
-            <motion.div variants={itemVariants} className="welcome-logo">
-              <Logo size={44} />
+            <motion.div variants={itemVariants} style={{ marginBottom: "24px" }}>
+              {/* Slightly larger logo for the hero section */}
+              <Logo size={52} /> 
             </motion.div>
 
-            <motion.h1 variants={itemVariants} className="welcome-title">
-              SmartLearn
+            <motion.h1 
+              variants={itemVariants} 
+              style={{
+                fontSize: "1.75rem",
+                fontWeight: 600,
+                color: "var(--text-primary)",
+                marginBottom: "40px",
+                letterSpacing: "-0.03em",
+                textAlign: "center"
+              }}
+            >
+              How can I help you today?
             </motion.h1>
 
-            <motion.p variants={itemVariants} className="welcome-subtitle">
-              How can I help you today?
-            </motion.p>
-
-            <motion.div variants={itemVariants} className="suggestions-grid">
-              {SUGGESTIONS.map((text, i) => (
+            <motion.div 
+              variants={itemVariants} 
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                gap: "12px",
+                width: "100%",
+                maxWidth: "680px" // Keeps the grid tightly centered
+              }}
+            >
+              {SUGGESTIONS.map((item, i) => (
                 <motion.div
                   key={i}
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="suggestion-card"
+                  whileHover={{ scale: 1.02, backgroundColor: "var(--bg-hover)", borderColor: "var(--accent-color)" }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => {
-                    setInput(text);
+                    setInput(item.text);
                     textareaRef.current?.focus();
                   }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "14px",
+                    padding: "16px 20px",
+                    background: "var(--bg-input)",
+                    border: "1px solid var(--border-color)",
+                    borderRadius: "16px", // Sleeker, rounder corners
+                    cursor: "pointer",
+                    boxShadow: "var(--shadow-sm)",
+                    transition: "all 0.2s ease"
+                  }}
                 >
-                  {text}
+                  <div style={{ color: "var(--text-muted)", display: "flex", alignItems: "center" }}>
+                    {item.icon}
+                  </div>
+                  <span style={{ color: "var(--text-secondary)", fontSize: "0.9rem", fontWeight: 500 }}>
+                    {item.text}
+                  </span>
                 </motion.div>
               ))}
             </motion.div>
@@ -205,7 +245,7 @@ export default function ChatWindow({
         <div ref={messagesEndRef} style={{ height: 1 }} />
       </div>
 
-      {/* Scroll to bottom button - REDESIGNED */}
+      {/* Scroll to bottom button */}
       <AnimatePresence>
         {showScrollBtn && (
           <motion.button
@@ -216,20 +256,20 @@ export default function ChatWindow({
             onClick={() => scrollToBottom(true)}
             title="Scroll to bottom"
             style={{
-              position: "absolute", // FIX: Floats over the UI, detached from text
-              bottom: "130px",      // Above the input box
-              right: "32px",        // FIX: Moved to the SIDE
+              position: "absolute",
+              bottom: "130px",
+              right: "32px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              width: "42px",        // FIX: Makes it a perfect circle
+              width: "42px",
               height: "42px",
               background: "var(--bg-input)",
               border: "1px solid var(--border-color)",
-              borderRadius: "50%",  // FIX: Circular design
+              borderRadius: "50%",
               color: "var(--text-secondary)",
               cursor: "pointer",
-              boxShadow: "0 4px 16px rgba(0,0,0,0.15)", // Deep professional shadow
+              boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
               zIndex: 100,
             }}
           >
