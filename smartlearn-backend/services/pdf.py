@@ -1,67 +1,110 @@
 import io
 from pypdf import PdfReader
 
-# pdfplumber is better for tables/complex layouts — use as fallback
 try:
     import pdfplumber
     PDFPLUMBER_AVAILABLE = True
 except ImportError:
     PDFPLUMBER_AVAILABLE = False
 
+# FIXED: Limit pages processed — a 300-page PDF was reading ALL pages
+# = massive RAM spike + slow response. 80 pages is enough for most docs.
+MAX_PAGES = 80
 
-def extract_text_pypdf(file) -> str:
-    """Extract text using pypdf (fast, works for most PDFs)."""
-    reader = PdfReader(file)
+# FIXED: Cap total text size sent to embeddings — prevents OOM
+MAX_TEXT_CHARS = 120_000  # ~30,000 words, plenty
+
+
+def extract_text_pypdf(file_bytes: bytes) -> str:
+    """Fast extraction using pypdf."""
+    reader = PdfReader(io.BytesIO(file_bytes))
     pages = []
+    total_chars = 0
+
     for i, page in enumerate(reader.pages):
+        if i >= MAX_PAGES:
+            pages.append(f"\n\n[Note: Document truncated at page {MAX_PAGES} to save memory]")
+            break
+
         text = page.extract_text() or ""
-        if text.strip():
-            pages.append(f"[Page {i+1}]\n{text.strip()}")
+        text = text.strip()
+        if not text:
+            continue
+
+        pages.append(f"[Page {i+1}]\n{text}")
+        total_chars += len(text)
+
+        # Stop early if we hit text cap
+        if total_chars >= MAX_TEXT_CHARS:
+            pages.append(f"\n\n[Note: Text capped at {MAX_TEXT_CHARS} characters]")
+            break
+
     return "\n\n".join(pages)
 
 
 def extract_text_pdfplumber(file_bytes: bytes) -> str:
-    """Extract text using pdfplumber (better for tables and complex layouts)."""
+    """Fallback extraction using pdfplumber (better for tables)."""
     pages = []
+    total_chars = 0
+
     with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
         for i, page in enumerate(pdf.pages):
+            if i >= MAX_PAGES:
+                break
+
             text = page.extract_text() or ""
 
-            # Also extract tables as plain text
-            tables = page.extract_tables()
+            # Extract tables
             table_texts = []
-            for table in tables:
-                for row in table:
-                    cleaned = [str(cell or "").strip() for cell in row]
-                    table_texts.append(" | ".join(cleaned))
+            try:
+                tables = page.extract_tables()
+                for table in (tables or []):
+                    for row in (table or []):
+                        if row:
+                            cleaned = [str(cell or "").strip() for cell in row]
+                            line = " | ".join(c for c in cleaned if c)
+                            if line:
+                                table_texts.append(line)
+            except Exception:
+                pass  # skip table extraction errors silently
 
             combined = text.strip()
             if table_texts:
-                combined += "\n\nTable data:\n" + "\n".join(table_texts)
+                combined += "\n\nTables:\n" + "\n".join(table_texts)
 
             if combined.strip():
                 pages.append(f"[Page {i+1}]\n{combined}")
+                total_chars += len(combined)
+
+            if total_chars >= MAX_TEXT_CHARS:
+                break
 
     return "\n\n".join(pages)
 
 
 def extract_text(file) -> str:
     """
-    Smart extraction: tries pypdf first, falls back to pdfplumber
-    if the result looks too short (scanned/complex PDF).
+    Smart extraction with page + size limits.
+    Tries pypdf first, falls back to pdfplumber only if needed.
     """
     try:
-        # Read bytes once so we can reuse
-        file_bytes = file.read()
+        # FIXED: Read bytes once — previous code was reading file twice
+        if hasattr(file, 'read'):
+            file_bytes = file.read()
+        else:
+            file_bytes = bytes(file)
 
-        # Try pypdf first
-        pypdf_text = extract_text_pypdf(io.BytesIO(file_bytes))
+        if not file_bytes:
+            return ""
 
-        # If pypdf got good content, use it
-        if len(pypdf_text.strip()) > 200:
+        # Try pypdf first (faster, lower memory)
+        pypdf_text = extract_text_pypdf(file_bytes)
+
+        # If we got enough text, use it — don't run pdfplumber too
+        if len(pypdf_text.strip()) > 300:
             return pypdf_text
 
-        # If pypdf got very little, try pdfplumber
+        # Only fall back to pdfplumber if pypdf result is poor
         if PDFPLUMBER_AVAILABLE:
             plumber_text = extract_text_pdfplumber(file_bytes)
             if len(plumber_text.strip()) > len(pypdf_text.strip()):
@@ -74,15 +117,19 @@ def extract_text(file) -> str:
 
 
 def get_pdf_metadata(file) -> dict:
-    """Extract basic metadata from a PDF."""
+    """Get basic PDF metadata without loading full content."""
     try:
-        file_bytes = file.read() if hasattr(file, 'read') else file
+        if hasattr(file, 'read'):
+            file_bytes = file.read()
+        else:
+            file_bytes = bytes(file)
+
         reader = PdfReader(io.BytesIO(file_bytes))
         meta = reader.metadata or {}
         return {
             "pages": len(reader.pages),
-            "title": meta.get("/Title", ""),
-            "author": meta.get("/Author", ""),
+            "title": str(meta.get("/Title", "") or ""),
+            "author": str(meta.get("/Author", "") or ""),
         }
     except Exception:
         return {"pages": 0, "title": "", "author": ""}

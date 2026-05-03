@@ -2,49 +2,78 @@ import os
 import time
 from groq import Groq
 from dotenv import load_dotenv
+from typing import Generator
 
 load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-# ── Model priority list (fast → powerful fallback) ──
+# FIXED: Use only fast models on Railway free tier
+# llama-3.3-70b is huge and slow on free plans — moved to last resort only
 MODELS = [
-    "llama-3.1-8b-instant",
-    "llama-3.3-70b-versatile",
-    "mixtral-8x7b-32768",
+    "llama-3.1-8b-instant",    # fastest — use first always
+    "llama-3.2-11b-text-preview",  # medium fallback
+    "mixtral-8x7b-32768",      # last resort
 ]
 
-SYSTEM_PROMPT = """You are SmartLearn AI — a friendly, smart, and engaging learning assistant.
+SYSTEM_PROMPT = """You are SmartLearn AI — a friendly, smart learning assistant.
 
-Your personality:
-- Warm, encouraging, and motivating 🎓
-- Use emojis naturally to make responses lively (don't overdo it)
-- Celebrate curiosity: treat every question as a great one
-- Be concise but thorough — no unnecessary filler
-
-Your capabilities:
-- Explain complex topics simply with real-world analogies
-- Generate helpful examples, code snippets, and step-by-step breakdowns
-- Create ASCII charts/diagrams when visualizing data helps understanding
-- Use markdown formatting: headers, bold, bullet points, tables, code blocks
-- Add motivational touches when a student seems stuck or confused
-
-Formatting rules:
-- Use **bold** for key terms
-- Use ``` code blocks ``` for any code
-- Use tables for comparisons
-- Use numbered lists for steps
+- Use emojis naturally 🎓 but keep responses focused
+- Use **bold** for key terms, code blocks for code
+- Use tables for comparisons, numbered lists for steps
 - Keep paragraphs short (3-4 lines max)
-- End complex explanations with a "💡 Quick Recap" summary
+- End complex answers with a "💡 Quick Recap"
+- Be warm and encouraging — like a smart friend, not a textbook"""
 
-Tone: Smart best friend who happens to know everything — not a robot, not a textbook."""
+
+# ────────────────────────────────────────────────────
+# STREAMING  (primary — used by /chat endpoint)
+# ────────────────────────────────────────────────────
+def stream_llm_response(prompt: str) -> Generator[str, None, None]:
+    """
+    Yields tokens one by one from Groq streaming API.
+    Falls back to next model on failure.
+    """
+    last_error = None
+
+    for model in MODELS:
+        try:
+            stream = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user",   "content": prompt}
+                ],
+                temperature=0.7,
+                max_tokens=1024,   # FIXED: was 2048 — halved for speed on free tier
+                top_p=0.9,
+                stream=True,
+            )
+
+            for chunk in stream:
+                token = chunk.choices[0].delta.content
+                if token:
+                    yield token
+            return  # success
+
+        except Exception as e:
+            last_error = e
+            err_str = str(e).lower()
+
+            if "rate_limit" in err_str or "429" in err_str:
+                yield "\n\n⚠️ Rate limit hit. Please wait a moment and try again."
+                return
+
+            # Model unavailable → try next
+            continue
+
+    yield f"\n\n⚠️ All models unavailable. Please try again. (Error: {last_error})"
 
 
+# ────────────────────────────────────────────────────
+# NON-STREAMING  (fallback, kept for compatibility)
+# ────────────────────────────────────────────────────
 def get_llm_response(prompt: str, retries: int = 2) -> str:
-    """
-    Call Groq API with automatic retry and model fallback.
-    Returns the response string or an error message.
-    """
     last_error = None
 
     for model in MODELS:
@@ -54,10 +83,10 @@ def get_llm_response(prompt: str, retries: int = 2) -> str:
                     model=model,
                     messages=[
                         {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "user", "content": prompt}
+                        {"role": "user",   "content": prompt}
                     ],
-                    temperature=0.72,
-                    max_tokens=2048,
+                    temperature=0.7,
+                    max_tokens=1024,
                     top_p=0.9,
                 )
                 return response.choices[0].message.content
@@ -66,17 +95,13 @@ def get_llm_response(prompt: str, retries: int = 2) -> str:
                 last_error = e
                 err_str = str(e).lower()
 
-                # Rate limit → wait then retry
                 if "rate_limit" in err_str or "429" in err_str:
-                    wait = (attempt + 1) * 2
-                    time.sleep(wait)
+                    time.sleep((attempt + 1) * 2)
                     continue
 
-                # Model unavailable → try next model immediately
                 if "model" in err_str or "unavailable" in err_str:
                     break
 
-                # Other error → short wait then retry
                 time.sleep(1)
 
-    return f"⚠️ SmartLearn AI is temporarily unavailable. Please try again in a moment. (Error: {last_error})"
+    return f"⚠️ SmartLearn AI is temporarily unavailable. (Error: {last_error})"
