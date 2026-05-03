@@ -33,12 +33,18 @@ export default function ChatWindow({
   const [showScrollBtn, setShowScrollBtn] = useState(false);
 
   // Smart scroll — only auto-scroll if near bottom
+// Smart scroll — only auto-scroll if near bottom
   const scrollToBottom = useCallback((force = false) => {
     const container = scrollContainerRef.current;
     if (!container) return;
     const distFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+    
     if (force || distFromBottom < 120) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      messagesEndRef.current?.scrollIntoView({ 
+        // Use "smooth" ONLY if the user clicked the button (force = true)
+        // Otherwise, use "auto" for instant snapping during streaming
+        behavior: force ? "smooth" : "auto" 
+      });
     }
   }, []);
 

@@ -13,7 +13,7 @@ import json
 
 # ────────────────────────────────────────────────────
 # APP SETUP
-# ────────────────────────────────────────────────────
+# ──────────────────────────────────────────────────── 
 app = FastAPI(
     title="SmartLearn AI Backend",
     description="Groq-powered learning assistant with RAG, streaming, and PDF support",
