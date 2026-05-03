@@ -48,19 +48,8 @@ export default function App() {
           const sorted = formatted.sort((a, b) => Number(b.id) - Number(a.id));
 
           if (sorted.length > 0) {
-            // ── FIX: ALWAYS START WITH A BLANK CANVAS ──
-            const topChat = sorted[0];
-            
-            // If the top chat in history is already empty, just use it
-            if (topChat.messages.length === 0) {
-              setChats(sorted);
-              setActiveChatId(topChat.id);
-            } else {
-              // Otherwise, create a fresh blank chat and put it at the top of the list
-              const freshChat = { id: Date.now().toString(), title: "New chat", messages: [] };
-              setChats([freshChat, ...sorted]);
-              setActiveChatId(freshChat.id);
-            }
+            setChats(sorted);
+            setActiveChatId(sorted[0].id);
           } else {
             createNewChat();
           }
@@ -172,95 +161,30 @@ export default function App() {
 
     const baseHistory = customHistory ?? activeChat.messages;
     const currentChatId = activeChatId;
+    updateMessages([...baseHistory, { role: "user", content: textToSend }, { role: "assistant", content: "" }], currentChatId);
 
-    // Add user message + empty AI bubble immediately
-    updateMessages(
-      [...baseHistory,
-       { role: "user", content: textToSend },
-       { role: "assistant", content: "" }
-      ], currentChatId
-    );
-
-    if (!overrideText) { setInput(""); setAttachedFile(null); }
+    if (!overrideText) {
+      setInput("");
+      setAttachedFile(null);
+    }
     setLoading(true);
 
     try {
-      const res = await fetch(`${API}/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: textToSend, chat_id: currentChatId }),
-        signal: controller.signal,
-      });
+      const res = await axios.post(`${API}/chat`, {
+        message: textToSend,
+        chat_id: activeChatId
+      }, { signal: controller.signal });
+      await streamText(res.data.response, controller, currentChatId);
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let accumulated = "";
-      
-      let renderBuffer = ""; 
-      let lastRenderTime = Date.now();
-
-      while (true) {
-        const { done, value } = await reader.read();
-        
-        if (done) {
-          // Final flush to ensure no text is left behind
-          if (renderBuffer) {
-             setChats(prev => prev.map(chat => {
-               if (chat.id !== currentChatId) return chat;
-               const msgs = [...chat.messages];
-               msgs[msgs.length - 1] = { role: "assistant", content: accumulated };
-               return { ...chat, messages: msgs };
-             }));
-          }
-          break;
-        }
-
-        const text = decoder.decode(value);
-        const lines = text.split("\n");
-
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          try {
-            const json = JSON.parse(line.slice(6));
-            if (json.done) break;
-            
-            if (json.token) {
-              accumulated += json.token;
-              renderBuffer += json.token;
-
-              // Only update the UI every 50ms, or on punctuation
-              const now = Date.now();
-              if (now - lastRenderTime > 50 || json.token.includes('\n')) {
-                setChats(prev => prev.map(chat => {
-                  if (chat.id !== currentChatId) return chat;
-                  const msgs = [...chat.messages];
-                  msgs[msgs.length - 1] = { role: "assistant", content: accumulated };
-                  return { ...chat, messages: msgs };
-                }));
-                renderBuffer = ""; // Clear buffer
-                lastRenderTime = now;
-              }
-            }
-          } catch {}
-        }
-      }
-
-      // Update chat title
       setChats(prev => prev.map(c => {
-        if (c.id === currentChatId && c.title === "New chat") {
+        if (c.id === currentChatId && c.title === "New chat" && !controller.signal.aborted) {
           return { ...c, title: textToSend.slice(0, 30) + (textToSend.length > 30 ? "..." : "") };
         }
         return c;
       }));
-
     } catch (err) {
-      if (err.name !== "AbortError") {
-        setChats(prev => prev.map(chat => {
-          if (chat.id !== currentChatId) return chat;
-          const msgs = [...chat.messages];
-          msgs[msgs.length - 1] = { role: "assistant", content: "⚠️ Error. Please try again." };
-          return { ...chat, messages: msgs };
-        }));
+      if (!axios.isCancel(err)) {
+        await streamText("⚠️ An error occurred. Please try again.", controller, currentChatId);
       }
     }
 
@@ -294,7 +218,8 @@ export default function App() {
     const currentChatId = activeChatId;
 
     try {
-      await axios.post(`${API}/upload`, formData);
+      // ✅ FIXED: send chat_id so PDF is stored under the correct session
+      await axios.post(`${API}/upload?chat_id=${currentChatId}`, formData);
       setChats(prev => prev.map(chat => {
         if (chat.id === currentChatId) {
           return { ...chat, messages: [...chat.messages, { role: "assistant", content: `✅ **${file.name}** is uploaded and processed! You can now ask questions about it.` }] };
@@ -585,7 +510,6 @@ export default function App() {
           overflow-y: auto;
           padding: 58px 0 168px 0;
           scroll-behavior: smooth;
-          overflow-anchor: auto;
         }
 
         .messages-scroll-area::-webkit-scrollbar { width: 5px; }
@@ -719,13 +643,6 @@ export default function App() {
           line-height: 1.8;
           color: var(--text-primary);
           padding-top: 2px;
-        }
-
-        .ai-content, .message-user-bubble {
-          overflow-wrap: break-word;
-          word-wrap: break-word;
-          word-break: break-word;
-          hyphens: auto;
         }
 
         .msg-actions {
