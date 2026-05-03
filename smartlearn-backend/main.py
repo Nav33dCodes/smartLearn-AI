@@ -132,22 +132,24 @@ Answer based on the context above. If the answer isn't in the context, say so an
 
 
 # ────────────────────────────────────────────────────
-# GET ALL CHATS  (grouped by chat_id)
+# GET CHATS (Optimized: Fetches only the requested chat_id)
 # ────────────────────────────────────────────────────
 @app.get("/chats")
-def get_chats():
+def get_chats(chat_id: str = "default"):
+    """
+    Railway Memory Fix: Now requires a chat_id query parameter.
+    Prevents loading the entire database into RAM.
+    """
     db = SessionLocal()
     try:
-        chats = db.query(Chat).order_by(Chat.id.asc()).all()
+        chats = db.query(Chat).filter(Chat.chat_id == chat_id).order_by(Chat.id.asc()).all()
 
-        grouped: dict = {}
+        formatted_chats = []
         for c in chats:
-            if c.chat_id not in grouped:
-                grouped[c.chat_id] = []
-            grouped[c.chat_id].append({"role": "user",      "content": c.message})
-            grouped[c.chat_id].append({"role": "assistant", "content": c.response})
+            formatted_chats.append({"role": "user",      "content": c.message})
+            formatted_chats.append({"role": "assistant", "content": c.response})
 
-        return {"chats": grouped}
+        return {"chats": {chat_id: formatted_chats}}
 
     finally:
         db.close()
@@ -172,7 +174,7 @@ def delete_chat(chat_id: str):
 
 
 # ────────────────────────────────────────────────────
-# PDF UPLOAD
+# PDF UPLOAD (Optimized: Stream directly, no file.read())
 # ────────────────────────────────────────────────────
 @app.post("/upload")
 async def upload(file: UploadFile = File(...), chat_id: str = "default"):
@@ -181,12 +183,9 @@ async def upload(file: UploadFile = File(...), chat_id: str = "default"):
            not (file.filename or "").lower().endswith((".pdf", ".txt", ".doc", ".docx")):
             raise HTTPException(status_code=400, detail="Only PDF and text files are supported")
 
-        file_bytes = await file.read()
-
-        if len(file_bytes) == 0:
-            raise HTTPException(status_code=400, detail="Uploaded file is empty")
-
-        text = extract_text(io.BytesIO(file_bytes))
+        # FIX: Pass the raw file stream directly to our optimized extract_text function.
+        # This prevents the 50MB+ RAM spike when users upload large files.
+        text = extract_text(file.file)
 
         if not text or not text.strip():
             raise HTTPException(status_code=422, detail="No readable text found in this file")
@@ -194,7 +193,9 @@ async def upload(file: UploadFile = File(...), chat_id: str = "default"):
         chunk_count = store_pdf(text, chat_id=chat_id)
 
         try:
-            meta = get_pdf_metadata(io.BytesIO(file_bytes))
+            # Must reset the stream position before reading metadata
+            file.file.seek(0)
+            meta = get_pdf_metadata(file.file)
         except Exception:
             meta = {"pages": "?", "title": "", "author": ""}
 
