@@ -2,70 +2,77 @@ import io
 import gc
 from pypdf import PdfReader
 
-# Only import pdfplumber if absolutely needed for tables
+# Optimize by making pdfplumber an optional, lazy-loaded dependency
+PDFPLUMBER_AVAILABLE = False
 try:
     import pdfplumber
     PDFPLUMBER_AVAILABLE = True
 except ImportError:
-    PDFPLUMBER_AVAILABLE = False
+    pass
 
-def extract_text_optimized(file_stream) -> str:
+def extract_text(file) -> str:
     """
-    Stream-based extraction to prevent OOM errors on Railway.
+    Railway-optimized extraction. 
+    Handles both SpooledTemporaryFile (FastAPI) and BytesIO.
     """
     output = []
-    
     try:
-        # 1. Use pypdf for the metadata and basic check
-        # We wrap in BytesIO only if it's not already a stream
-        reader = PdfReader(file_stream)
-        num_pages = len(reader.pages)
+        # Step 1: Ensure we are at the start of the file
+        if hasattr(file, 'seek'):
+            file.seek(0)
         
-        # Performance trick: Process only a few pages with pypdf to check quality
-        # if the first page is empty, it might be a complex layout/scan
-        first_page_text = reader.pages[0].extract_text() or ""
+        # Step 2: Use pypdf for initial light-weight check
+        # This prevents loading the whole binary into a string
+        reader = PdfReader(file)
         
-        # Switch to pdfplumber ONLY if pypdf fails or if you need high-fidelity tables
+        # Performance Check: If 1st page is empty/short, it's likely a complex layout
+        first_page_text = ""
+        if len(reader.pages) > 0:
+            first_page_text = reader.pages[0].extract_text() or ""
+
+        # Step 3: Branch logic based on content density
         if PDFPLUMBER_AVAILABLE and len(first_page_text.strip()) < 50:
-            file_stream.seek(0) # Reset stream position
-            with pdfplumber.open(file_stream) as pdf:
+            # Fallback to pdfplumber for tables/complex layouts
+            file.seek(0)
+            with pdfplumber.open(file) as pdf:
                 for i, page in enumerate(pdf.pages):
-                    text = page.extract_text() or ""
-                    # Table extraction is slow/heavy; only do it if necessary
+                    p_text = page.extract_text() or ""
                     tables = page.extract_tables()
                     if tables:
-                        table_data = "\n".join([" | ".join([str(c or "").strip() for c in row]) for table in tables for row in table])
-                        text += f"\n{table_data}"
+                        table_str = "\n".join([" | ".join([str(c or "").strip() for c in row]) for table in tables for row in table])
+                        p_text += f"\n\nTable data:\n{table_str}"
                     
-                    output.append(f"[Page {i+1}]\n{text}")
-                    # Free memory per page
-                    page.flush_cache() 
+                    if p_text.strip():
+                        output.append(f"[Page {i+1}]\n{p_text}")
+                    # CRITICAL: Clear page cache to save RAM
+                    page.flush_cache()
         else:
-            # Stick with pypdf (Faster & Lower Memory)
+            # High-speed pypdf extraction
             for i, page in enumerate(reader.pages):
-                text = page.extract_text() or ""
-                if text.strip():
-                    output.append(f"[Page {i+1}]\n{text.strip()}")
+                p_text = page.extract_text() or ""
+                if p_text.strip():
+                    output.append(f"[Page {i+1}]\n{p_text.strip()}")
 
         return "\n\n".join(output)
 
     except Exception as e:
-        return f"Error: {str(e)}"
+        return f"PDF extraction error: {str(e)}"
     finally:
-        # Force cleanup
-        del output
+        # Manual garbage collection to assist Railway's limited RAM
         gc.collect()
 
-def get_pdf_metadata_fast(file_stream) -> dict:
-    """Extract metadata without loading the whole file into memory."""
+def get_pdf_metadata(file) -> dict:
+    """Lightweight metadata extraction."""
     try:
-        file_stream.seek(0)
-        reader = PdfReader(file_stream)
+        if hasattr(file, 'seek'):
+            file.seek(0)
+        
+        reader = PdfReader(file)
         meta = reader.metadata or {}
         return {
             "pages": len(reader.pages),
             "title": str(meta.get("/Title", "")),
             "author": str(meta.get("/Author", "")),
         }
-    except:
+    except Exception:
         return {"pages": 0, "title": "Unknown", "author": "Unknown"}
