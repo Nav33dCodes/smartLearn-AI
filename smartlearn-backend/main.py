@@ -31,12 +31,15 @@ app = FastAPI(title="SmartLearn AI", version="9.2.2")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://smart-learn-ai-gules.vercel.app",
-        "http://localhost:5173",
-        "http://localhost:3000",
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
+
+    # allow_origins=[
+    #     "https://smart-learn-ai-gules.vercel.app",
+    #     "http://localhost:5173",
+    #     "http://localhost:3000",
+    # ],
+  
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
