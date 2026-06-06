@@ -28,7 +28,7 @@
 
 ---
 
-## ✨ Key Features
+## ✨ Key Feature
 
 * 💬 Real-time AI Chat (Groq API)
 * 📄 PDF Upload + Q&A
