@@ -321,120 +321,111 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode }
 
               {/* DATA & PRIVACY TAB */}
               {activeTab === 'data' && (
-                <motion.div key="data" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="max-w-xl">
+                <motion.div key="data" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="max-w-2xl">
                   <h3 className="text-lg font-medium mb-6 pb-2 border-b border-zinc-200 dark:border-zinc-800">Data & Privacy</h3>
                   
-                  <div className="space-y-8">
-                    {/* Export */}
-                    <div>
-                      <h4 className="text-sm font-semibold mb-2 flex items-center gap-2"><Download size={16} /> Export Your Data</h4>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Download a machine-readable JSON file containing your account details, chat metadata, and full chat history.
-                      </p>
+                  <div className="space-y-4">
+                    {/* Export Card */}
+                    <div className="p-5 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <h4 className="text-sm font-semibold mb-1 flex items-center gap-2"><Download size={16} className="text-zinc-600 dark:text-zinc-400" /> Export Your Data</h4>
+                        <p className="text-xs text-muted-foreground">Download a JSON file containing your account details and full chat history.</p>
+                      </div>
                       <button 
                         onClick={handleExportData}
                         disabled={exportMutation.isPending}
-                        className="bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-foreground px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                        className="shrink-0 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-foreground px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 shadow-sm"
                       >
                         {exportMutation.isPending && <Loader2 size={14} className="animate-spin" />}
                         Export Data
                       </button>
                     </div>
 
-                    <div className="border-t border-zinc-200 dark:border-zinc-800" />
-
-                    {/* Delete Chats */}
-                    <div>
-                      <h4 className="text-sm font-semibold mb-2 flex items-center gap-2 text-destructive"><Trash2 size={16} /> Delete All Chats</h4>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Permanently delete your entire chat history. This action cannot be undone.
-                      </p>
+                    {/* Delete Chats Card */}
+                    <div className="p-5 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <h4 className="text-sm font-semibold mb-1 flex items-center gap-2 text-red-500"><Trash2 size={16} /> Delete All Chats</h4>
+                        <p className="text-xs text-muted-foreground">Permanently delete your entire chat history. This cannot be undone.</p>
+                      </div>
                       
                       {!deleteChatsConfirm ? (
                         <button 
                           onClick={() => setDeleteChatsConfirm(true)}
-                          className="bg-red-50 dark:bg-red-950/30 text-destructive border border-red-200 dark:border-red-900 hover:bg-red-100 dark:hover:bg-red-900/50 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                          className="shrink-0 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm"
                         >
-                          Delete All Chats
+                          Delete Chats
                         </button>
                       ) : (
-                        <div className="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-lg">
-                          <AlertTriangle className="text-destructive shrink-0" size={18} />
-                          <span className="text-sm font-medium text-destructive">Are you absolutely sure?</span>
-                          <div className="ml-auto flex items-center gap-2">
-                            <button onClick={() => setDeleteChatsConfirm(false)} className="px-3 py-1.5 text-xs font-medium hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-colors">Cancel</button>
-                            <button onClick={handleDeleteAllChats} disabled={deleteAllChatsMutation.isPending} className="px-3 py-1.5 text-xs font-medium bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-md transition-colors flex items-center gap-2">
-                              {deleteAllChatsMutation.isPending && <Loader2 size={12} className="animate-spin" />}
-                              Confirm Delete
-                            </button>
-                          </div>
+                        <div className="flex items-center gap-2 bg-red-50 dark:bg-red-950/30 p-1.5 rounded-lg border border-red-200 dark:border-red-900/50">
+                          <button onClick={() => setDeleteChatsConfirm(false)} className="px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-colors">Cancel</button>
+                          <button onClick={handleDeleteAllChats} disabled={deleteAllChatsMutation.isPending} className="px-3 py-1.5 text-xs font-medium bg-red-500 text-white hover:bg-red-600 rounded-md transition-colors flex items-center gap-2 shadow-sm">
+                            {deleteAllChatsMutation.isPending && <Loader2 size={12} className="animate-spin" />}
+                            Confirm
+                          </button>
                         </div>
                       )}
                     </div>
 
-                    <div className="border-t border-zinc-200 dark:border-zinc-800" />
+                    {/* Delete Account Card */}
+                    <div className="p-5 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                        <div>
+                          <h4 className="text-sm font-semibold mb-1 flex items-center gap-2 text-red-500"><Lock size={16} /> Delete Account</h4>
+                          <p className="text-xs text-muted-foreground">Permanently delete your account and data. Requires OTP verification.</p>
+                        </div>
 
-                    {/* Delete Account */}
-                    <div>
-                      <h4 className="text-sm font-semibold mb-2 flex items-center gap-2 text-destructive"><Lock size={16} /> Delete Account</h4>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Permanently delete your SmartLearn AI account and all associated data. You will receive an OTP code to verify this destructive action.
-                      </p>
-
-                      {deleteAccountPhase === 0 && (
-                        <button 
-                          onClick={handleRequestAccountDeletion}
-                          disabled={reqDeleteAccountMutation.isPending}
-                          className="bg-red-50 dark:bg-red-950/30 text-destructive border border-red-200 dark:border-red-900 hover:bg-red-100 dark:hover:bg-red-900/50 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
-                        >
-                          {reqDeleteAccountMutation.isPending && <Loader2 size={14} className="animate-spin" />}
-                          Request Deletion
-                        </button>
-                      )}
+                        {deleteAccountPhase === 0 && (
+                          <button 
+                            onClick={handleRequestAccountDeletion}
+                            disabled={reqDeleteAccountMutation.isPending}
+                            className="shrink-0 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center justify-center gap-2"
+                          >
+                            {reqDeleteAccountMutation.isPending && <Loader2 size={14} className="animate-spin" />}
+                            Delete Account
+                          </button>
+                        )}
+                      </div>
 
                       {deleteAccountPhase === 2 && (
-                        <form onSubmit={handleConfirmAccountDeletion} className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-lg space-y-4">
-                          <div>
-                            <label className="block text-sm font-medium text-destructive mb-2">Enter OTP sent to your email</label>
+                        <form onSubmit={handleConfirmAccountDeletion} className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row gap-3 sm:items-end">
+                          <div className="flex-1">
+                            <label className="block text-xs font-medium text-muted-foreground mb-1">Enter Verification Code</label>
                             <input 
                               type="text" 
                               value={deleteOtp}
                               onChange={e => setDeleteOtp(e.target.value)}
-                              placeholder="e.g. 123456"
+                              placeholder="6-digit OTP"
                               required
-                              className="w-full max-w-[200px] bg-background border border-red-300 dark:border-red-800 rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-destructive focus:border-destructive outline-none"
+                              className="w-full bg-background border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
                             />
                           </div>
-                          <div className="flex items-center gap-3">
-                            <button 
-                              type="submit" 
-                              disabled={confirmDeleteAccountMutation.isPending}
-                              className="bg-destructive text-destructive-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-destructive/90 transition-colors flex items-center gap-2"
-                            >
-                              {confirmDeleteAccountMutation.isPending && <Loader2 size={14} className="animate-spin" />}
-                              Permanently Delete
-                            </button>
+                          <div className="flex items-center gap-2">
                             <button 
                               type="button" 
                               onClick={() => { setDeleteAccountPhase(0); setDeleteOtp(""); }}
-                              className="px-4 py-2 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-colors"
+                              className="px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                             >
                               Cancel
+                            </button>
+                            <button 
+                              type="submit" 
+                              disabled={confirmDeleteAccountMutation.isPending}
+                              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center gap-2"
+                            >
+                              {confirmDeleteAccountMutation.isPending && <Loader2 size={14} className="animate-spin" />}
+                              Confirm Deletion
                             </button>
                           </div>
                         </form>
                       )}
                     </div>
 
-                    <div className="border-t border-zinc-200 dark:border-zinc-800" />
-
-                    <div>
-                      <h4 className="text-sm font-semibold mb-2">Privacy Information</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Your privacy is our priority. We do not sell your personal data or chat histories to third parties. All PDF extractions and conversational data are securely stored and encrypted in transit. By exporting your data, you agree to handle your local copy securely.
+                    <div className="pt-4 mt-2 border-t border-zinc-200 dark:border-zinc-800">
+                      <h4 className="text-xs font-semibold mb-2 uppercase tracking-wider text-muted-foreground">Privacy Commitment</h4>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        We do not sell your personal data or chat histories to third parties. All PDF extractions and conversational data are securely stored. By exporting your data, you agree to handle your local copy securely.
                       </p>
                     </div>
-
                   </div>
                 </motion.div>
               )}
@@ -445,7 +436,7 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode }
                   <h3 className="text-lg font-medium mb-6 pb-2 border-b border-zinc-200 dark:border-zinc-800">About SmartLearn AI</h3>
                   <div className="space-y-6">
                     <div className="flex items-center gap-4">
-                      <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground">
+                      <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-sm">
                         <CheckCircle2 size={24} />
                       </div>
                       <div>
@@ -453,22 +444,33 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode }
                         <p className="text-sm text-muted-foreground">Version 13.7.4 (BETA)</p>
                       </div>
                     </div>
-                    <div className="bg-zinc-50 dark:bg-zinc-900/50 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 space-y-2">
-                      <p className="text-sm text-muted-foreground">
+                    <div className="bg-zinc-50 dark:bg-zinc-900/40 p-5 rounded-xl border border-zinc-200 dark:border-zinc-800">
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
                         SmartLearn AI is an advanced, industry-level cognitive assistant designed for peak productivity, rapid learning, and seamless AI interactions.
                       </p>
-                      <p className="text-xs text-muted-foreground pt-2">
+                      <p className="text-xs text-muted-foreground mt-4 font-medium">
                         &copy; {new Date().getFullYear()} SmartLearn AI. All rights reserved.
                       </p>
                     </div>
-                    <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800">
-                      <h4 className="text-sm font-medium mb-3">Need Help?</h4>
+                    <div className="pt-2">
+                      <h4 className="text-sm font-semibold mb-2">Need Help?</h4>
                       <p className="text-sm text-muted-foreground mb-4">
-                        Our premium support team is available 24/7 to assist you with any inquiries or technical difficulties.
+                        Our premium support team is available 24/7 to assist you. You can reach us directly at the email below.
                       </p>
-                      <a href="mailto:iamnaveed.cs@gmail.com?subject=SmartLearn%20AI%20Support%20Request" className="inline-flex items-center justify-center bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 dark:text-zinc-900 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors">
-                        Contact Support
-                      </a>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-4 py-2.5 text-sm font-medium text-foreground select-all">
+                          iamnaveed.cs@gmail.com
+                        </div>
+                        <button 
+                          onClick={() => {
+                            navigator.clipboard.writeText("iamnaveed.cs@gmail.com");
+                            toast.success("Email copied to clipboard!");
+                          }}
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm"
+                        >
+                          Copy
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
