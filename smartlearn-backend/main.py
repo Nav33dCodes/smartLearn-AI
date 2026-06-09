@@ -117,7 +117,7 @@ class PinRequest(BaseModel):
 # ────────────────────────────────────────────────────
 @app.get("/")
 def root():
-    return {"status": "SmartLearn AI Running 🚀", "version": "9.2.2"}
+    return {"status": "SmartLearn AI Running 🚀", "version": "13.7.4"}
 
 @app.get("/health")
 def health():
