@@ -329,6 +329,30 @@ def archive_chat(chat_id: str, current_user: User = Depends(get_current_user), d
     db.commit()
     return {"status": "archived"}
 
+@app.put("/chats/archive_all")
+def archive_all_chats(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    # Archive all unarchived chats
+    db.query(ChatMetadata).filter(
+        ChatMetadata.user_id == current_user.id,
+        ChatMetadata.is_archived == False
+    ).update({"is_archived": True})
+    
+    # Also find all chats that don't even have metadata yet and create metadata for them
+    from sqlalchemy import func
+    subquery = db.query(Chat.chat_id, func.min(Chat.id).label("min_id")).filter(Chat.user_id == current_user.id).group_by(Chat.chat_id).subquery()
+    first_messages = db.query(Chat).join(subquery, Chat.id == subquery.c.min_id).all()
+    
+    existing_meta = {m.chat_id for m in db.query(ChatMetadata.chat_id).filter(ChatMetadata.user_id == current_user.id).all()}
+    
+    for c in first_messages:
+        if c.chat_id not in existing_meta:
+            title = c.message[:30]
+            new_metadata = ChatMetadata(user_id=current_user.id, chat_id=c.chat_id, title=title, is_archived=True)
+            db.add(new_metadata)
+            
+    db.commit()
+    return {"status": "success"}
+
 @app.put("/chat/{chat_id}/unarchive")
 def unarchive_chat(chat_id: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     full_chat_id = get_full_chat_id(current_user.id, chat_id)
