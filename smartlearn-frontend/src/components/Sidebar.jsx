@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from "react";
-import { Plus, Trash2, MessageSquare, Search, PanelLeftClose, LogOut, Edit2, Pin, PinOff, Archive } from "lucide-react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
+import { Plus, Trash2, MessageSquare, Search, PanelLeftClose, LogOut, Edit2, Pin, PinOff, Archive, MoreHorizontal } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useChats, useDeleteChat, useRenameChat, usePinChat, useArchiveChat } from "../hooks/useChats";
 import { useAuth } from "../context/AuthContext";
@@ -23,6 +23,18 @@ export default function Sidebar({
   
   const [editingChatId, setEditingChatId] = useState(null);
   const [editTitle, setEditTitle] = useState("");
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenDropdownId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const startEditing = (e, chat) => {
     e.stopPropagation();
@@ -124,35 +136,59 @@ export default function Sidebar({
                 </div>
                 
                 {editingChatId !== chat.id && (
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all shrink-0">
+                  <div 
+                    className={`flex items-center gap-1 transition-all shrink-0 relative ${openDropdownId === chat.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                    ref={openDropdownId === chat.id ? dropdownRef : null}
+                  >
                     <button
-                      onClick={(e) => handlePinToggle(e, chat)}
-                      className="text-muted-foreground hover:text-primary hover:bg-primary/10 p-1 rounded-md transition-colors"
-                      title={chat.is_pinned ? "Unpin chat" : "Pin chat"}
+                      onClick={(e) => { e.stopPropagation(); setOpenDropdownId(openDropdownId === chat.id ? null : chat.id); }}
+                      className="text-muted-foreground hover:text-foreground p-1 rounded-md transition-colors"
+                      title="Options"
                     >
-                      {chat.is_pinned ? <PinOff size={14} /> : <Pin size={14} />}
+                      <MoreHorizontal size={16} />
                     </button>
-                    <button
-                      onClick={(e) => startEditing(e, chat)}
-                      className="text-muted-foreground hover:text-primary hover:bg-primary/10 p-1 rounded-md transition-colors"
-                      title="Rename chat"
-                    >
-                      <Edit2 size={14} />
-                    </button>
-                    <button
-                      onClick={(e) => handleArchive(e, chat.id)}
-                      className="text-muted-foreground hover:text-amber-500 hover:bg-amber-500/10 p-1 rounded-md transition-colors"
-                      title="Archive chat"
-                    >
-                      <Archive size={14} />
-                    </button>
-                    <button
-                      onClick={(e) => handleDelete(e, chat.id)}
-                      className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 p-1 rounded-md transition-colors"
-                      title="Delete chat"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                    <AnimatePresence>
+                      {openDropdownId === chat.id && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95, y: -5 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95, y: -5 }}
+                          transition={{ duration: 0.1 }}
+                          className="absolute right-0 top-8 w-36 bg-popover border border-border rounded-md shadow-md z-50 p-1 flex flex-col"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            onClick={(e) => { handlePinToggle(e, chat); setOpenDropdownId(null); }}
+                            className="flex items-center gap-2 px-2 py-1.5 text-xs text-foreground hover:bg-muted rounded-sm transition-colors text-left"
+                          >
+                            {chat.is_pinned ? <PinOff size={14} /> : <Pin size={14} />}
+                            {chat.is_pinned ? "Unpin chat" : "Pin chat"}
+                          </button>
+                          <button
+                            onClick={(e) => { startEditing(e, chat); setOpenDropdownId(null); }}
+                            className="flex items-center gap-2 px-2 py-1.5 text-xs text-foreground hover:bg-muted rounded-sm transition-colors text-left"
+                          >
+                            <Edit2 size={14} />
+                            Rename
+                          </button>
+                          <button
+                            onClick={(e) => { handleArchive(e, chat.id); setOpenDropdownId(null); }}
+                            className="flex items-center gap-2 px-2 py-1.5 text-xs text-foreground hover:bg-muted rounded-sm transition-colors text-left"
+                          >
+                            <Archive size={14} />
+                            Archive
+                          </button>
+                          <div className="h-px bg-border my-1" />
+                          <button
+                            onClick={(e) => { handleDelete(e, chat.id); setOpenDropdownId(null); }}
+                            className="flex items-center gap-2 px-2 py-1.5 text-xs text-destructive hover:bg-destructive/10 rounded-sm transition-colors text-left"
+                          >
+                            <Trash2 size={14} />
+                            Delete
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 )}
               </div>

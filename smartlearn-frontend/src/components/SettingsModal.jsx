@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, User as UserIcon, Settings as SettingsIcon, Sun, Moon, Loader2, Info, Lock, Camera, CheckCircle2, Shield, Download, Trash2, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useUpdateName, useUpdatePassword, useUpdateAvatar, useExportData, useDeleteAllChats, useRequestDeleteAccount, useConfirmDeleteAccount } from '../hooks/useUser';
+import { useChats, useUnarchiveChat, useDeleteChat, useRevokeShare } from '../hooks/useChats';
 import { toast } from 'sonner';
 
 export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode }) {
@@ -31,6 +32,14 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode }
   const [deleteChatsConfirm, setDeleteChatsConfirm] = useState(false);
   const [deleteAccountPhase, setDeleteAccountPhase] = useState(0); // 0: Idle, 1: Requesting OTP, 2: Entering OTP
   const [deleteOtp, setDeleteOtp] = useState("");
+
+  // Manage Chats State
+  const { data: chatsData = [] } = useChats();
+  const unarchiveMutation = useUnarchiveChat();
+  const deleteChatMutation = useDeleteChat();
+  const revokeShareMutation = useRevokeShare();
+  const archivedChats = chatsData.filter(c => c.is_archived);
+  const sharedChats = chatsData.filter(c => c.is_shared);
 
   if (!isOpen) return null;
 
@@ -419,6 +428,56 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode }
                         </form>
                       )}
                     </div>
+
+                    {/* Manage Archived Chats */}
+                    {archivedChats.length > 0 && (
+                      <div className="p-5 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl">
+                        <div className="mb-4">
+                          <h4 className="text-sm font-semibold mb-1 flex items-center gap-2">Archived Chats</h4>
+                          <p className="text-xs text-muted-foreground">Manage your hidden conversations.</p>
+                        </div>
+                        <div className="space-y-2 max-h-48 overflow-y-auto pr-2 scrollbar-thin">
+                          {archivedChats.map(chat => (
+                            <div key={chat.id} className="flex items-center justify-between p-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg">
+                              <span className="text-sm truncate mr-4">{chat.title}</span>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <button onClick={() => unarchiveMutation.mutate(chat.id)} className="text-xs font-medium text-primary hover:underline">Unarchive</button>
+                                <button onClick={() => deleteChatMutation.mutate(chat.id)} className="text-xs font-medium text-red-500 hover:underline">Delete</button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Manage Shared Links */}
+                    {sharedChats.length > 0 && (
+                      <div className="p-5 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl">
+                        <div className="mb-4">
+                          <h4 className="text-sm font-semibold mb-1 flex items-center gap-2">Shared Links</h4>
+                          <p className="text-xs text-muted-foreground">Manage your public chat links.</p>
+                        </div>
+                        <div className="space-y-2 max-h-48 overflow-y-auto pr-2 scrollbar-thin">
+                          {sharedChats.map(chat => (
+                            <div key={chat.id} className="flex items-center justify-between p-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg">
+                              <span className="text-sm truncate mr-4">{chat.title}</span>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <button 
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(`${window.location.origin}/share/${chat.share_id}`);
+                                    toast.success("Link copied!");
+                                  }} 
+                                  className="text-xs font-medium text-primary hover:underline"
+                                >
+                                  Copy
+                                </button>
+                                <button onClick={() => revokeShareMutation.mutate(chat.id)} className="text-xs font-medium text-red-500 hover:underline">Revoke</button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     <div className="pt-4 mt-2 border-t border-zinc-200 dark:border-zinc-800">
                       <h4 className="text-xs font-semibold mb-2 uppercase tracking-wider text-muted-foreground">Privacy Commitment</h4>

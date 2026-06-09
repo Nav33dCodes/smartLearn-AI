@@ -4,7 +4,7 @@ import { useSharedChat } from '../hooks/useChats';
 import { Loader2, AlertCircle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import Logo from './Logo';
+import Logo from '../components/Logo';
 
 export default function SharedChat() {
   const { shareId } = useParams();
