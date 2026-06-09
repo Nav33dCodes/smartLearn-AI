@@ -33,7 +33,7 @@ MAX_SESSIONS = 5
 # ────────────────────────────────────────────────────
 # CHUNKING
 # ────────────────────────────────────────────────────
-def create_chunks(text: str, size: int = 600, overlap: int = 60) -> list:
+def create_chunks(text: str, size: int = 1500, overlap: int = 200) -> list:
     # Clean excessive whitespace
     text = re.sub(r'\n{3,}', '\n\n', text)
     text = re.sub(r' {2,}', ' ', text)
@@ -113,8 +113,8 @@ def store_pdf(text: str, chat_id: str = None) -> int:
 # ────────────────────────────────────────────────────
 # SEARCH
 # ────────────────────────────────────────────────────
-def search(query: str, chat_id: str = None, k: int = 3) -> str:
-    # FIXED: k=3 instead of 4 — less context = faster prompt + smaller token cost
+def search(query: str, chat_id: str = None, k: int = 6) -> str:
+    # FIXED: k=6 and chunk size 1500 provides much richer context for detailed answers
 
     if chat_id and chat_id in _sessions:
         idx = _sessions[chat_id]["index"]

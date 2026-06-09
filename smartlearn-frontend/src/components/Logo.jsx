@@ -22,7 +22,7 @@ export default function Logo({ size = 32 }) {
 
         {/* Gradient */}
         <linearGradient id="sl_pro_grad" x1="4" y1="3" x2="28" y2="29">
-          <stop stopColor="var(--accent-color)" />
+          <stop stopColor="#10b981" />
           <stop offset="1" stopColor="#2563eb" />
         </linearGradient>
       </defs>
@@ -37,15 +37,15 @@ export default function Logo({ size = 32 }) {
       {/* 🔷 Inner Lines (AI structure) */}
       <path
         d="M16 16 V30 M16 16 L28.5 8.5 M16 16 L3.5 8.5"
-        stroke="var(--bg-main)"
+        stroke="var(--background)"
         strokeWidth="2.2"
         strokeLinecap="round"
       />
 
       {/* 🔷 Core AI Node (Animated) */}
-      <circle cx="16" cy="16" r="5" fill="var(--bg-main)" />
+      <circle cx="16" cy="16" r="5" fill="var(--background)" />
 
-      <circle cx="16" cy="16" r="2.2" fill="var(--text-primary)">
+      <circle cx="16" cy="16" r="2.2" fill="var(--foreground)">
         <animate
           attributeName="r"
           values="2;2.8;2"

@@ -1,4 +1,5 @@
 import io
+import re
 from pypdf import PdfReader
 
 try:
@@ -14,6 +15,20 @@ MAX_PAGES = 80
 # FIXED: Cap total text size sent to embeddings — prevents OOM
 MAX_TEXT_CHARS = 120_000  # ~30,000 words, plenty
 
+def clean_pdf_text(text: str) -> str:
+    """Removes weird newlines inside paragraphs but preserves double newlines."""
+    text = text.replace('\r\n', '\n').replace('\r', '\n')
+    paragraphs = text.split('\n\n')
+    cleaned_paragraphs = []
+    for p in paragraphs:
+        p = p.strip()
+        # Replace single newlines with spaces
+        p = re.sub(r'(?<!\n)\n(?!\n)', ' ', p)
+        p = re.sub(r' +', ' ', p)
+        if p:
+            cleaned_paragraphs.append(p)
+    return "\n\n".join(cleaned_paragraphs)
+
 
 def extract_text_pypdf(file_bytes: bytes) -> str:
     """Fast extraction using pypdf."""
@@ -27,11 +42,11 @@ def extract_text_pypdf(file_bytes: bytes) -> str:
             break
 
         text = page.extract_text() or ""
-        text = text.strip()
+        text = clean_pdf_text(text)
         if not text:
             continue
 
-        pages.append(f"[Page {i+1}]\n{text}")
+        pages.append(f"### [Page {i+1}]\n{text}")
         total_chars += len(text)
 
         # Stop early if we hit text cap
@@ -72,8 +87,9 @@ def extract_text_pdfplumber(file_bytes: bytes) -> str:
             if table_texts:
                 combined += "\n\nTables:\n" + "\n".join(table_texts)
 
+            combined = clean_pdf_text(combined)
             if combined.strip():
-                pages.append(f"[Page {i+1}]\n{combined}")
+                pages.append(f"### [Page {i+1}]\n{combined}")
                 total_chars += len(combined)
 
             if total_chars >= MAX_TEXT_CHARS:

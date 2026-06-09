@@ -29,16 +29,12 @@ logger = logging.getLogger(__name__)
 # ────────────────────────────────────────────────────
 app = FastAPI(title="SmartLearn AI", version="9.2.2")
 
+import os
+
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "https://smart-learn-ai-gules.vercel.app,http://localhost:5173,http://localhost:3000").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-
-    # allow_origins=[
-    #     "https://smart-learn-ai-gules.vercel.app",
-    #     "http://localhost:5173",
-    #     "http://localhost:3000",
-    # ],
-  
+    allow_origins=[origin.strip() for origin in ALLOWED_ORIGINS if origin.strip()],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -126,8 +122,8 @@ async def chat(data: ChatRequest, background_tasks: BackgroundTasks):
     # RAG context
     try:
         context = search(message, chat_id=chat_id)
-        if context and len(context) > 1500:
-            context = context[:1500] + "\n...[truncated]"
+        if context and len(context) > 10000:
+            context = context[:10000] + "\n...[truncated]"
     except Exception as e:
         logger.error(f"❌ RAG search error: {e}")
         context = ""
@@ -138,7 +134,12 @@ async def chat(data: ChatRequest, background_tasks: BackgroundTasks):
 
 Student question: {message}
 
-Answer from the context. If not found, say so briefly and help generally."""
+You are SmartLearn AI, an advanced, professional tutor. Please answer the student's question comprehensively using ONLY the provided Document Context. 
+Your response MUST be detailed and highly structured, utilizing rich Markdown formatting such as:
+- **Headings (##, ###)** to organize different sections
+- **Tables** to compare data or present statistics if applicable
+- **Bullet points** and **bold text** for key information
+Ensure your explanation is thorough (medium-to-long length) and beautifully presented, exactly like a premium AI assistant. If the answer is not found in the context, briefly mention it and help generally."""
     else:
         prompt = message
 
@@ -238,6 +239,8 @@ async def upload(file: UploadFile = File(...), chat_id: str = "default"):
         text = extract_text(io.BytesIO(file_bytes))
         if not text or not text.strip():
             raise HTTPException(status_code=422, detail="No readable text found in this file")
+        if text.startswith("PDF extraction error:"):
+            raise HTTPException(status_code=400, detail=text)
 
         logger.info(f"📄 Extracted {len(text)} chars — now storing in RAG...")
 
