@@ -15,6 +15,7 @@ export default function Sidebar({
   const renameChatMutation = useRenameChat();
   const [searchQuery, setSearchQuery] = useState("");
   const { user, logout } = useAuth();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   
   const [editingChatId, setEditingChatId] = useState(null);
   const [editTitle, setEditTitle] = useState("");
@@ -184,12 +185,38 @@ export default function Sidebar({
               </div>
               <span className="text-sm font-medium text-foreground truncate max-w-[120px]">{user.name}</span>
             </div>
-            <Button variant="ghost" size="icon" onClick={logout} className="text-muted-foreground hover:text-destructive shrink-0">
+            <Button variant="ghost" size="icon" onClick={() => setShowLogoutModal(true)} className="text-muted-foreground hover:text-destructive shrink-0">
               <LogOut size={18} />
             </Button>
           </div>
         )}
       </motion.aside>
+
+      {/* Logout Confirmation Modal */}
+      <AnimatePresence>
+        {showLogoutModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 10 }}
+              className="bg-card border border-border shadow-2xl rounded-3xl p-6 max-w-sm w-full"
+            >
+              <h3 className="text-xl font-bold text-foreground mb-2">Sign Out</h3>
+              <p className="text-muted-foreground text-sm mb-6">Are you sure you want to log out of your account? You will need to sign back in to access your chats.</p>
+              <div className="flex items-center gap-3 justify-end">
+                <Button variant="ghost" onClick={() => setShowLogoutModal(false)}>Cancel</Button>
+                <Button variant="destructive" onClick={logout}>Sign Out</Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
