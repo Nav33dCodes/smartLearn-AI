@@ -7,7 +7,7 @@ import { Routes, Route } from 'react-router-dom';
 import Sidebar from "./components/Sidebar";
 import ChatWindow from "./components/ChatWindow";
 import InputBox from "./components/InputBox";
-import { useChats } from "./hooks/useChats";
+import { useChats, useChatHistory } from "./hooks/useChats";
 import { useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
@@ -22,9 +22,9 @@ function ChatDashboard() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { data: chatsData = [], isLoading: isChatsLoading } = useChats();
-  
   // We use local state for the *active* session to handle streaming updates optimally
   const [activeChatId, setActiveChatId] = useState(null);
+  const { data: historyData } = useChatHistory(activeChatId);
   const [activeMessages, setActiveMessages] = useState([]);
   
   const [input, setInput] = useState("");
@@ -75,15 +75,12 @@ function ChatDashboard() {
     }
   }, [isChatsLoading, hasInitialized, createNewChat]);
 
-  // When activeChatId changes (user clicks sidebar), load its messages
+  // When activeChatId changes, load its dynamic history
   useEffect(() => {
     if (activeChatId) {
-      const chat = chatsData.find(c => c.id === activeChatId);
-      if (chat) {
-        setActiveMessages(chat.messages || []);
-      }
+      setActiveMessages(historyData?.messages || []);
     }
-  }, [activeChatId, chatsData]);
+  }, [activeChatId, historyData]);
 
   const sendMessage = async (overrideText = null) => {
     const textToSend = overrideText ?? input;
@@ -140,17 +137,8 @@ function ChatDashboard() {
         const { done, value } = await reader.read();
 
         if (done) {
-          // Streaming finished, update React Query cache so sidebar updates
-          queryClient.setQueryData(['chats', user?.id], (old) => {
-            if (!old) return old;
-            return old.map(c => {
-              if (c.id === currentChatId) {
-                const finalMsgs = [...newHistory, { role: "assistant", content: accumulated }];
-                return { ...c, messages: finalMsgs, title: c.title === "New chat" ? textToSend.slice(0, 30) : c.title };
-              }
-              return c;
-            });
-          });
+          // Streaming finished, trigger background refetch to grab the LLM auto-generated title!
+          queryClient.invalidateQueries(['chats', user?.id]);
           break;
         }
 

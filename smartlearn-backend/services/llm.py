@@ -110,3 +110,29 @@ def get_llm_response(prompt: str, retries: int = 2) -> str:
                 time.sleep(1)
 
     return f"⚠️ SmartLearn AI is temporarily unavailable. (Error: {last_error})"
+
+
+# ────────────────────────────────────────────────────
+# TITLE GENERATION
+# ────────────────────────────────────────────────────
+def generate_chat_title(message: str) -> str:
+    """Generates a short 3-5 word title for the chat based on the first message."""
+    prompt = f"Generate a short, concise, 3 to 5 word title for the following message. Return ONLY the title text, nothing else, no quotes, no explanation:\n\n{message}"
+    
+    for model in MODELS:
+        try:
+            response = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.5,
+                max_tokens=15,
+                top_p=0.9,
+            )
+            title = response.choices[0].message.content.strip().strip('"').strip("'")
+            return title if title else message[:30]
+        except Exception:
+            continue
+            
+    return message[:30]

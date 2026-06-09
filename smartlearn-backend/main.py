@@ -130,9 +130,25 @@ def health():
 def save_to_db(user_id: int, chat_id: str, message: str, response: str):
     db = SessionLocal()
     try:
+        from sqlalchemy import func
+        count = db.query(func.count(Chat.id)).filter(Chat.chat_id == chat_id).scalar()
+
         db.add(Chat(user_id=user_id, chat_id=chat_id, message=message, response=response))
         db.commit()
         logger.info(f"💾 Saved message for chat_id={chat_id}")
+
+        if count == 0:
+            from services.llm import generate_chat_title
+            title = generate_chat_title(message)
+            meta = db.query(ChatMetadata).filter(ChatMetadata.chat_id == chat_id, ChatMetadata.user_id == user_id).first()
+            if not meta:
+                new_meta = ChatMetadata(user_id=user_id, chat_id=chat_id, title=title)
+                db.add(new_meta)
+            else:
+                meta.title = title
+            db.commit()
+            logger.info(f"✨ Auto-generated title for {chat_id}: {title}")
+
     except Exception as e:
         db.rollback()
         logger.error(f"❌ DB save error: {e}")
@@ -213,19 +229,41 @@ Ensure your explanation is thorough (medium-to-long length) and beautifully pres
 @app.get("/chats")
 def get_chats(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
-        chats = db.query(Chat).filter(Chat.user_id == current_user.id).order_by(Chat.id.asc()).all()
+        from sqlalchemy import func
+        # 1. Fetch metadata
         metadata = db.query(ChatMetadata).filter(ChatMetadata.user_id == current_user.id).all()
         metadata_map = {m.chat_id: {"title": m.title, "is_pinned": m.is_pinned} for m in metadata}
+        
+        # 2. Fetch ONLY the first message of each chat (for fallback titles) to save massive amounts of RAM
+        subquery = db.query(Chat.chat_id, func.min(Chat.id).label("min_id")).filter(Chat.user_id == current_user.id).group_by(Chat.chat_id).subquery()
+        first_messages = db.query(Chat).join(subquery, Chat.id == subquery.c.min_id).all()
+        
         grouped: dict = {}
-        for c in chats:
-            if c.chat_id not in grouped:
-                grouped[c.chat_id] = []
-            grouped[c.chat_id].append({"role": "user",      "content": c.message})
-            grouped[c.chat_id].append({"role": "assistant", "content": c.response})
+        for c in first_messages:
+            grouped[c.chat_id] = [{"role": "user", "content": c.message[:100]}]
+            
         return {"chats": grouped, "metadata": metadata_map}
     except Exception as e:
         logger.error(f"❌ get_chats error: {e}")
         return {"chats": {}, "metadata": {}}
+
+
+# ────────────────────────────────────────────────────
+# GET CHAT MESSAGES
+# ────────────────────────────────────────────────────
+@app.get("/chat/{chat_id}/messages")
+def get_chat_messages(chat_id: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    full_chat_id = get_full_chat_id(current_user.id, chat_id)
+    try:
+        chats = db.query(Chat).filter(Chat.chat_id == full_chat_id, Chat.user_id == current_user.id).order_by(Chat.id.asc()).all()
+        messages = []
+        for c in chats:
+            messages.append({"role": "user", "content": c.message})
+            messages.append({"role": "assistant", "content": c.response})
+        return {"messages": messages}
+    except Exception as e:
+        logger.error(f"❌ get_chat_messages error: {e}")
+        return {"messages": []}
 
 
 # ────────────────────────────────────────────────────

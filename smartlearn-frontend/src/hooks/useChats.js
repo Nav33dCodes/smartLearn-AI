@@ -33,7 +33,13 @@ export function useChats() {
         };
       });
 
-      return formatted.sort((a, b) => Number(b.id) - Number(a.id));
+      return formatted.sort((a, b) => {
+        const getTime = (id) => {
+          const parts = id.split('_');
+          return Number(parts[parts.length - 1]) || 0;
+        };
+        return getTime(b.id) - getTime(a.id);
+      });
     },
     // Prevent fetching if no user is logged in
     enabled: !!user,
@@ -93,6 +99,20 @@ export function usePinChat() {
         return oldChats.map(chat => chat.id === id ? { ...chat, is_pinned } : chat);
       });
     }
+  });
+}
+
+export function useChatHistory(chatId) {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ['chatHistory', user?.id, chatId],
+    queryFn: async () => {
+      if (!chatId || chatId === "default") return { messages: [] };
+      const res = await api.get(`${API}/chat/${chatId}/messages`);
+      return res.data;
+    },
+    enabled: !!user && !!chatId && chatId !== "default",
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 }
 
