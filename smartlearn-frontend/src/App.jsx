@@ -7,12 +7,13 @@ import { Routes, Route } from 'react-router-dom';
 import Sidebar from "./components/Sidebar";
 import ChatWindow from "./components/ChatWindow";
 import InputBox from "./components/InputBox";
-import { useChats, useChatHistory } from "./hooks/useChats";
+import { useChats, useChatHistory, useShareChat } from "./hooks/useChats";
 import { useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
+import SharedChat from "./pages/SharedChat";
 
 const API = import.meta.env.DEV
   ? "http://localhost:8000"
@@ -22,6 +23,8 @@ function ChatDashboard() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { data: chatsData = [], isLoading: isChatsLoading } = useChats();
+  const shareChatMutation = useShareChat();
+  
   // We use local state for the *active* session to handle streaming updates optimally
   const [activeChatId, setActiveChatId] = useState(null);
   const { data: historyData } = useChatHistory(activeChatId);
@@ -238,6 +241,34 @@ function ChatDashboard() {
               {chatsData.find(c => c.id === activeChatId)?.title || "Chat"}
             </span>
           </div>
+
+          {activeChatId && (
+            <button
+              onClick={() => {
+                const chat = chatsData.find(c => c.id === activeChatId);
+                if (!chat) return;
+                
+                if (chat.is_shared && chat.share_id) {
+                  const url = `${window.location.origin}/share/${chat.share_id}`;
+                  navigator.clipboard.writeText(url);
+                  toast.success("Link copied to clipboard!");
+                } else {
+                  shareChatMutation.mutate(activeChatId, {
+                    onSuccess: (data) => {
+                      const url = `${window.location.origin}/share/${data.share_id}`;
+                      navigator.clipboard.writeText(url);
+                      toast.success("Link generated and copied to clipboard!");
+                    }
+                  });
+                }
+              }}
+              disabled={shareChatMutation.isPending}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground border border-border rounded-lg hover:bg-muted transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
+              {shareChatMutation.isPending ? "Sharing..." : (chatsData.find(c => c.id === activeChatId)?.is_shared ? "Copy Link" : "Share")}
+            </button>
+          )}
         </header>
 
         <ChatWindow 
@@ -270,6 +301,7 @@ export default function App() {
     <>
       <Toaster position="top-center" richColors />
       <Routes>
+        <Route path="/share/:shareId" element={<SharedChat />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

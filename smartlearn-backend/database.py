@@ -73,6 +73,9 @@ class ChatMetadata(Base):
     chat_id = Column(Text, index=True, unique=True, nullable=False)
     title = Column(Text, nullable=False)
     is_pinned = Column(Boolean, default=False)
+    is_archived = Column(Boolean, default=False)
+    is_shared = Column(Boolean, default=False)
+    share_id = Column(Text, unique=True, index=True, nullable=True)
 
 
 Base.metadata.create_all(bind=engine)

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
-import { Plus, Trash2, MessageSquare, Search, PanelLeftClose, LogOut, Edit2, Pin, PinOff } from "lucide-react";
+import { Plus, Trash2, MessageSquare, Search, PanelLeftClose, LogOut, Edit2, Pin, PinOff, Archive } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useChats, useDeleteChat, useRenameChat, usePinChat } from "../hooks/useChats";
+import { useChats, useDeleteChat, useRenameChat, usePinChat, useArchiveChat } from "../hooks/useChats";
 import { useAuth } from "../context/AuthContext";
 import Logo from "./Logo";
 import { Input } from "./ui/input";
@@ -15,6 +15,7 @@ export default function Sidebar({
   const deleteChatMutation = useDeleteChat();
   const renameChatMutation = useRenameChat();
   const pinChatMutation = usePinChat();
+  const archiveChatMutation = useArchiveChat();
   const [searchQuery, setSearchQuery] = useState("");
   const { user, logout } = useAuth();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -37,8 +38,9 @@ export default function Sidebar({
   };
 
   const filteredChats = useMemo(() => {
+    let list = chatsData.filter(c => !c.is_archived);
     const q = searchQuery.trim().toLowerCase();
-    return q ? chatsData.filter(c => c.title.toLowerCase().includes(q)) : chatsData;
+    return q ? list.filter(c => c.title.toLowerCase().includes(q)) : list;
   }, [chatsData, searchQuery]);
 
   const pinnedChats = useMemo(() => filteredChats.filter(c => c.is_pinned), [filteredChats]);
@@ -63,6 +65,18 @@ export default function Sidebar({
   const handlePinToggle = (e, chat) => {
     e.stopPropagation();
     pinChatMutation.mutate({ id: chat.id, is_pinned: !chat.is_pinned });
+  };
+
+  const handleArchive = (e, id) => {
+    e.stopPropagation();
+    archiveChatMutation.mutate(id, {
+      onSuccess: () => {
+        if (activeChatId === id && chatsData.length > 0) {
+          const nextChat = chatsData.find(c => c.id !== id && !c.is_archived);
+          setActiveChatId(nextChat ? nextChat.id : null);
+        }
+      }
+    });
   };
 
   const renderChatList = (chats, title) => {
@@ -124,6 +138,13 @@ export default function Sidebar({
                       title="Rename chat"
                     >
                       <Edit2 size={14} />
+                    </button>
+                    <button
+                      onClick={(e) => handleArchive(e, chat.id)}
+                      className="text-muted-foreground hover:text-amber-500 hover:bg-amber-500/10 p-1 rounded-md transition-colors"
+                      title="Archive chat"
+                    >
+                      <Archive size={14} />
                     </button>
                     <button
                       onClick={(e) => handleDelete(e, chat.id)}

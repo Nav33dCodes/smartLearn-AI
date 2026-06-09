@@ -232,7 +232,15 @@ def get_chats(current_user: User = Depends(get_current_user), db: Session = Depe
         from sqlalchemy import func
         # 1. Fetch metadata
         metadata = db.query(ChatMetadata).filter(ChatMetadata.user_id == current_user.id).all()
-        metadata_map = {m.chat_id: {"title": m.title, "is_pinned": m.is_pinned} for m in metadata}
+        metadata_map = {
+            m.chat_id: {
+                "title": m.title, 
+                "is_pinned": m.is_pinned,
+                "is_archived": m.is_archived,
+                "is_shared": m.is_shared,
+                "share_id": m.share_id
+            } for m in metadata
+        }
         
         # 2. Fetch ONLY the first message of each chat (for fallback titles) to save massive amounts of RAM
         subquery = db.query(Chat.chat_id, func.min(Chat.id).label("min_id")).filter(Chat.user_id == current_user.id).group_by(Chat.chat_id).subquery()
@@ -302,6 +310,83 @@ def pin_chat(chat_id: str, data: PinRequest, current_user: User = Depends(get_cu
     
     db.commit()
     return {"status": "success", "is_pinned": data.is_pinned}
+
+
+# ────────────────────────────────────────────────────
+# ARCHIVE CHAT
+# ────────────────────────────────────────────────────
+@app.put("/chat/{chat_id}/archive")
+def archive_chat(chat_id: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    full_chat_id = get_full_chat_id(current_user.id, chat_id)
+    metadata = db.query(ChatMetadata).filter(ChatMetadata.chat_id == full_chat_id, ChatMetadata.user_id == current_user.id).first()
+    if metadata:
+        metadata.is_archived = True
+    else:
+        first_chat = db.query(Chat).filter(Chat.chat_id == full_chat_id).order_by(Chat.id.asc()).first()
+        title = first_chat.message[:30] if first_chat else "New Chat"
+        new_metadata = ChatMetadata(user_id=current_user.id, chat_id=full_chat_id, title=title, is_archived=True)
+        db.add(new_metadata)
+    db.commit()
+    return {"status": "archived"}
+
+@app.put("/chat/{chat_id}/unarchive")
+def unarchive_chat(chat_id: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    full_chat_id = get_full_chat_id(current_user.id, chat_id)
+    metadata = db.query(ChatMetadata).filter(ChatMetadata.chat_id == full_chat_id, ChatMetadata.user_id == current_user.id).first()
+    if metadata:
+        metadata.is_archived = False
+        db.commit()
+    return {"status": "unarchived"}
+
+
+# ────────────────────────────────────────────────────
+# SHARE CHAT
+# ────────────────────────────────────────────────────
+import uuid
+
+@app.post("/chat/{chat_id}/share")
+def share_chat(chat_id: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    full_chat_id = get_full_chat_id(current_user.id, chat_id)
+    metadata = db.query(ChatMetadata).filter(ChatMetadata.chat_id == full_chat_id, ChatMetadata.user_id == current_user.id).first()
+    
+    if not metadata:
+        first_chat = db.query(Chat).filter(Chat.chat_id == full_chat_id).order_by(Chat.id.asc()).first()
+        title = first_chat.message[:30] if first_chat else "New Chat"
+        metadata = ChatMetadata(user_id=current_user.id, chat_id=full_chat_id, title=title)
+        db.add(metadata)
+        db.commit()
+        db.refresh(metadata)
+        
+    if not metadata.is_shared or not metadata.share_id:
+        metadata.is_shared = True
+        metadata.share_id = uuid.uuid4().hex
+        db.commit()
+        
+    return {"status": "shared", "share_id": metadata.share_id}
+
+@app.delete("/chat/{chat_id}/share")
+def revoke_share_chat(chat_id: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    full_chat_id = get_full_chat_id(current_user.id, chat_id)
+    metadata = db.query(ChatMetadata).filter(ChatMetadata.chat_id == full_chat_id, ChatMetadata.user_id == current_user.id).first()
+    if metadata:
+        metadata.is_shared = False
+        metadata.share_id = None
+        db.commit()
+    return {"status": "revoked"}
+
+@app.get("/shared/{share_id}")
+def get_shared_chat(share_id: str, db: Session = Depends(get_db)):
+    metadata = db.query(ChatMetadata).filter(ChatMetadata.share_id == share_id, ChatMetadata.is_shared == True).first()
+    if not metadata:
+        raise HTTPException(status_code=404, detail="Shared chat not found or access revoked")
+        
+    chats = db.query(Chat).filter(Chat.chat_id == metadata.chat_id).order_by(Chat.id.asc()).all()
+    messages = []
+    for c in chats:
+        messages.append({"role": "user", "content": c.message})
+        messages.append({"role": "assistant", "content": c.response})
+        
+    return {"title": metadata.title, "messages": messages, "created_at": chats[0].created_at if chats else None}
 
 
 # ────────────────────────────────────────────────────

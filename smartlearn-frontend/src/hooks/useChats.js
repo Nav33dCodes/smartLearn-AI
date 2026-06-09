@@ -29,6 +29,9 @@ export function useChats() {
           id: chatId,
           title: meta.title || messages[0]?.content?.slice(0, 30) || "Chat",
           is_pinned: meta.is_pinned || false,
+          is_archived: meta.is_archived || false,
+          is_shared: meta.is_shared || false,
+          share_id: meta.share_id || null,
           messages
         };
       });
@@ -124,5 +127,96 @@ export function useUploadPdf() {
       const res = await api.post(`${API}/upload?chat_id=${chatId}`, formData);
       return res.data;
     }
+  });
+}
+
+// ARCHIVING
+export function useArchiveChat() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  
+  return useMutation({
+    mutationFn: async (id) => {
+      await api.put(`${API}/chat/${id}/archive`);
+      return id;
+    },
+    onSuccess: (id) => {
+      queryClient.setQueryData(['chats', user?.id], (oldChats) => {
+        if (!oldChats) return [];
+        return oldChats.map(chat => chat.id === id ? { ...chat, is_archived: true } : chat);
+      });
+    }
+  });
+}
+
+export function useUnarchiveChat() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  
+  return useMutation({
+    mutationFn: async (id) => {
+      await api.put(`${API}/chat/${id}/unarchive`);
+      return id;
+    },
+    onSuccess: (id) => {
+      queryClient.setQueryData(['chats', user?.id], (oldChats) => {
+        if (!oldChats) return [];
+        return oldChats.map(chat => chat.id === id ? { ...chat, is_archived: false } : chat);
+      });
+    }
+  });
+}
+
+// SHARING
+export function useShareChat() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  
+  return useMutation({
+    mutationFn: async (id) => {
+      const res = await api.post(`${API}/chat/${id}/share`);
+      return { id, share_id: res.data.share_id };
+    },
+    onSuccess: ({ id, share_id }) => {
+      queryClient.setQueryData(['chats', user?.id], (oldChats) => {
+        if (!oldChats) return [];
+        return oldChats.map(chat => chat.id === id ? { ...chat, is_shared: true, share_id } : chat);
+      });
+    }
+  });
+}
+
+export function useRevokeShare() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  
+  return useMutation({
+    mutationFn: async (id) => {
+      await api.delete(`${API}/chat/${id}/share`);
+      return id;
+    },
+    onSuccess: (id) => {
+      queryClient.setQueryData(['chats', user?.id], (oldChats) => {
+        if (!oldChats) return [];
+        return oldChats.map(chat => chat.id === id ? { ...chat, is_shared: false, share_id: null } : chat);
+      });
+    }
+  });
+}
+
+export function useSharedChat(shareId) {
+  return useQuery({
+    queryKey: ['sharedChat', shareId],
+    queryFn: async () => {
+      if (!shareId) return null;
+      // We do not use `api` (which includes Auth interceptors) for public shared links.
+      // Actually, axios `api` instance might attach token, but backend doesn't require it.
+      // So it's fine to use standard api instance, or just fetch.
+      // Let's use `api` since it handles base URL.
+      const res = await api.get(`${API}/shared/${shareId}`);
+      return res.data;
+    },
+    enabled: !!shareId,
+    retry: false // Don't retry on 404
   });
 }
