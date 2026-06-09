@@ -14,6 +14,10 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [otp, setOtp] = useState('');
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -28,7 +32,35 @@ export default function Login() {
       toast.success('Logged in successfully!');
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Invalid email or password.');
+      if (err.response?.status === 403 && err.response?.data?.detail?.includes("Email not verified")) {
+        // User needs to verify email. The backend automatically resent the OTP.
+        setIsVerifying(true);
+        toast.info("Please verify your email to continue.");
+        setError('');
+      } else {
+        setError(err.response?.data?.detail || 'Invalid email or password.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    if (!otp) {
+      setError('Please enter the verification code.');
+      return;
+    }
+
+    setError('');
+    setIsLoading(true);
+    try {
+      const response = await api.post('/auth/verify-account', { email, otp });
+      login(response.data.user, response.data.access_token, response.data.refresh_token);
+      toast.success('Email verified successfully! Welcome back.');
+      navigate('/');
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Invalid or expired verification code.');
     } finally {
       setIsLoading(false);
     }
@@ -77,69 +109,120 @@ export default function Login() {
           </div>
           
           <div className="mb-8">
-            <h1 className="text-3xl font-semibold text-zinc-100 mb-2 tracking-tight">Welcome back</h1>
-            <p className="text-zinc-400">Please enter your details to sign in.</p>
+            <h1 className="text-3xl font-semibold text-zinc-100 mb-2 tracking-tight">
+              {isVerifying ? "Verify your email" : "Welcome back"}
+            </h1>
+            <p className="text-zinc-400">
+              {isVerifying 
+                ? `Please enter the verification code sent to ${email}.`
+                : "Please enter your details to sign in."}
+            </p>
           </div>
           
-          <form onSubmit={handleLogin} className="flex flex-col gap-5">
-            <AnimatePresence>
-              {error && (
-                <motion.div 
-                  initial={{ opacity: 0, y: -10, height: 0 }}
-                  animate={{ opacity: 1, y: 0, height: "auto" }}
-                  exit={{ opacity: 0, y: -10, height: 0 }}
-                  className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-3 rounded-lg flex items-center gap-2 overflow-hidden"
-                >
-                  <div className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
-                  {error}
-                </motion.div>
-              )}
-            </AnimatePresence>
+          <AnimatePresence mode="wait">
+            {error && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10, height: 0 }}
+                animate={{ opacity: 1, y: 0, height: "auto" }}
+                exit={{ opacity: 0, y: -10, height: 0 }}
+                className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-3 rounded-lg flex items-center gap-2 overflow-hidden mb-5"
+              >
+                <div className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
+                {error}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-            <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-2">Email</label>
-              <input 
-                type="email" 
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-100 focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400 transition-all outline-none"
-                placeholder="Enter your email"
-                required
-              />
-            </div>
-            
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-medium text-zinc-300">Password</label>
-                <Link to="/forgot-password" className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors">Forgot password?</Link>
-              </div>
-              <div className="relative">
+          {!isVerifying ? (
+            <form onSubmit={handleLogin} className="flex flex-col gap-5">
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">Email</label>
                 <input 
-                  type={showPassword ? "text" : "password"} 
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-100 focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400 transition-all outline-none pr-10"
-                  placeholder="••••••••"
+                  type="email" 
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-100 focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400 transition-all outline-none"
+                  placeholder="Enter your email"
                   required
                 />
+              </div>
+              
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-medium text-zinc-300">Password</label>
+                  <Link to="/forgot-password" className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors">Forgot password?</Link>
+                </div>
+                <div className="relative">
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-100 focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400 transition-all outline-none pr-10"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+              
+              <Button type="submit" disabled={isLoading} className="w-full mt-4 h-11 text-base font-medium rounded-lg bg-zinc-100 text-zinc-900 hover:bg-zinc-300 transition-colors">
+                {isLoading ? <Loader2 className="animate-spin mr-2 h-5 w-5" /> : 'Sign In'}
+              </Button>
+            </form>
+          ) : (
+            <motion.form 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              onSubmit={handleVerify} 
+              className="flex flex-col gap-5"
+            >
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">Verification Code</label>
+                <input 
+                  type="text" 
+                  value={otp}
+                  onChange={e => setOtp(e.target.value)}
+                  className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-3 text-center text-2xl tracking-[0.5em] font-mono text-zinc-100 focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400 transition-all outline-none"
+                  placeholder="000000"
+                  maxLength={6}
+                  required
+                />
+              </div>
+              
+              <Button type="submit" disabled={isLoading} className="w-full mt-4 h-11 text-base font-medium rounded-lg bg-zinc-100 text-zinc-900 hover:bg-zinc-300 transition-colors">
+                {isLoading ? <Loader2 className="animate-spin mr-2 h-5 w-5" /> : 'Verify & Sign In'}
+              </Button>
+
+              <div className="text-center mt-2">
                 <button 
                   type="button" 
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                  onClick={async () => {
+                    try {
+                      await api.post('/auth/resend-verification', { email });
+                      toast.success("A new verification code has been sent!");
+                    } catch (err) {
+                      toast.error("Failed to resend code. Please try again.");
+                    }
+                  }}
+                  className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors"
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  Didn't receive a code? Resend
                 </button>
               </div>
-            </div>
-            
-            <Button type="submit" disabled={isLoading} className="w-full mt-4 h-11 text-base font-medium rounded-lg bg-zinc-100 text-zinc-900 hover:bg-zinc-300 transition-colors">
-              {isLoading ? <Loader2 className="animate-spin mr-2 h-5 w-5" /> : 'Sign In'}
-            </Button>
-          </form>
+            </motion.form>
+          )}
           
-          <div className="mt-8 text-center text-sm text-zinc-400">
-            Don't have an account? <Link to="/signup" className="text-zinc-100 font-medium hover:underline ml-1">Sign up</Link>
-          </div>
+          {!isVerifying && (
+            <div className="mt-8 text-center text-sm text-zinc-400">
+              Don't have an account? <Link to="/signup" className="text-zinc-100 font-medium hover:underline ml-1">Sign up</Link>
+            </div>
+          )}
         </div>
       </div>
     </div>

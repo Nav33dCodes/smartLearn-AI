@@ -170,3 +170,49 @@ def send_password_reset_success_email(to_email: str):
     </html>
     """.replace("{{ year }}", "2026")
     return send_email(to_email, subject, body)
+
+def send_verification_email(to_email: str, name: str, otp: str):
+    subject = "Verify Your SmartLearn AI Account"
+    body = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+            body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f5; margin: 0; padding: 40px 0; }}
+            .container {{ max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }}
+            .header {{ background-color: #0a0a0a; padding: 30px; text-align: center; }}
+            .header h1 {{ color: #ffffff; margin: 0; font-size: 24px; letter-spacing: -0.5px; }}
+            .header span {{ color: #10b981; }}
+            .content {{ padding: 40px 30px; }}
+            .content h2 {{ color: #18181b; margin-top: 0; font-size: 20px; }}
+            .content p {{ color: #52525b; line-height: 1.6; font-size: 16px; }}
+            .otp-container {{ background-color: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 8px; padding: 20px; text-align: center; margin: 30px 0; }}
+            .otp-code {{ color: #10b981; font-size: 36px; font-weight: 700; letter-spacing: 8px; margin: 0; }}
+            .footer {{ background-color: #fafafa; padding: 20px; text-align: center; border-top: 1px solid #e4e4e7; }}
+            .footer p {{ color: #a1a1aa; font-size: 13px; margin: 0; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>SmartLearn <span>AI</span></h1>
+            </div>
+            <div class="content">
+                <h2>Hi {name}, almost there!</h2>
+                <p>Thank you for signing up for SmartLearn AI. To complete your registration and activate your account, please use the verification code below:</p>
+                <div class="otp-container">
+                    <p class="otp-code">{otp}</p>
+                </div>
+                <p><strong>Note:</strong> This code is only valid for the next 15 minutes.</p>
+                <p>If you didn't attempt to create an account, you can safely ignore this email.</p>
+            </div>
+            <div class="footer">
+                <p>&copy; {{{{ year }}}} SmartLearn AI. All rights reserved.</p>
+                <p>This is an automated message, please do not reply directly to this email.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """.replace("{{ year }}", "2026")
+    return send_email(to_email, subject, body)
