@@ -223,8 +223,6 @@ function ChatDashboard() {
 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
-      <Toaster position="top-center" theme={darkMode ? 'dark' : 'light'} />
-      
       <Sidebar 
         activeChatId={activeChatId}
         setActiveChatId={setActiveChatId}

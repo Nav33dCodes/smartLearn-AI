@@ -13,6 +13,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -21,12 +22,13 @@ export default function Login() {
     setIsLoading(true);
     
     try {
+      setError('');
       const response = await api.post('/auth/login', { email, password });
       login(response.data.user, response.data.access_token, response.data.refresh_token);
       toast.success('Logged in successfully!');
       navigate('/');
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Invalid email or password.');
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Invalid email or password.');
     } finally {
       setIsLoading(false);
     }
@@ -74,12 +76,26 @@ export default function Login() {
             <Logo size={36} />
           </div>
           
-          <div className="mb-10">
+          <div className="mb-8">
             <h1 className="text-3xl font-semibold text-zinc-100 mb-2 tracking-tight">Welcome back</h1>
             <p className="text-zinc-400">Please enter your details to sign in.</p>
           </div>
           
           <form onSubmit={handleLogin} className="flex flex-col gap-5">
+            <AnimatePresence>
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10, height: 0 }}
+                  animate={{ opacity: 1, y: 0, height: "auto" }}
+                  exit={{ opacity: 0, y: -10, height: 0 }}
+                  className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-3 rounded-lg flex items-center gap-2 overflow-hidden"
+                >
+                  <div className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
+                  {error}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <div>
               <label className="block text-sm font-medium text-zinc-300 mb-2">Email</label>
               <input 

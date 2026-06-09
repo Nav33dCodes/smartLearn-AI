@@ -16,17 +16,20 @@ export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setError('');
+    
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
+      setError('Passwords do not match');
       return;
     }
     if (password.length < 6) {
-      toast.error('Password must be at least 6 characters');
+      setError('Password must be at least 6 characters');
       return;
     }
     
@@ -36,8 +39,8 @@ export default function Signup() {
       login(response.data.user, response.data.access_token, response.data.refresh_token);
       toast.success('Account created successfully! Welcome email sent.');
       navigate('/');
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Registration failed.');
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Registration failed.');
     } finally {
       setIsLoading(false);
     }
@@ -85,12 +88,26 @@ export default function Signup() {
             <Logo size={36} />
           </div>
           
-          <div className="mb-10">
+          <div className="mb-8">
             <h1 className="text-3xl font-semibold text-zinc-100 mb-2 tracking-tight">Create an account</h1>
             <p className="text-zinc-400">Join SmartLearn to start analyzing your documents.</p>
           </div>
           
           <form onSubmit={handleSignup} className="flex flex-col gap-5">
+            <AnimatePresence>
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10, height: 0 }}
+                  animate={{ opacity: 1, y: 0, height: "auto" }}
+                  exit={{ opacity: 0, y: -10, height: 0 }}
+                  className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-3 rounded-lg flex items-center gap-2 overflow-hidden"
+                >
+                  <div className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
+                  {error}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <div>
               <label className="block text-sm font-medium text-zinc-300 mb-2">Full Name</label>
               <input 
