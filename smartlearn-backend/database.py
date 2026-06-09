@@ -38,6 +38,7 @@ class User(Base):
     email = Column(Text, unique=True, index=True, nullable=False)
     password_hash = Column(Text, nullable=False)
     is_verified = Column(Boolean, default=False)
+    avatar = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

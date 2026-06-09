@@ -220,6 +220,8 @@ function ChatDashboard() {
         setSidebarOpen={setSidebarOpen}
         createNewChat={createNewChat}
         isMobile={isMobile}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
       />
 
       <main className="flex-1 flex flex-col relative min-w-0 transition-all duration-300">

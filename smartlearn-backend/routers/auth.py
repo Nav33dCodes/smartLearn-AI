@@ -37,6 +37,28 @@ class ResetPasswordRequest(BaseModel):
     otp: str
     new_password: str
 
+class UpdateNameRequest(BaseModel):
+    name: str
+
+class UpdatePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from services.jwt_handler import verify_token
+
+security = HTTPBearer()
+
+def get_current_user_auth(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)):
+    payload = verify_token(credentials.credentials, token_type="access")
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    user_id = payload.get("sub")
+    user = db.query(User).filter(User.id == int(user_id)).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    return user
+
 @router.post("/signup")
 def signup(req: SignupRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == req.email).first()
@@ -169,3 +191,21 @@ def reset_password(req: ResetPasswordRequest, background_tasks: BackgroundTasks,
     background_tasks.add_task(send_password_reset_success_email, user.email)
     
     return {"message": "Password reset successful"}
+
+@router.put("/user/name")
+def update_name(req: UpdateNameRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user_auth)):
+    current_user.name = req.name.strip()
+    db.commit()
+    return {"message": "Name updated successfully", "name": current_user.name}
+
+@router.put("/user/password")
+def update_password(req: UpdatePasswordRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user_auth)):
+    if not verify_password(req.current_password, current_user.password_hash):
+        raise HTTPException(status_code=400, detail="Incorrect current password")
+    
+    if req.current_password == req.new_password:
+        raise HTTPException(status_code=400, detail="New password cannot be the same as the current password")
+        
+    current_user.password_hash = get_password_hash(req.new_password)
+    db.commit()
+    return {"message": "Password updated successfully"}

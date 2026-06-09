@@ -6,9 +6,10 @@ import { useAuth } from "../context/AuthContext";
 import Logo from "./Logo";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import SettingsModal from "./SettingsModal";
 
 export default function Sidebar({
-  activeChatId, setActiveChatId, sidebarOpen, setSidebarOpen, createNewChat, isMobile
+  activeChatId, setActiveChatId, sidebarOpen, setSidebarOpen, createNewChat, isMobile, darkMode, setDarkMode
 }) {
   const { data: chatsData = [] } = useChats();
   const deleteChatMutation = useDeleteChat();
@@ -17,6 +18,7 @@ export default function Sidebar({
   const [searchQuery, setSearchQuery] = useState("");
   const { user, logout } = useAuth();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   
   const [editingChatId, setEditingChatId] = useState(null);
   const [editTitle, setEditTitle] = useState("");
@@ -205,19 +207,29 @@ export default function Sidebar({
         </div>
 
         {user && (
-          <div className="p-4 border-t border-border flex items-center justify-between">
+          <div 
+            onClick={() => setIsSettingsOpen(true)}
+            className="p-4 border-t border-border flex items-center justify-between cursor-pointer hover:bg-muted/50 transition-colors"
+          >
             <div className="flex items-center gap-3 overflow-hidden">
               <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm shrink-0">
                 {user.name ? user.name.charAt(0).toUpperCase() : "U"}
               </div>
               <span className="text-sm font-medium text-foreground truncate max-w-[120px]">{user.name}</span>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => setShowLogoutModal(true)} className="text-muted-foreground hover:text-destructive shrink-0">
+            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setShowLogoutModal(true); }} className="text-muted-foreground hover:text-destructive shrink-0">
               <LogOut size={18} />
             </Button>
           </div>
         )}
       </motion.aside>
+
+      <SettingsModal 
+        isOpen={isSettingsOpen} 
+        onClose={() => setIsSettingsOpen(false)} 
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+      />
 
       {/* Logout Confirmation Modal */}
       <AnimatePresence>
