@@ -45,3 +45,48 @@ export function useUpdatePassword() {
     }
   });
 }
+
+export function useDeleteAllChats() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  return useMutation({
+    mutationFn: async () => {
+      const res = await api.delete(`${API}/auth/user/chats`);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['chats', user?.id]);
+    }
+  });
+}
+
+export function useRequestDeleteAccount() {
+  return useMutation({
+    mutationFn: async () => {
+      const res = await api.post(`${API}/auth/user/delete-request`);
+      return res.data;
+    }
+  });
+}
+
+export function useConfirmDeleteAccount() {
+  const { logout } = useAuth();
+  return useMutation({
+    mutationFn: async ({ otp }) => {
+      const res = await api.delete(`${API}/auth/user/account`, { data: { otp } });
+      return res.data;
+    },
+    onSuccess: () => {
+      logout();
+    }
+  });
+}
+
+export function useExportData() {
+  return useMutation({
+    mutationFn: async () => {
+      const res = await api.get(`${API}/auth/user/export`);
+      return res.data;
+    }
+  });
+}
