@@ -8,6 +8,7 @@ import Sidebar from "./components/Sidebar";
 import ChatWindow from "./components/ChatWindow";
 import InputBox from "./components/InputBox";
 import { useChats } from "./hooks/useChats";
+import { useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -19,6 +20,7 @@ const API = import.meta.env.DEV
 
 function ChatDashboard() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const { data: chatsData = [], isLoading: isChatsLoading } = useChats();
   
   // We use local state for the *active* session to handle streaming updates optimally
@@ -101,7 +103,7 @@ function ChatDashboard() {
     setActiveMessages(newHistory);
 
     if (activeMessages.length === 0) {
-      queryClient.setQueryData(['chats'], (old) => {
+      queryClient.setQueryData(['chats', user?.id], (old) => {
         const newChat = { id: currentChatId, title: textToSend.slice(0, 30), messages: newHistory };
         return [newChat, ...(old || [])];
       });
@@ -139,7 +141,7 @@ function ChatDashboard() {
 
         if (done) {
           // Streaming finished, update React Query cache so sidebar updates
-          queryClient.setQueryData(['chats'], (old) => {
+          queryClient.setQueryData(['chats', user?.id], (old) => {
             if (!old) return old;
             return old.map(c => {
               if (c.id === currentChatId) {
