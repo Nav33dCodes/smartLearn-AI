@@ -6,7 +6,7 @@ from datetime import datetime
 from services.auth_logic import get_password_hash, verify_password
 from services.jwt_handler import create_access_token, create_refresh_token
 from services.otp_manager import store_otp, verify_otp_hash
-from services.email_service import send_welcome_email, send_otp_email
+from services.email_service import send_welcome_email, send_otp_email, send_password_reset_success_email
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -101,7 +101,7 @@ def verify_otp(req: VerifyOTPRequest, db: Session = Depends(get_db)):
     return {"message": "OTP verified successfully"}
 
 @router.post("/reset-password")
-def reset_password(req: ResetPasswordRequest, db: Session = Depends(get_db)):
+def reset_password(req: ResetPasswordRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     otp_record = db.query(OTP).filter(
         OTP.email == req.email, 
         OTP.is_used == False,
@@ -118,5 +118,7 @@ def reset_password(req: ResetPasswordRequest, db: Session = Depends(get_db)):
     user.password_hash = get_password_hash(req.new_password)
     otp_record.is_used = True
     db.commit()
+    
+    background_tasks.add_task(send_password_reset_success_email, user.email)
     
     return {"message": "Password reset successful"}
