@@ -31,7 +31,10 @@ function ChatDashboard() {
   const [loading, setLoading] = useState(false);
   const [abortController, setAbortController] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(() => {
+    const savedTheme = localStorage.getItem("sl_theme_pro");
+    return savedTheme !== null ? savedTheme === "true" : true;
+  });
   const [isMobile, setIsMobile] = useState(false);
 
   const textareaRef = useRef(null);
@@ -41,11 +44,6 @@ function ChatDashboard() {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("sl_theme_pro");
-    if (savedTheme !== null) setDarkMode(savedTheme === "true");
   }, []);
 
   useEffect(() => {
@@ -240,14 +238,6 @@ function ChatDashboard() {
               {chatsData.find(c => c.id === activeChatId)?.title || "Chat"}
             </span>
           </div>
-          
-          <button 
-            onClick={() => setDarkMode(!darkMode)}
-            className="p-2 hover:bg-muted rounded-md text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Toggle Theme"
-          >
-            {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
         </header>
 
         <ChatWindow 
