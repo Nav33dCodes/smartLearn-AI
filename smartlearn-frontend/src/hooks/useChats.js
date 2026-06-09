@@ -167,6 +167,23 @@ export function useUnarchiveChat() {
   });
 }
 
+export function useArchiveAllChats() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  
+  return useMutation({
+    mutationFn: async () => {
+      await api.put(`${API}/chats/archive_all`);
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(['chats', user?.id], (oldChats) => {
+        if (!oldChats) return [];
+        return oldChats.map(chat => ({ ...chat, is_archived: true }));
+      });
+    }
+  });
+}
+
 // SHARING
 export function useShareChat() {
   const queryClient = useQueryClient();
