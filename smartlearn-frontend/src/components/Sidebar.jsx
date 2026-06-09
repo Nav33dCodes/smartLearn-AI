@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from "react";
-import { Plus, Trash2, MessageSquare, Search, PanelLeftClose } from "lucide-react";
+import { Plus, Trash2, MessageSquare, Search, PanelLeftClose, LogOut, Edit2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useChats, useDeleteChat } from "../hooks/useChats";
+import { useChats, useDeleteChat, useRenameChat } from "../hooks/useChats";
+import { useAuth } from "../context/AuthContext";
 import Logo from "./Logo";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -11,7 +12,25 @@ export default function Sidebar({
 }) {
   const { data: chatsData = [] } = useChats();
   const deleteChatMutation = useDeleteChat();
+  const renameChatMutation = useRenameChat();
   const [searchQuery, setSearchQuery] = useState("");
+  const { user, logout } = useAuth();
+  
+  const [editingChatId, setEditingChatId] = useState(null);
+  const [editTitle, setEditTitle] = useState("");
+
+  const startEditing = (e, chat) => {
+    e.stopPropagation();
+    setEditingChatId(chat.id);
+    setEditTitle(chat.title);
+  };
+
+  const handleRename = (id) => {
+    if (editTitle.trim() && editTitle.trim() !== chatsData.find(c => c.id === id)?.title) {
+      renameChatMutation.mutate({ id, title: editTitle.trim() });
+    }
+    setEditingChatId(null);
+  };
 
   const filteredChats = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -109,29 +128,67 @@ export default function Sidebar({
                 transition={{ duration: 0.15 }}
               >
                 <div
-                  onClick={() => handleSelectChat(chat.id)}
+                  onClick={() => { if (editingChatId !== chat.id) handleSelectChat(chat.id) }}
                   className={`group flex items-center justify-between px-3 py-2.5 rounded-md cursor-pointer mb-1 transition-colors ${
                     chat.id === activeChatId 
                       ? 'bg-accent text-accent-foreground font-medium' 
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   }`}
                 >
-                  <div className="flex items-center gap-3 overflow-hidden">
+                  <div className="flex items-center gap-3 overflow-hidden flex-1">
                     <MessageSquare size={16} className="shrink-0" />
-                    <span className="truncate text-sm">{chat.title}</span>
+                    {editingChatId === chat.id ? (
+                      <input
+                        autoFocus
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        onBlur={() => handleRename(chat.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleRename(chat.id);
+                          if (e.key === "Escape") setEditingChatId(null);
+                        }}
+                        className="bg-background border border-primary text-foreground text-sm rounded-sm px-1 w-full outline-none"
+                      />
+                    ) : (
+                      <span className="truncate text-sm">{chat.title}</span>
+                    )}
                   </div>
                   
-                  <button
-                    onClick={(e) => handleDelete(e, chat.id)}
-                    className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive hover:bg-destructive/10 p-1 rounded-md transition-all shrink-0"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                  {editingChatId !== chat.id && (
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all shrink-0">
+                      <button
+                        onClick={(e) => startEditing(e, chat)}
+                        className="text-muted-foreground hover:text-primary hover:bg-primary/10 p-1 rounded-md transition-colors"
+                      >
+                        <Edit2 size={14} />
+                      </button>
+                      <button
+                        onClick={(e) => handleDelete(e, chat.id)}
+                        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 p-1 rounded-md transition-colors"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             ))}
           </AnimatePresence>
         </div>
+
+        {user && (
+          <div className="p-4 border-t border-border flex items-center justify-between">
+            <div className="flex items-center gap-3 overflow-hidden">
+              <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm shrink-0">
+                {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+              </div>
+              <span className="text-sm font-medium text-foreground truncate max-w-[120px]">{user.name}</span>
+            </div>
+            <Button variant="ghost" size="icon" onClick={logout} className="text-muted-foreground hover:text-destructive shrink-0">
+              <LogOut size={18} />
+            </Button>
+          </div>
+        )}
       </motion.aside>
     </>
   );

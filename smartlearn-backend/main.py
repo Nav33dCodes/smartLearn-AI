@@ -4,7 +4,7 @@ import json
 import gc
 import time
 from datetime import datetime, timezone
-from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks
+from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
@@ -13,7 +13,27 @@ from sqlalchemy import text
 from services.llm import stream_llm_response
 from services.pdf import extract_text, get_pdf_metadata
 from services.rag import store_pdf, search, clear_session, get_stats
-from database import SessionLocal, Chat
+from database import SessionLocal, Chat, get_db, User, ChatMetadata
+from routers import auth
+from services.jwt_handler import verify_token
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from sqlalchemy.orm import Session
+
+security = HTTPBearer()
+
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)):
+    payload = verify_token(credentials.credentials, token_type="access")
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    user_id = payload.get("sub")
+    user = db.query(User).filter(User.id == int(user_id)).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    return user
+
+def get_full_chat_id(user_id: int, chat_id: str) -> str:
+    prefix = f"{user_id}_"
+    return str(chat_id) if str(chat_id).startswith(prefix) else f"{prefix}{chat_id}"
 
 # ────────────────────────────────────────────────────
 # LOGGING — so Railway shows real errors
@@ -35,10 +55,12 @@ ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "https://smart-learn-ai-gules.ver
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[origin.strip() for origin in ALLOWED_ORIGINS if origin.strip()],
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(auth.router)
 
 
 # ────────────────────────────────────────────────────
@@ -77,6 +99,9 @@ class ChatRequest(BaseModel):
     message: str
     chat_id: str = "default"
 
+class RenameRequest(BaseModel):
+    title: str
+
 
 # ────────────────────────────────────────────────────
 # HEALTH
@@ -93,10 +118,10 @@ def health():
 # ────────────────────────────────────────────────────
 # BACKGROUND DB SAVE
 # ────────────────────────────────────────────────────
-def save_to_db(chat_id: str, message: str, response: str):
+def save_to_db(user_id: int, chat_id: str, message: str, response: str):
     db = SessionLocal()
     try:
-        db.add(Chat(chat_id=chat_id, message=message, response=response))
+        db.add(Chat(user_id=user_id, chat_id=chat_id, message=message, response=response))
         db.commit()
         logger.info(f"💾 Saved message for chat_id={chat_id}")
     except Exception as e:
@@ -110,9 +135,9 @@ def save_to_db(chat_id: str, message: str, response: str):
 # CHAT — SSE streaming
 # ────────────────────────────────────────────────────
 @app.post("/chat")
-async def chat(data: ChatRequest, background_tasks: BackgroundTasks):
+async def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_user: User = Depends(get_current_user)):
     message = data.message.strip()
-    chat_id = str(data.chat_id)
+    chat_id = get_full_chat_id(current_user.id, data.chat_id)
 
     if not message:
         raise HTTPException(status_code=400, detail="Message is required")
@@ -159,7 +184,7 @@ Ensure your explanation is thorough (medium-to-long length) and beautifully pres
         finally:
             complete = "".join(full_response)
             if complete.strip():
-                background_tasks.add_task(save_to_db, chat_id, message, complete)
+                background_tasks.add_task(save_to_db, current_user.id, chat_id, message, complete)
             yield f"data: {json.dumps({'done': True})}\n\n"
 
     return StreamingResponse(
@@ -177,34 +202,52 @@ Ensure your explanation is thorough (medium-to-long length) and beautifully pres
 # GET CHATS
 # ────────────────────────────────────────────────────
 @app.get("/chats")
-def get_chats():
-    db = SessionLocal()
+def get_chats(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
-        chats = db.query(Chat).order_by(Chat.id.asc()).all()
+        chats = db.query(Chat).filter(Chat.user_id == current_user.id).order_by(Chat.id.asc()).all()
+        metadata = db.query(ChatMetadata).filter(ChatMetadata.user_id == current_user.id).all()
+        metadata_map = {m.chat_id: m.title for m in metadata}
         grouped: dict = {}
         for c in chats:
             if c.chat_id not in grouped:
                 grouped[c.chat_id] = []
             grouped[c.chat_id].append({"role": "user",      "content": c.message})
             grouped[c.chat_id].append({"role": "assistant", "content": c.response})
-        return {"chats": grouped}
+        return {"chats": grouped, "metadata": metadata_map}
     except Exception as e:
         logger.error(f"❌ get_chats error: {e}")
-        return {"chats": {}}
-    finally:
-        db.close()
+        return {"chats": {}, "metadata": {}}
+
+
+# ────────────────────────────────────────────────────
+# RENAME CHAT
+# ────────────────────────────────────────────────────
+@app.put("/chat/{chat_id}/rename")
+def rename_chat(chat_id: str, data: RenameRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    full_chat_id = get_full_chat_id(current_user.id, chat_id)
+    
+    metadata = db.query(ChatMetadata).filter(ChatMetadata.chat_id == full_chat_id, ChatMetadata.user_id == current_user.id).first()
+    if metadata:
+        metadata.title = data.title
+    else:
+        new_metadata = ChatMetadata(user_id=current_user.id, chat_id=full_chat_id, title=data.title)
+        db.add(new_metadata)
+    
+    db.commit()
+    return {"status": "success", "title": data.title}
 
 
 # ────────────────────────────────────────────────────
 # DELETE CHAT
 # ────────────────────────────────────────────────────
 @app.delete("/chat/{chat_id}")
-def delete_chat(chat_id: str):
-    db = SessionLocal()
+def delete_chat(chat_id: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    full_chat_id = get_full_chat_id(current_user.id, chat_id)
     try:
-        deleted = db.query(Chat).filter(Chat.chat_id == chat_id).delete()
+        deleted = db.query(Chat).filter(Chat.chat_id == full_chat_id, Chat.user_id == current_user.id).delete()
+        db.query(ChatMetadata).filter(ChatMetadata.chat_id == full_chat_id, ChatMetadata.user_id == current_user.id).delete()
         db.commit()
-        clear_session(chat_id)
+        clear_session(full_chat_id)
         gc.collect()
         logger.info(f"🗑️ Deleted chat_id={chat_id} rows={deleted}")
         return {"status": "deleted", "rows": deleted}
@@ -212,16 +255,15 @@ def delete_chat(chat_id: str):
         db.rollback()
         logger.error(f"❌ delete_chat error: {e}")
         return JSONResponse(status_code=500, content={"error": str(e)})
-    finally:
-        db.close()
 
 
 # ────────────────────────────────────────────────────
 # PDF UPLOAD
 # ────────────────────────────────────────────────────
 @app.post("/upload")
-async def upload(file: UploadFile = File(...), chat_id: str = "default"):
-    logger.info(f"📄 Upload: filename={file.filename} chat_id={chat_id}")
+async def upload(file: UploadFile = File(...), chat_id: str = "default", current_user: User = Depends(get_current_user)):
+    full_chat_id = get_full_chat_id(current_user.id, chat_id)
+    logger.info(f"📄 Upload: filename={file.filename} chat_id={full_chat_id}")
     try:
         allowed_types = ("application/pdf", "text/plain")
         allowed_exts  = (".pdf", ".txt", ".doc", ".docx")
@@ -244,8 +286,8 @@ async def upload(file: UploadFile = File(...), chat_id: str = "default"):
 
         logger.info(f"📄 Extracted {len(text)} chars — now storing in RAG...")
 
-        chunk_count = store_pdf(text, chat_id=chat_id)
-        logger.info(f"✅ Stored {chunk_count} chunks for chat_id={chat_id}")
+        chunk_count = store_pdf(text, chat_id=full_chat_id)
+        logger.info(f"✅ Stored {chunk_count} chunks for chat_id={full_chat_id}")
 
         try:
             meta = get_pdf_metadata(io.BytesIO(file_bytes))
@@ -274,8 +316,9 @@ async def upload(file: UploadFile = File(...), chat_id: str = "default"):
 # RAG STATUS
 # ────────────────────────────────────────────────────
 @app.get("/rag-status")
-def rag_status(chat_id: str = "default"):
-    return get_stats(chat_id=chat_id)
+def rag_status(chat_id: str = "default", current_user: User = Depends(get_current_user)):
+    full_chat_id = get_full_chat_id(current_user.id, chat_id)
+    return get_stats(chat_id=full_chat_id)
 
 
 # ────────────────────────────────────────────────────

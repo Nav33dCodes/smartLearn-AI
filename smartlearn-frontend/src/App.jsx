@@ -2,17 +2,22 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Moon, Sun, PanelLeftOpen } from "lucide-react";
 import { Toaster, toast } from 'sonner';
+import { Routes, Route } from 'react-router-dom';
 
 import Sidebar from "./components/Sidebar";
 import ChatWindow from "./components/ChatWindow";
 import InputBox from "./components/InputBox";
 import { useChats } from "./hooks/useChats";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
 
 const API = import.meta.env.DEV
   ? "http://localhost:8000"
   : "https://smartlearn-ai-production.up.railway.app";
 
-export default function App() {
+function ChatDashboard() {
   const queryClient = useQueryClient();
   const { data: chatsData = [], isLoading: isChatsLoading } = useChats();
   
@@ -50,15 +55,23 @@ export default function App() {
     }
   }, [darkMode]);
 
-  // Set initial active chat
+  const createNewChat = useCallback(() => {
+    const newId = Date.now().toString();
+    setActiveChatId(newId);
+    setActiveMessages([]);
+    if (isMobile) setSidebarOpen(false);
+    setInput("");
+    setTimeout(() => textareaRef.current?.focus(), 100);
+  }, [isMobile]);
+
+  const [hasInitialized, setHasInitialized] = useState(false);
+
   useEffect(() => {
-    if (!activeChatId && chatsData.length > 0) {
-      setActiveChatId(chatsData[0].id);
-      setActiveMessages(chatsData[0].messages || []);
-    } else if (!activeChatId && !isChatsLoading) {
+    if (!hasInitialized && !isChatsLoading) {
       createNewChat();
+      setHasInitialized(true);
     }
-  }, [chatsData, activeChatId, isChatsLoading]);
+  }, [isChatsLoading, hasInitialized, createNewChat]);
 
   // When activeChatId changes (user clicks sidebar), load its messages
   useEffect(() => {
@@ -66,25 +79,9 @@ export default function App() {
       const chat = chatsData.find(c => c.id === activeChatId);
       if (chat) {
         setActiveMessages(chat.messages || []);
-      } else if (chatsData.length === 0) {
-        setActiveMessages([]);
       }
     }
   }, [activeChatId, chatsData]);
-
-  const createNewChat = useCallback(() => {
-    const newId = Date.now().toString();
-    const newChat = { id: newId, title: "New chat", messages: [] };
-    
-    // Optimistically add to cache
-    queryClient.setQueryData(['chats'], (old) => [newChat, ...(old || [])]);
-    
-    setActiveChatId(newId);
-    setActiveMessages([]);
-    if (isMobile) setSidebarOpen(false);
-    setInput("");
-    setTimeout(() => textareaRef.current?.focus(), 100);
-  }, [queryClient, isMobile]);
 
   const sendMessage = async (overrideText = null) => {
     const textToSend = overrideText ?? input;
@@ -94,6 +91,7 @@ export default function App() {
     setAbortController(controller);
 
     const currentChatId = activeChatId;
+    const token = localStorage.getItem('access_token');
 
     // Optimistic UI Update - Only add the user message
     const newHistory = [
@@ -102,18 +100,34 @@ export default function App() {
     ];
     setActiveMessages(newHistory);
 
+    if (activeMessages.length === 0) {
+      queryClient.setQueryData(['chats'], (old) => {
+        const newChat = { id: currentChatId, title: textToSend.slice(0, 30), messages: newHistory };
+        return [newChat, ...(old || [])];
+      });
+    }
+
     if (!overrideText) setInput("");
     setLoading(true);
 
     try {
       const res = await fetch(`${API}/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": token ? `Bearer ${token}` : ""
+        },
         body: JSON.stringify({ message: textToSend, chat_id: currentChatId }),
         signal: controller.signal,
       });
 
-      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      if (!res.ok) {
+        if (res.status === 401) {
+            toast.error("Session expired. Please refresh the page.");
+            throw new Error("Unauthorized");
+        }
+        throw new Error(`Server error: ${res.status}`);
+      }
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -268,5 +282,23 @@ export default function App() {
         />
       </main>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <>
+      <Toaster position="top-center" richColors />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/" element={
+          <ProtectedRoute>
+            <ChatDashboard />
+          </ProtectedRoute>
+        } />
+      </Routes>
+    </>
   );
 }

@@ -2,8 +2,10 @@ import React from "react";
 import { motion } from "framer-motion";
 import AIMessage from "./AIMessage";
 import Logo from "./Logo";
+import { useAuth } from "../context/AuthContext";
 
 export default function ChatWindow({ messages, loading, isChatsLoading, onSuggestionClick, regenerateMessage }) {
+  const { user } = useAuth();
   if (isChatsLoading && messages.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center pt-14 pb-32">
@@ -13,6 +15,8 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
   }
 
   if (messages.length === 0) {
+    const firstName = user?.name ? user.name.split(" ")[0] : "there";
+    
     return (
       <div className="flex-1 flex flex-col items-center justify-center pt-14 pb-32 px-4 text-center">
         <motion.div 
@@ -23,8 +27,24 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
           <div className="mx-auto bg-primary/5 text-primary w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-border">
             <Logo size={32} />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground mb-2">How can I help you today?</h1>
-          <p className="text-muted-foreground mb-8">Upload a PDF to ask context-aware questions or just start chatting.</p>
+          
+          <motion.h1 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 20 }}
+            className="text-3xl font-bold tracking-tight text-foreground mb-2"
+          >
+            Welcome, {firstName}!
+          </motion.h1>
+          
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-muted-foreground mb-8"
+          >
+            How can I help you today? Upload a PDF to ask context-aware questions or just start chatting.
+          </motion.p>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
             {[
@@ -33,13 +53,16 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
               "Write a python script for data analysis",
               "Help me prepare for a frontend interview"
             ].map((text, i) => (
-              <div 
+              <motion.div 
                 key={i} 
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 + (i * 0.1), type: "spring", stiffness: 300, damping: 24 }}
                 onClick={() => onSuggestionClick?.(text)}
                 className="bg-card border border-border p-3 rounded-lg text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors shadow-sm"
               >
                 {text}
-              </div>
+              </motion.div>
             ))}
           </div>
         </motion.div>

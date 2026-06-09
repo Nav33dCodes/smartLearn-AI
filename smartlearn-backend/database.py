@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from sqlalchemy import create_engine, Column, Integer, Text, DateTime, func
+from sqlalchemy import create_engine, Column, Integer, Text, DateTime, func, Boolean, ForeignKey
 from sqlalchemy.orm import sessionmaker, declarative_base
 from datetime import datetime
 import os
@@ -30,14 +30,47 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(Text, nullable=False)
+    email = Column(Text, unique=True, index=True, nullable=False)
+    password_hash = Column(Text, nullable=False)
+    is_verified = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class OTP(Base):
+    __tablename__ = "otps"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(Text, index=True, nullable=False)
+    otp_hash = Column(Text, nullable=False)
+    is_used = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    expires_at = Column(DateTime, nullable=False)
+
+
 class Chat(Base):
     __tablename__ = "chats"
 
     id         = Column(Integer, primary_key=True, index=True)
+    user_id    = Column(Integer, ForeignKey("users.id"), index=True, nullable=True) # nullable for backwards compatibility with existing rows
     chat_id    = Column(Text, index=True)
     message    = Column(Text)
     response   = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class ChatMetadata(Base):
+    __tablename__ = "chat_metadata"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True, nullable=False)
+    chat_id = Column(Text, index=True, unique=True, nullable=False)
+    title = Column(Text, nullable=False)
 
 
 Base.metadata.create_all(bind=engine)
