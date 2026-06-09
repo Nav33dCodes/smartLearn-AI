@@ -47,7 +47,7 @@ logger = logging.getLogger(__name__)
 # ────────────────────────────────────────────────────
 # APP
 # ────────────────────────────────────────────────────
-app = FastAPI(title="SmartLearn AI", version="9.2.2")
+app = FastAPI(title="SmartLearn AI", version="13.7.4")
 
 import os
 

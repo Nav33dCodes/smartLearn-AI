@@ -40,6 +40,9 @@ class ResetPasswordRequest(BaseModel):
 class UpdateNameRequest(BaseModel):
     name: str
 
+class UpdateAvatarRequest(BaseModel):
+    avatar: str
+
 class UpdatePasswordRequest(BaseModel):
     current_password: str
     new_password: str
@@ -197,6 +200,12 @@ def update_name(req: UpdateNameRequest, db: Session = Depends(get_db), current_u
     current_user.name = req.name.strip()
     db.commit()
     return {"message": "Name updated successfully", "name": current_user.name}
+
+@router.put("/user/avatar")
+def update_avatar(req: UpdateAvatarRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user_auth)):
+    current_user.avatar = req.avatar
+    db.commit()
+    return {"message": "Avatar updated successfully", "avatar": current_user.avatar}
 
 @router.put("/user/password")
 def update_password(req: UpdatePasswordRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user_auth)):

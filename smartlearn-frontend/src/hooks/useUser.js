@@ -21,6 +21,22 @@ export function useUpdateName() {
   });
 }
 
+export function useUpdateAvatar() {
+  const { user, login } = useAuth();
+  
+  return useMutation({
+    mutationFn: async ({ avatar }) => {
+      const res = await api.put(`${API}/auth/user/avatar`, { avatar });
+      return res.data;
+    },
+    onSuccess: (data, variables) => {
+      const token = localStorage.getItem('access_token');
+      const refreshToken = localStorage.getItem('refresh_token');
+      login({ ...user, avatar: variables.avatar }, token, refreshToken);
+    }
+  });
+}
+
 export function useUpdatePassword() {
   return useMutation({
     mutationFn: async ({ current_password, new_password }) => {

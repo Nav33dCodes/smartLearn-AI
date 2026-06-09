@@ -212,8 +212,12 @@ export default function Sidebar({
             className="p-4 border-t border-border flex items-center justify-between cursor-pointer hover:bg-muted/50 transition-colors"
           >
             <div className="flex items-center gap-3 overflow-hidden">
-              <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm shrink-0">
-                {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+              <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm shrink-0 overflow-hidden">
+                {user?.avatar ? (
+                  <img src={user.avatar} alt="Avatar" className="h-full w-full object-cover" />
+                ) : (
+                  user.name ? user.name.charAt(0).toUpperCase() : "U"
+                )}
               </div>
               <span className="text-sm font-medium text-foreground truncate max-w-[120px]">{user.name}</span>
             </div>
