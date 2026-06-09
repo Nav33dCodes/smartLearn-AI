@@ -74,6 +74,12 @@ async def startup_event():
     try:
         db = SessionLocal()
         db.execute(text("SELECT 1"))
+        # Seamlessly upgrade DB for new features without losing data
+        try:
+            db.execute(text("ALTER TABLE chat_metadata ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT FALSE"))
+        except Exception:
+            pass # Ignore if sqlite or already exists
+        db.commit()
         db.close()
         logger.info("✅ Database connected OK")
     except Exception as e:
@@ -101,6 +107,9 @@ class ChatRequest(BaseModel):
 
 class RenameRequest(BaseModel):
     title: str
+
+class PinRequest(BaseModel):
+    is_pinned: bool
 
 
 # ────────────────────────────────────────────────────
@@ -206,7 +215,7 @@ def get_chats(current_user: User = Depends(get_current_user), db: Session = Depe
     try:
         chats = db.query(Chat).filter(Chat.user_id == current_user.id).order_by(Chat.id.asc()).all()
         metadata = db.query(ChatMetadata).filter(ChatMetadata.user_id == current_user.id).all()
-        metadata_map = {m.chat_id: m.title for m in metadata}
+        metadata_map = {m.chat_id: {"title": m.title, "is_pinned": m.is_pinned} for m in metadata}
         grouped: dict = {}
         for c in chats:
             if c.chat_id not in grouped:
@@ -235,6 +244,26 @@ def rename_chat(chat_id: str, data: RenameRequest, current_user: User = Depends(
     
     db.commit()
     return {"status": "success", "title": data.title}
+
+
+# ────────────────────────────────────────────────────
+# PIN CHAT
+# ────────────────────────────────────────────────────
+@app.put("/chat/{chat_id}/pin")
+def pin_chat(chat_id: str, data: PinRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    full_chat_id = get_full_chat_id(current_user.id, chat_id)
+    
+    metadata = db.query(ChatMetadata).filter(ChatMetadata.chat_id == full_chat_id, ChatMetadata.user_id == current_user.id).first()
+    if metadata:
+        metadata.is_pinned = data.is_pinned
+    else:
+        first_chat = db.query(Chat).filter(Chat.chat_id == full_chat_id).order_by(Chat.id.asc()).first()
+        title = first_chat.message[:30] if first_chat else "New Chat"
+        new_metadata = ChatMetadata(user_id=current_user.id, chat_id=full_chat_id, title=title, is_pinned=data.is_pinned)
+        db.add(new_metadata)
+    
+    db.commit()
+    return {"status": "success", "is_pinned": data.is_pinned}
 
 
 # ────────────────────────────────────────────────────

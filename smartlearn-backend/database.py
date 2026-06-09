@@ -71,6 +71,7 @@ class ChatMetadata(Base):
     user_id = Column(Integer, ForeignKey("users.id"), index=True, nullable=False)
     chat_id = Column(Text, index=True, unique=True, nullable=False)
     title = Column(Text, nullable=False)
+    is_pinned = Column(Boolean, default=False)
 
 
 Base.metadata.create_all(bind=engine)

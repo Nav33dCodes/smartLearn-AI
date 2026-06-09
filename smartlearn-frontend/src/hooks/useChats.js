@@ -24,9 +24,11 @@ export function useChats() {
       }
 
       const formatted = Object.entries(backendChats).map(([chatId, messages]) => {
+        const meta = metadata[chatId] || {};
         return {
           id: chatId,
-          title: metadata[chatId] || messages[0]?.content?.slice(0, 30) || "Chat",
+          title: meta.title || messages[0]?.content?.slice(0, 30) || "Chat",
+          is_pinned: meta.is_pinned || false,
           messages
         };
       });
@@ -71,6 +73,24 @@ export function useRenameChat() {
       queryClient.setQueryData(['chats', user?.id], (oldChats) => {
         if (!oldChats) return [];
         return oldChats.map(chat => chat.id === id ? { ...chat, title } : chat);
+      });
+    }
+  });
+}
+
+export function usePinChat() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  
+  return useMutation({
+    mutationFn: async ({ id, is_pinned }) => {
+      await api.put(`${API}/chat/${id}/pin`, { is_pinned });
+      return { id, is_pinned };
+    },
+    onSuccess: ({ id, is_pinned }) => {
+      queryClient.setQueryData(['chats', user?.id], (oldChats) => {
+        if (!oldChats) return [];
+        return oldChats.map(chat => chat.id === id ? { ...chat, is_pinned } : chat);
       });
     }
   });

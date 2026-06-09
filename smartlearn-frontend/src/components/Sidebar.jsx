@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
-import { Plus, Trash2, MessageSquare, Search, PanelLeftClose, LogOut, Edit2 } from "lucide-react";
+import { Plus, Trash2, MessageSquare, Search, PanelLeftClose, LogOut, Edit2, Pin, PinOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useChats, useDeleteChat, useRenameChat } from "../hooks/useChats";
+import { useChats, useDeleteChat, useRenameChat, usePinChat } from "../hooks/useChats";
 import { useAuth } from "../context/AuthContext";
 import Logo from "./Logo";
 import { Input } from "./ui/input";
@@ -13,6 +13,7 @@ export default function Sidebar({
   const { data: chatsData = [] } = useChats();
   const deleteChatMutation = useDeleteChat();
   const renameChatMutation = useRenameChat();
+  const pinChatMutation = usePinChat();
   const [searchQuery, setSearchQuery] = useState("");
   const { user, logout } = useAuth();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -38,6 +39,9 @@ export default function Sidebar({
     return q ? chatsData.filter(c => c.title.toLowerCase().includes(q)) : chatsData;
   }, [chatsData, searchQuery]);
 
+  const pinnedChats = useMemo(() => filteredChats.filter(c => c.is_pinned), [filteredChats]);
+  const unpinnedChats = useMemo(() => filteredChats.filter(c => !c.is_pinned), [filteredChats]);
+
   const handleSelectChat = (id) => {
     setActiveChatId(id);
     if (isMobile) setSidebarOpen(false);
@@ -52,6 +56,88 @@ export default function Sidebar({
         }
       }
     });
+  };
+
+  const handlePinToggle = (e, chat) => {
+    e.stopPropagation();
+    pinChatMutation.mutate({ id: chat.id, is_pinned: !chat.is_pinned });
+  };
+
+  const renderChatList = (chats, title) => {
+    if (chats.length === 0) return null;
+    return (
+      <div className="mb-4">
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2 mb-2 mt-2">
+          {title}
+        </div>
+        <AnimatePresence mode="popLayout">
+          {chats.map(chat => (
+            <motion.div
+              key={chat.id}
+              layout
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+            >
+              <div
+                onClick={() => { if (editingChatId !== chat.id) handleSelectChat(chat.id) }}
+                className={`group flex items-center justify-between px-3 py-2.5 rounded-md cursor-pointer mb-1 transition-colors ${
+                  chat.id === activeChatId 
+                    ? 'bg-accent text-accent-foreground font-medium' 
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                }`}
+              >
+                <div className="flex items-center gap-3 overflow-hidden flex-1">
+                  <MessageSquare size={16} className="shrink-0" />
+                  {editingChatId === chat.id ? (
+                    <input
+                      autoFocus
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      onBlur={() => handleRename(chat.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleRename(chat.id);
+                        if (e.key === "Escape") setEditingChatId(null);
+                      }}
+                      className="bg-background border border-primary text-foreground text-sm rounded-sm px-1 w-full outline-none"
+                    />
+                  ) : (
+                    <span className="truncate text-sm">{chat.title}</span>
+                  )}
+                </div>
+                
+                {editingChatId !== chat.id && (
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all shrink-0">
+                    <button
+                      onClick={(e) => handlePinToggle(e, chat)}
+                      className="text-muted-foreground hover:text-primary hover:bg-primary/10 p-1 rounded-md transition-colors"
+                      title={chat.is_pinned ? "Unpin chat" : "Pin chat"}
+                    >
+                      {chat.is_pinned ? <PinOff size={14} /> : <Pin size={14} />}
+                    </button>
+                    <button
+                      onClick={(e) => startEditing(e, chat)}
+                      className="text-muted-foreground hover:text-primary hover:bg-primary/10 p-1 rounded-md transition-colors"
+                      title="Rename chat"
+                    >
+                      <Edit2 size={14} />
+                    </button>
+                    <button
+                      onClick={(e) => handleDelete(e, chat.id)}
+                      className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 p-1 rounded-md transition-colors"
+                      title="Delete chat"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+    );
   };
 
   return (
@@ -108,73 +194,14 @@ export default function Sidebar({
         </div>
 
         <div className="flex-1 overflow-y-auto px-2 pb-4 scrollbar-thin">
-          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2 mb-2 mt-2">
-            {searchQuery ? `Results (${filteredChats.length})` : "Recent"}
-          </div>
-
           {filteredChats.length === 0 && (
-            <div className="text-sm text-muted-foreground text-center p-4">
+            <div className="text-sm text-muted-foreground text-center p-4 mt-2">
               {searchQuery ? "No chats matched." : "No chats yet."}
             </div>
           )}
 
-          <AnimatePresence mode="popLayout">
-            {filteredChats.map(chat => (
-              <motion.div
-                key={chat.id}
-                layout
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.15 }}
-              >
-                <div
-                  onClick={() => { if (editingChatId !== chat.id) handleSelectChat(chat.id) }}
-                  className={`group flex items-center justify-between px-3 py-2.5 rounded-md cursor-pointer mb-1 transition-colors ${
-                    chat.id === activeChatId 
-                      ? 'bg-accent text-accent-foreground font-medium' 
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  }`}
-                >
-                  <div className="flex items-center gap-3 overflow-hidden flex-1">
-                    <MessageSquare size={16} className="shrink-0" />
-                    {editingChatId === chat.id ? (
-                      <input
-                        autoFocus
-                        value={editTitle}
-                        onChange={(e) => setEditTitle(e.target.value)}
-                        onBlur={() => handleRename(chat.id)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") handleRename(chat.id);
-                          if (e.key === "Escape") setEditingChatId(null);
-                        }}
-                        className="bg-background border border-primary text-foreground text-sm rounded-sm px-1 w-full outline-none"
-                      />
-                    ) : (
-                      <span className="truncate text-sm">{chat.title}</span>
-                    )}
-                  </div>
-                  
-                  {editingChatId !== chat.id && (
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all shrink-0">
-                      <button
-                        onClick={(e) => startEditing(e, chat)}
-                        className="text-muted-foreground hover:text-primary hover:bg-primary/10 p-1 rounded-md transition-colors"
-                      >
-                        <Edit2 size={14} />
-                      </button>
-                      <button
-                        onClick={(e) => handleDelete(e, chat.id)}
-                        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 p-1 rounded-md transition-colors"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+          {renderChatList(pinnedChats, "Pinned")}
+          {renderChatList(unpinnedChats, searchQuery ? `Results (${unpinnedChats.length})` : "Recent")}
         </div>
 
         {user && (
