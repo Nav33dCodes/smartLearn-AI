@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User as UserIcon, Settings as SettingsIcon, Sun, Moon, Loader2, Info, Lock, Camera, CheckCircle2, Shield, Download, Trash2, AlertTriangle } from 'lucide-react';
+import { X, User as UserIcon, Settings as SettingsIcon, Sun, Moon, Loader2, Info, Lock, Camera, CheckCircle2, Shield, Download, Trash2, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useUpdateName, useUpdatePassword, useUpdateAvatar, useExportData, useDeleteAllChats, useRequestDeleteAccount, useConfirmDeleteAccount } from '../hooks/useUser';
-import { useChats, useUnarchiveChat, useDeleteChat, useRevokeShare } from '../hooks/useChats';
+import { useChats, useUnarchiveChat, useDeleteChat, useRevokeShare, useArchiveAllChats } from '../hooks/useChats';
 import { toast } from 'sonner';
 
 export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode }) {
@@ -38,6 +38,7 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode }
   const unarchiveMutation = useUnarchiveChat();
   const deleteChatMutation = useDeleteChat();
   const revokeShareMutation = useRevokeShare();
+  const archiveAllMutation = useArchiveAllChats();
   const archivedChats = chatsData.filter(c => c.is_archived);
   const sharedChats = chatsData.filter(c => c.is_shared);
 
@@ -333,41 +334,60 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode }
                 <motion.div key="data" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="max-w-2xl">
                   <h3 className="text-lg font-medium mb-6 pb-2 border-b border-zinc-200 dark:border-zinc-800">Data & Privacy</h3>
                   
-                  <div className="space-y-4">
-                    {/* Export Card */}
-                    <div className="p-5 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex flex-col">
+                    <div className="flex items-center justify-between py-4 border-b border-zinc-200 dark:border-zinc-800">
                       <div>
-                        <h4 className="text-sm font-semibold mb-1 flex items-center gap-2"><Download size={16} className="text-zinc-600 dark:text-zinc-400" /> Export Your Data</h4>
-                        <p className="text-xs text-muted-foreground">Download a JSON file containing your account details and full chat history.</p>
+                        <div className="text-sm font-medium">Export Data</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Download your account details and chat history</div>
                       </div>
-                      <button 
-                        onClick={handleExportData}
-                        disabled={exportMutation.isPending}
-                        className="shrink-0 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-foreground px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 shadow-sm"
-                      >
-                        {exportMutation.isPending && <Loader2 size={14} className="animate-spin" />}
-                        Export Data
+                      <button onClick={handleExportData} disabled={exportMutation.isPending} className="px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-sm font-medium rounded-md transition-colors flex items-center gap-2">
+                        {exportMutation.isPending ? <Loader2 size={14} className="animate-spin" /> : "Export"}
+                      </button>
+                    </div>
+                    
+                    <div className="flex items-center justify-between py-4 border-b border-zinc-200 dark:border-zinc-800">
+                      <div>
+                        <div className="text-sm font-medium">Archived chats</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Manage your hidden conversations</div>
+                      </div>
+                      <button onClick={() => setActiveTab('archived_chats')} className="px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-sm font-medium rounded-md transition-colors">
+                        Manage
                       </button>
                     </div>
 
-                    {/* Delete Chats Card */}
-                    <div className="p-5 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center justify-between py-4 border-b border-zinc-200 dark:border-zinc-800">
                       <div>
-                        <h4 className="text-sm font-semibold mb-1 flex items-center gap-2 text-red-500"><Trash2 size={16} /> Delete All Chats</h4>
-                        <p className="text-xs text-muted-foreground">Permanently delete your entire chat history. This cannot be undone.</p>
+                        <div className="text-sm font-medium">Archive all chats</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Archive all of your current unarchived chats</div>
                       </div>
-                      
+                      <button onClick={() => archiveAllMutation.mutate()} disabled={archiveAllMutation.isPending} className="px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-sm font-medium rounded-md transition-colors">
+                        {archiveAllMutation.isPending ? "Archiving..." : "Archive all"}
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between py-4 border-b border-zinc-200 dark:border-zinc-800">
+                      <div>
+                        <div className="text-sm font-medium">Shared links</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Manage your publicly shared chat links</div>
+                      </div>
+                      <button onClick={() => setActiveTab('shared_links')} className="px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-sm font-medium rounded-md transition-colors">
+                        Manage
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between py-4 border-b border-zinc-200 dark:border-zinc-800">
+                      <div>
+                        <div className="text-sm font-medium text-red-500">Delete all chats</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Permanently delete your entire chat history</div>
+                      </div>
                       {!deleteChatsConfirm ? (
-                        <button 
-                          onClick={() => setDeleteChatsConfirm(true)}
-                          className="shrink-0 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm"
-                        >
-                          Delete Chats
+                        <button onClick={() => setDeleteChatsConfirm(true)} className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-md transition-colors">
+                          Delete all
                         </button>
                       ) : (
-                        <div className="flex items-center gap-2 bg-red-50 dark:bg-red-950/30 p-1.5 rounded-lg border border-red-200 dark:border-red-900/50">
+                        <div className="flex items-center gap-2">
                           <button onClick={() => setDeleteChatsConfirm(false)} className="px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-colors">Cancel</button>
-                          <button onClick={handleDeleteAllChats} disabled={deleteAllChatsMutation.isPending} className="px-3 py-1.5 text-xs font-medium bg-red-500 text-white hover:bg-red-600 rounded-md transition-colors flex items-center gap-2 shadow-sm">
+                          <button onClick={handleDeleteAllChats} disabled={deleteAllChatsMutation.isPending} className="px-3 py-1.5 text-xs font-medium bg-red-500 text-white hover:bg-red-600 rounded-md transition-colors flex items-center gap-2">
                             {deleteAllChatsMutation.isPending && <Loader2 size={12} className="animate-spin" />}
                             Confirm
                           </button>
@@ -375,109 +395,139 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode }
                       )}
                     </div>
 
-                    {/* Delete Account Card */}
-                    <div className="p-5 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                        <div>
-                          <h4 className="text-sm font-semibold mb-1 flex items-center gap-2 text-red-500"><Lock size={16} /> Delete Account</h4>
-                          <p className="text-xs text-muted-foreground">Permanently delete your account and data. Requires OTP verification.</p>
-                        </div>
-
-                        {deleteAccountPhase === 0 && (
-                          <button 
-                            onClick={handleRequestAccountDeletion}
-                            disabled={reqDeleteAccountMutation.isPending}
-                            className="shrink-0 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center justify-center gap-2"
-                          >
-                            {reqDeleteAccountMutation.isPending && <Loader2 size={14} className="animate-spin" />}
-                            Delete Account
-                          </button>
-                        )}
+                    <div className="flex items-center justify-between py-4">
+                      <div>
+                        <div className="text-sm font-medium text-red-500">Delete account</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Permanently delete your account and data</div>
                       </div>
-
-                      {deleteAccountPhase === 2 && (
-                        <form onSubmit={handleConfirmAccountDeletion} className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row gap-3 sm:items-end">
-                          <div className="flex-1">
-                            <label className="block text-xs font-medium text-muted-foreground mb-1">Enter Verification Code</label>
-                            <input 
-                              type="text" 
-                              value={deleteOtp}
-                              onChange={e => setDeleteOtp(e.target.value)}
-                              placeholder="6-digit OTP"
-                              required
-                              className="w-full bg-background border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
-                            />
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <button 
-                              type="button" 
-                              onClick={() => { setDeleteAccountPhase(0); setDeleteOtp(""); }}
-                              className="px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
-                            >
-                              Cancel
-                            </button>
-                            <button 
-                              type="submit" 
-                              disabled={confirmDeleteAccountMutation.isPending}
-                              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center gap-2"
-                            >
-                              {confirmDeleteAccountMutation.isPending && <Loader2 size={14} className="animate-spin" />}
-                              Confirm Deletion
-                            </button>
-                          </div>
-                        </form>
-                      )}
+                      <button onClick={() => setActiveTab('delete_account')} className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-md transition-colors">
+                        Delete
+                      </button>
                     </div>
+                  </div>
+                </motion.div>
+              )}
 
-                    {/* Manage Archived Chats */}
-                    {archivedChats.length > 0 && (
-                      <div className="p-5 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl">
-                        <div className="mb-4">
-                          <h4 className="text-sm font-semibold mb-1 flex items-center gap-2">Archived Chats</h4>
-                          <p className="text-xs text-muted-foreground">Manage your hidden conversations.</p>
+              {/* ARCHIVED CHATS SUB-VIEW */}
+              {activeTab === 'archived_chats' && (
+                <motion.div key="archived_chats" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="max-w-2xl h-full flex flex-col">
+                  <div className="flex items-center gap-3 mb-6 pb-2 border-b border-zinc-200 dark:border-zinc-800">
+                    <button onClick={() => setActiveTab('data')} className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors">
+                      <ArrowLeft size={18} />
+                    </button>
+                    <h3 className="text-lg font-medium">Archived chats</h3>
+                  </div>
+                  
+                  {archivedChats.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <p className="text-sm text-muted-foreground">You have no archived conversations.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2 overflow-y-auto pr-2 scrollbar-thin">
+                      {archivedChats.map(chat => (
+                        <div key={chat.id} className="flex items-center justify-between p-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-lg group">
+                          <span className="text-sm truncate mr-4 font-medium">{chat.title}</span>
+                          <div className="flex items-center gap-3 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onClick={() => unarchiveMutation.mutate(chat.id)} className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">Unarchive</button>
+                            <button onClick={() => deleteChatMutation.mutate(chat.id)} className="text-xs font-medium text-red-500 hover:text-red-600 transition-colors"><Trash2 size={16} /></button>
+                          </div>
                         </div>
-                        <div className="space-y-2 max-h-48 overflow-y-auto pr-2 scrollbar-thin">
-                          {archivedChats.map(chat => (
-                            <div key={chat.id} className="flex items-center justify-between p-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg">
-                              <span className="text-sm truncate mr-4">{chat.title}</span>
-                              <div className="flex items-center gap-2 shrink-0">
-                                <button onClick={() => unarchiveMutation.mutate(chat.id)} className="text-xs font-medium text-primary hover:underline">Unarchive</button>
-                                <button onClick={() => deleteChatMutation.mutate(chat.id)} className="text-xs font-medium text-red-500 hover:underline">Delete</button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              )}
 
-                    {/* Manage Shared Links */}
-                    {sharedChats.length > 0 && (
-                      <div className="p-5 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl">
-                        <div className="mb-4">
-                          <h4 className="text-sm font-semibold mb-1 flex items-center gap-2">Shared Links</h4>
-                          <p className="text-xs text-muted-foreground">Manage your public chat links.</p>
+              {/* SHARED LINKS SUB-VIEW */}
+              {activeTab === 'shared_links' && (
+                <motion.div key="shared_links" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="max-w-2xl h-full flex flex-col">
+                  <div className="flex items-center gap-3 mb-6 pb-2 border-b border-zinc-200 dark:border-zinc-800">
+                    <button onClick={() => setActiveTab('data')} className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors">
+                      <ArrowLeft size={18} />
+                    </button>
+                    <h3 className="text-lg font-medium">Shared links</h3>
+                  </div>
+                  
+                  {sharedChats.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <p className="text-sm text-muted-foreground">You have no shared links.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2 overflow-y-auto pr-2 scrollbar-thin">
+                      {sharedChats.map(chat => (
+                        <div key={chat.id} className="flex items-center justify-between p-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-lg group">
+                          <span className="text-sm truncate mr-4 font-medium">{chat.title}</span>
+                          <div className="flex items-center gap-3 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button 
+                              onClick={() => {
+                                navigator.clipboard.writeText(`${window.location.origin}/share/${chat.share_id}`);
+                                toast.success("Link copied!");
+                              }} 
+                              className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                              Copy Link
+                            </button>
+                            <button onClick={() => revokeShareMutation.mutate(chat.id)} className="text-xs font-medium text-red-500 hover:text-red-600 transition-colors">
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         </div>
-                        <div className="space-y-2 max-h-48 overflow-y-auto pr-2 scrollbar-thin">
-                          {sharedChats.map(chat => (
-                            <div key={chat.id} className="flex items-center justify-between p-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg">
-                              <span className="text-sm truncate mr-4">{chat.title}</span>
-                              <div className="flex items-center gap-2 shrink-0">
-                                <button 
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(`${window.location.origin}/share/${chat.share_id}`);
-                                    toast.success("Link copied!");
-                                  }} 
-                                  className="text-xs font-medium text-primary hover:underline"
-                                >
-                                  Copy
-                                </button>
-                                <button onClick={() => revokeShareMutation.mutate(chat.id)} className="text-xs font-medium text-red-500 hover:underline">Revoke</button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {/* DELETE ACCOUNT SUB-VIEW */}
+              {activeTab === 'delete_account' && (
+                <motion.div key="delete_account" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="max-w-md">
+                  <div className="flex items-center gap-3 mb-6 pb-2 border-b border-zinc-200 dark:border-zinc-800">
+                    <button onClick={() => { setActiveTab('data'); setDeleteAccountPhase(0); setDeleteOtp(""); }} className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors">
+                      <ArrowLeft size={18} />
+                    </button>
+                    <h3 className="text-lg font-medium text-red-500">Delete Account</h3>
+                  </div>
+
+                  <p className="text-sm text-muted-foreground mb-6">
+                    Permanently delete your account, settings, and all chat history. This action cannot be reversed.
+                  </p>
+
+                  {deleteAccountPhase === 0 && (
+                    <button 
+                      onClick={handleRequestAccountDeletion}
+                      disabled={reqDeleteAccountMutation.isPending}
+                      className="bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center justify-center gap-2 w-full"
+                    >
+                      {reqDeleteAccountMutation.isPending && <Loader2 size={14} className="animate-spin" />}
+                      Request Deletion OTP
+                    </button>
+                  )}
+
+                  {deleteAccountPhase === 2 && (
+                    <form onSubmit={handleConfirmAccountDeletion} className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Enter Verification Code</label>
+                        <input 
+                          type="text" 
+                          value={deleteOtp}
+                          onChange={e => setDeleteOtp(e.target.value)}
+                          placeholder="6-digit OTP sent to your email"
+                          required
+                          className="w-full bg-background border border-zinc-300 dark:border-zinc-700 rounded-lg px-4 py-2.5 text-sm focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
+                        />
                       </div>
-                    )}
+                      <button 
+                        type="submit" 
+                        disabled={confirmDeleteAccountMutation.isPending}
+                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center justify-center gap-2 w-full"
+                      >
+                        {confirmDeleteAccountMutation.isPending && <Loader2 size={14} className="animate-spin" />}
+                        Confirm Deletion
+                      </button>
+                    </form>
+                  )}
+                </motion.div>
+              )}
 
                     <div className="pt-4 mt-2 border-t border-zinc-200 dark:border-zinc-800">
                       <h4 className="text-xs font-semibold mb-2 uppercase tracking-wider text-muted-foreground">Privacy Commitment</h4>
