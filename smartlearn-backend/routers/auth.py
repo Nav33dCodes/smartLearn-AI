@@ -6,7 +6,8 @@ from datetime import datetime
 from services.auth_logic import get_password_hash, verify_password
 from services.jwt_handler import create_access_token, create_refresh_token
 from services.otp_manager import store_otp, verify_otp_hash
-from services.email_service import send_welcome_email, send_otp_email, send_password_reset_success_email, send_verification_email
+from services.email_service import send_welcome_email, send_otp_email, send_password_reset_success_email, send_verification_email, send_delete_account_otp_email
+from database import get_db, User, OTP, Chat, ChatMetadata
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -46,6 +47,9 @@ class UpdateAvatarRequest(BaseModel):
 class UpdatePasswordRequest(BaseModel):
     current_password: str
     new_password: str
+
+class DeleteAccountRequest(BaseModel):
+    otp: str
 
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from services.jwt_handler import verify_token
@@ -218,3 +222,57 @@ def update_password(req: UpdatePasswordRequest, db: Session = Depends(get_db), c
     current_user.password_hash = get_password_hash(req.new_password)
     db.commit()
     return {"message": "Password updated successfully"}
+
+@router.get("/user/export")
+def export_user_data(db: Session = Depends(get_db), current_user: User = Depends(get_current_user_auth)):
+    user_data = {
+        "id": current_user.id,
+        "name": current_user.name,
+        "email": current_user.email,
+        "created_at": current_user.created_at.isoformat() if current_user.created_at else None
+    }
+    
+    chats = db.query(Chat).filter(Chat.user_id == current_user.id).all()
+    metadata = db.query(ChatMetadata).filter(ChatMetadata.user_id == current_user.id).all()
+    
+    return {
+        "user": user_data,
+        "chat_metadata": [{"chat_id": m.chat_id, "title": m.title, "is_pinned": m.is_pinned} for m in metadata],
+        "messages": [{"chat_id": c.chat_id, "role": "user", "content": c.message} for c in chats] + \
+                    [{"chat_id": c.chat_id, "role": "assistant", "content": c.response} for c in chats]
+    }
+
+@router.delete("/user/chats")
+def delete_all_chats(db: Session = Depends(get_db), current_user: User = Depends(get_current_user_auth)):
+    db.query(Chat).filter(Chat.user_id == current_user.id).delete()
+    db.query(ChatMetadata).filter(ChatMetadata.user_id == current_user.id).delete()
+    db.commit()
+    return {"message": "All chats deleted successfully"}
+
+@router.post("/user/delete-request")
+def request_account_deletion(background_tasks: BackgroundTasks, db: Session = Depends(get_db), current_user: User = Depends(get_current_user_auth)):
+    otp_code = store_otp(current_user.email)
+    background_tasks.add_task(send_delete_account_otp_email, current_user.email, otp_code)
+    return {"message": "Deletion OTP sent to email"}
+
+@router.delete("/user/account")
+def delete_account(req: DeleteAccountRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user_auth)):
+    otp_record = db.query(OTP).filter(
+        OTP.email == current_user.email, 
+        OTP.is_used == False,
+        OTP.expires_at > datetime.utcnow()
+    ).order_by(OTP.id.desc()).first()
+    
+    if not otp_record or not verify_otp_hash(req.otp, otp_record.otp_hash):
+        raise HTTPException(status_code=400, detail="Invalid or expired OTP")
+        
+    otp_record.is_used = True
+    
+    # Delete everything
+    db.query(Chat).filter(Chat.user_id == current_user.id).delete()
+    db.query(ChatMetadata).filter(ChatMetadata.user_id == current_user.id).delete()
+    db.query(OTP).filter(OTP.email == current_user.email).delete()
+    db.delete(current_user)
+    db.commit()
+    
+    return {"message": "Account deleted successfully"}
