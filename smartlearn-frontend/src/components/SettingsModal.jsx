@@ -404,6 +404,13 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode }
                         Delete
                       </button>
                     </div>
+
+                    <div className="pt-4 mt-2 border-t border-zinc-200 dark:border-zinc-800">
+                      <h4 className="text-xs font-semibold mb-2 uppercase tracking-wider text-muted-foreground">Privacy Commitment</h4>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        We do not sell your personal data or chat histories to third parties. All PDF extractions and conversational data are securely stored. By exporting your data, you agree to handle your local copy securely.
+                      </p>
+                    </div>
                   </div>
                 </motion.div>
               )}
@@ -526,16 +533,6 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode }
                       </button>
                     </form>
                   )}
-                </motion.div>
-              )}
-
-                    <div className="pt-4 mt-2 border-t border-zinc-200 dark:border-zinc-800">
-                      <h4 className="text-xs font-semibold mb-2 uppercase tracking-wider text-muted-foreground">Privacy Commitment</h4>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        We do not sell your personal data or chat histories to third parties. All PDF extractions and conversational data are securely stored. By exporting your data, you agree to handle your local copy securely.
-                      </p>
-                    </div>
-                  </div>
                 </motion.div>
               )}
 
