@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from sqlalchemy import create_engine, Column, Integer, Text, DateTime, func, Boolean, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, Text, DateTime, func, Boolean, ForeignKey, Index
 from sqlalchemy.orm import sessionmaker, declarative_base
 from datetime import datetime
 import os
@@ -56,6 +56,9 @@ class OTP(Base):
 
 class Chat(Base):
     __tablename__ = "chats"
+    __table_args__ = (
+        Index("idx_chat_user_chat_id", "user_id", "chat_id"),
+    )
 
     id         = Column(Integer, primary_key=True, index=True)
     user_id    = Column(Integer, ForeignKey("users.id"), index=True, nullable=True) # nullable for backwards compatibility with existing rows
@@ -67,6 +70,10 @@ class Chat(Base):
 
 class ChatMetadata(Base):
     __tablename__ = "chat_metadata"
+    __table_args__ = (
+        Index("idx_meta_user_chat_id", "user_id", "chat_id"),
+        Index("idx_meta_user_archived", "user_id", "is_archived"),
+    )
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), index=True, nullable=False)
