@@ -15,7 +15,8 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
   const [searchWeb, setSearchWeb] = useState("auto"); // "auto", "on", "off"
   const [showPlusMenu, setShowPlusMenu] = useState(false);
   const plusMenuRef = useRef(null);
-  const recognitionRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -27,67 +28,53 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = "en-US";
-
-      let finalTranscript = "";
-
-      recognition.onstart = () => {
-        finalTranscript = "";
-      };
-
-      recognition.onresult = (event) => {
-        let interimTranscript = "";
-        let newFinal = "";
-        
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            newFinal += event.results[i][0].transcript + " ";
-          } else {
-            interimTranscript += event.results[i][0].transcript;
-          }
-        }
-        
-        if (newFinal) {
-          setInput(prev => (prev + " " + newFinal).trim());
-        }
-      };
-
-      recognition.onerror = (event) => {
-        console.error("Speech recognition error", event.error);
-        setIsRecording(false);
-        if (event.error === 'not-allowed') {
-          toast.error("Microphone access denied.");
-        }
-      };
-
-      recognition.onend = () => {
-        setIsRecording(false);
-      };
-
-      recognitionRef.current = recognition;
-    }
-  }, [setInput]);
-
-  const toggleRecording = () => {
+  const toggleRecording = async () => {
     if (isRecording) {
-      recognitionRef.current?.stop();
+      mediaRecorderRef.current?.stop();
       setIsRecording(false);
     } else {
-      if (!recognitionRef.current) {
-        toast.error("Speech recognition is not supported in this browser.");
-        return;
-      }
       try {
-        recognitionRef.current.start();
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mediaRecorder = new MediaRecorder(stream);
+        mediaRecorderRef.current = mediaRecorder;
+        audioChunksRef.current = [];
+
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) audioChunksRef.current.push(e.data);
+        };
+
+        mediaRecorder.onstop = async () => {
+          stream.getTracks().forEach(track => track.stop());
+          const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+          
+          const loadingToast = toast.loading("Transcribing audio...");
+          
+          try {
+            const formData = new FormData();
+            formData.append("audio", audioBlob, "recording.webm");
+            
+            const res = await api.post('/api/voice', formData, {
+              headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            
+            if (res.data?.text) {
+              setInput(prev => (prev + " " + res.data.text).trim());
+              toast.success("Transcribed!", { id: loadingToast });
+              setTimeout(() => textareaRef.current?.focus(), 50);
+            } else {
+              toast.error("Could not transcribe audio.", { id: loadingToast });
+            }
+          } catch (err) {
+            console.error("STT Error:", err);
+            toast.error("Transcription failed.", { id: loadingToast });
+          }
+        };
+
+        mediaRecorder.start();
         setIsRecording(true);
       } catch (err) {
-        console.error(err);
+        console.error("Microphone access error:", err);
+        toast.error("Microphone access denied or not available.");
       }
     }
   };

@@ -3,10 +3,14 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { Copy, Check, WrapText, Volume2, Square, Download } from "lucide-react";
+import { Copy, Check, WrapText, Volume2, Square, Download, Loader2 } from "lucide-react";
 import QuizBlock from "./QuizBlock";
 import FlashcardBlock from "./FlashcardBlock";
 import MermaidBlock from "./MermaidBlock";
+
+const API = import.meta.env.DEV
+  ? "http://localhost:8000"
+  : "https://smartlearn-ai-production.up.railway.app";
 
 // ── Copy Button ──
 function CopyButton({ text }) {
@@ -219,36 +223,71 @@ const markdownRenderers = {
 // ── Main ──
 function AIMessage({ content }) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const utteranceRef = useRef(null);
+  const [isFetchingTTS, setIsFetchingTTS] = useState(false);
+  const audioRef = useRef(null);
 
   useEffect(() => {
     return () => {
-      if (utteranceRef.current) {
-        window.speechSynthesis.cancel();
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
       }
+      window.speechSynthesis.cancel();
     };
   }, []);
 
-  const toggleSpeech = () => {
+  const toggleSpeech = async () => {
     if (isPlaying) {
-      window.speechSynthesis.cancel();
+      if (audioRef.current) {
+        audioRef.current.pause();
+      } else {
+        window.speechSynthesis.cancel();
+      }
       setIsPlaying(false);
-    } else {
-      // Strip markdown for speech
+      return;
+    }
+
+    if (audioRef.current) {
+      audioRef.current.play();
+      setIsPlaying(true);
+      return;
+    }
+
+    setIsFetchingTTS(true);
+    try {
+      const plainText = content.replace(/[*#_`~]/g, '');
+      const res = await fetch(`${API}/api/tts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: plainText, voice: "en-US-JennyNeural" })
+      });
+      if (!res.ok) throw new Error("TTS failed");
+      
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      
+      audio.onended = () => setIsPlaying(false);
+      audio.onerror = () => setIsPlaying(false);
+      
+      audioRef.current = audio;
+      audio.play();
+      setIsPlaying(true);
+    } catch (err) {
+      console.error("Neural TTS failed, falling back to browser:", err);
       const plainText = content.replace(/[*#_`~]/g, '');
       const utterance = new SpeechSynthesisUtterance(plainText);
-      utteranceRef.current = utterance;
-      
       utterance.onend = () => setIsPlaying(false);
       utterance.onerror = () => setIsPlaying(false);
       
-      // Try to find a good voice
       const voices = window.speechSynthesis.getVoices();
       const premiumVoice = voices.find(v => v.name.includes("Google") || v.name.includes("Premium") || v.name.includes("Natural"));
       if (premiumVoice) utterance.voice = premiumVoice;
 
       window.speechSynthesis.speak(utterance);
       setIsPlaying(true);
+    } finally {
+      setIsFetchingTTS(false);
     }
   };
 
@@ -266,10 +305,11 @@ function AIMessage({ content }) {
       <div className="mt-3 flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
         <button 
           onClick={toggleSpeech}
-          className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 text-xs font-medium transition-colors p-1 -ml-1 rounded hover:bg-muted"
+          disabled={isFetchingTTS}
+          className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 text-xs font-medium transition-colors p-1 -ml-1 rounded hover:bg-muted disabled:opacity-50"
         >
-          {isPlaying ? <Square size={14} className="fill-current text-primary" /> : <Volume2 size={14} />}
-          {isPlaying ? "Stop playing" : "Read aloud"}
+          {isFetchingTTS ? <Loader2 size={14} className="animate-spin text-primary" /> : isPlaying ? <Square size={14} className="fill-current text-primary" /> : <Volume2 size={14} />}
+          {isFetchingTTS ? "Loading voice..." : isPlaying ? "Stop playing" : "Read aloud"}
         </button>
       </div>
     </div>

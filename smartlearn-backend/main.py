@@ -525,6 +525,22 @@ async def process_voice(audio: UploadFile = File(...)):
         logger.error(f"Voice processing error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+class TTSRequest(BaseModel):
+    text: str
+    voice: Optional[str] = "en-US-JennyNeural"
+
+from fastapi import Response
+from services.voice import generate_speech
+
+@app.post("/api/tts")
+async def text_to_speech(req: TTSRequest):
+    try:
+        audio_bytes = await generate_speech(req.text, req.voice)
+        return Response(content=audio_bytes, media_type="audio/mpeg")
+    except Exception as e:
+        logger.error(f"TTS Route Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 class YouTubeRequest(BaseModel):
     query: str
 

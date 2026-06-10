@@ -5,9 +5,10 @@ import AIMessage from "./AIMessage";
 import Logo from "./Logo";
 import YouTubeRecommendations from "./YouTubeRecommendations";
 import { useAuth } from "../context/AuthContext";
-
 export default function ChatWindow({ messages, loading, isChatsLoading, onSuggestionClick, regenerateMessage }) {
   const { user } = useAuth();
+  const messagesEndRef = useRef(null);
+  const [activeSourcesQuery, setActiveSourcesQuery] = useState(null);
   const lastScrollTime = useRef(0);
 
   useEffect(() => {
