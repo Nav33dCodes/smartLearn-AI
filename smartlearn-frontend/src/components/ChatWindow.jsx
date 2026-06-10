@@ -4,6 +4,7 @@ import AIMessage from "./AIMessage";
 import Logo from "./Logo";
 import YouTubeRecommendations from "./YouTubeRecommendations";
 import { useAuth } from "../context/AuthContext";
+import { Layers, BrainCircuit, Network } from "lucide-react";
 
 export default function ChatWindow({ messages, loading, isChatsLoading, onSuggestionClick, regenerateMessage }) {
   const { user } = useAuth();
@@ -42,6 +43,41 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
           >
             How can I help you today, {firstName}?
           </motion.h1>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="flex flex-wrap items-center justify-center gap-3 mt-10 max-w-2xl mx-auto"
+          >
+            <button 
+              onClick={() => onSuggestionClick("Create a flashcard deck of 5 advanced Python concepts")}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-border bg-card hover:bg-muted hover:border-primary/50 text-sm font-medium transition-all shadow-sm group"
+            >
+              <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <Layers size={16} className="text-primary" />
+              </div>
+              <span className="text-foreground/80 group-hover:text-foreground">Flashcards</span>
+            </button>
+            <button 
+              onClick={() => onSuggestionClick("Give me a quick 3-question multiple choice quiz on the Solar System")}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-border bg-card hover:bg-muted hover:border-primary/50 text-sm font-medium transition-all shadow-sm group"
+            >
+              <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <BrainCircuit size={16} className="text-primary" />
+              </div>
+              <span className="text-foreground/80 group-hover:text-foreground">Interactive Quiz</span>
+            </button>
+            <button 
+              onClick={() => onSuggestionClick("Draw a detailed mind map explaining how photosynthesis works")}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-border bg-card hover:bg-muted hover:border-primary/50 text-sm font-medium transition-all shadow-sm group"
+            >
+              <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <Network size={16} className="text-primary" />
+              </div>
+              <span className="text-foreground/80 group-hover:text-foreground">Mind Map</span>
+            </button>
+          </motion.div>
         </motion.div>
       </div>
     );
