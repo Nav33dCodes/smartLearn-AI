@@ -8,16 +8,22 @@ import { useAuth } from "../context/AuthContext";
 
 export default function ChatWindow({ messages, loading, isChatsLoading, onSuggestionClick, regenerateMessage }) {
   const { user } = useAuth();
-  const messagesEndRef = useRef(null);
-  const [activeSourcesQuery, setActiveSourcesQuery] = useState(null);
+  const lastScrollTime = useRef(0);
 
   useEffect(() => {
-    // Use 'auto' during loading to prevent the browser's smooth scroll engine from vibrating
-    // when receiving rapid updates multiple times a second.
-    messagesEndRef.current?.scrollIntoView({ 
-      behavior: loading ? "auto" : "smooth",
-      block: "end"
-    });
+    const now = Date.now();
+    if (loading) {
+      // Throttle instant scrolling during generation to at most once every 100ms
+      // to prevent synchronous layout thrashing from freezing the browser.
+      if (now - lastScrollTime.current > 100) {
+        messagesEndRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
+        lastScrollTime.current = now;
+      }
+    } else {
+      // Smooth scroll for new user messages
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+      lastScrollTime.current = now;
+    }
   }, [messages, loading]);
   if (isChatsLoading && messages.length === 0) {
     return (
