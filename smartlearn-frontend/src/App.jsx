@@ -33,6 +33,8 @@ function ChatDashboard() {
   const { data: historyData, isFetching: isHistoryLoading } = useChatHistory(activeChatId);
   const [activeMessages, setActiveMessages] = useState([]);
   
+  const isNewChat = activeChatId ? !chatsData.some(c => String(c.id) === String(activeChatId)) : true;
+  
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [abortController, setAbortController] = useState(null);
@@ -290,7 +292,7 @@ function ChatDashboard() {
           )}
         </header>
 
-        {activeMessages.length === 0 && !isChatsLoading && !isHistoryLoading ? (
+        {activeMessages.length === 0 && !isChatsLoading && (!isHistoryLoading || isNewChat) ? (
           <div className="flex-1 flex flex-col items-center justify-center px-4 w-full h-full relative z-10 pb-20">
             <h1 className="text-4xl md:text-[44px] font-semibold tracking-tight text-foreground mb-8 text-center">
               How can I help you today, {user?.name ? user.name.split(" ")[0] : "there"}?
@@ -354,7 +356,7 @@ function ChatDashboard() {
               messages={activeMessages} 
               loading={loading}
               isChatsLoading={isChatsLoading}
-              isHistoryLoading={isHistoryLoading}
+              isHistoryLoading={isHistoryLoading && !isNewChat}
               onSuggestionClick={(text) => {
                 setInput(text);
                 setTimeout(() => textareaRef.current?.focus(), 50);
