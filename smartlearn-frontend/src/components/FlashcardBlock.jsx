@@ -54,38 +54,46 @@ export default function FlashcardBlock({ data }) {
       </div>
 
       {/* Card Body */}
-      <div className="p-6 md:p-8 flex flex-col items-center justify-center min-h-[300px] perspective-[1000px]">
-        <motion.div
-          className="relative w-full max-w-sm h-64 cursor-pointer transform-style-3d transition-all duration-500"
-          animate={{ rotateY: isFlipped ? 180 : 0 }}
-          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+      <div className="p-6 md:p-8 flex flex-col items-center justify-center min-h-[300px]">
+        <div 
+          className="relative w-full max-w-sm h-64 cursor-pointer"
           onClick={() => setIsFlipped(!isFlipped)}
         >
-          {/* Front */}
-          <div 
-            className="absolute inset-0 backface-hidden bg-gradient-to-br from-background to-muted/30 border border-border rounded-2xl shadow-sm flex flex-col items-center justify-center p-6 text-center"
-            style={{ backfaceVisibility: 'hidden' }}
-          >
-            <span className="absolute top-4 left-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Front</span>
-            <h3 className="text-xl md:text-2xl font-semibold text-foreground leading-snug">
-              {cards[currentIndex].front}
-            </h3>
-            <div className="absolute bottom-4 text-muted-foreground/50 flex items-center gap-1.5 text-xs font-medium">
-              <RotateCw size={12} /> Click to flip
-            </div>
-          </div>
-
-          {/* Back */}
-          <div 
-            className="absolute inset-0 backface-hidden bg-primary text-primary-foreground rounded-2xl shadow-lg flex flex-col items-center justify-center p-6 text-center"
-            style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
-          >
-            <span className="absolute top-4 left-4 text-xs font-bold text-primary-foreground/70 uppercase tracking-widest">Back</span>
-            <p className="text-lg md:text-xl font-medium leading-relaxed">
-              {cards[currentIndex].back}
-            </p>
-          </div>
-        </motion.div>
+          <AnimatePresence mode="wait">
+            {!isFlipped ? (
+              <motion.div
+                key="front"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 bg-gradient-to-br from-background to-muted/30 border border-border rounded-2xl shadow-sm flex flex-col items-center justify-center p-6 text-center"
+              >
+                <span className="absolute top-4 left-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Front</span>
+                <h3 className="text-xl md:text-2xl font-semibold text-foreground leading-snug">
+                  {cards[currentIndex].front}
+                </h3>
+                <div className="absolute bottom-4 text-muted-foreground/50 flex items-center gap-1.5 text-xs font-medium">
+                  <RotateCw size={12} /> Click to reveal
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="back"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 bg-primary text-primary-foreground rounded-2xl shadow-md flex flex-col items-center justify-center p-6 text-center"
+              >
+                <span className="absolute top-4 left-4 text-xs font-bold text-primary-foreground/70 uppercase tracking-widest">Back</span>
+                <p className="text-lg md:text-xl font-medium leading-relaxed">
+                  {cards[currentIndex].back}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* Controls */}
         <div className="flex items-center gap-6 mt-10">
