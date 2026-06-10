@@ -118,7 +118,7 @@ export default function Sidebar({
               <div
                 onClick={() => { if (editingChatId !== chat.id) handleSelectChat(chat.id) }}
                 className={`group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer mb-[2px] transition-all duration-200 ease-out ${
-                  chat.id === activeChatId 
+                  String(chat.id) === String(activeChatId) 
                     ? 'bg-primary/10 text-primary font-medium' 
                     : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground'
                 }`}
