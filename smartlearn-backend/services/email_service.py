@@ -28,239 +28,152 @@ def send_email(to_email: str, subject: str, body: str):
         print(f"Failed to send email: {e}")
         return False
 
-def send_welcome_email(to_email: str, name: str):
-    subject = "Welcome to SmartLearn AI!"
-    body = f"""
+def get_premium_template(title: str, content_html: str, show_warning: bool = False, warning_text: str = "") -> str:
+    warning_block = f"""
+    <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #eaeaea; color: #666666; font-size: 13px; line-height: 20px;">
+        {warning_text}
+    </div>
+    """ if show_warning else ""
+    
+    return f"""
     <!DOCTYPE html>
-    <html>
+    <html lang="en">
     <head>
-        <meta charset="utf-8">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-            body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f5; margin: 0; padding: 40px 0; }}
-            .container {{ max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }}
-            .header {{ background-color: #0a0a0a; padding: 30px; text-align: center; }}
-            .header h1 {{ color: #ffffff; margin: 0; font-size: 24px; letter-spacing: -0.5px; }}
-            .header span {{ color: #10b981; }}
-            .content {{ padding: 40px 30px; }}
-            .content h2 {{ color: #18181b; margin-top: 0; font-size: 20px; }}
-            .content p {{ color: #52525b; line-height: 1.6; font-size: 16px; }}
-            .btn-container {{ text-align: center; margin: 35px 0; }}
-            .btn {{ background-color: #10b981; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; }}
-            .footer {{ background-color: #fafafa; padding: 20px; text-align: center; border-top: 1px solid #e4e4e7; }}
-            .footer p {{ color: #a1a1aa; font-size: 13px; margin: 0; }}
+            body {{
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                background-color: #f6f9fc;
+                margin: 0;
+                padding: 40px 20px;
+                -webkit-font-smoothing: antialiased;
+            }}
+            .container {{
+                max-width: 580px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                border: 1px solid #eaeaea;
+                border-radius: 8px;
+                padding: 40px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+            }}
+            .logo {{
+                display: flex;
+                align-items: center;
+                margin-bottom: 32px;
+                font-size: 22px;
+                font-weight: 700;
+                color: #111111;
+                letter-spacing: -0.5px;
+            }}
+            .logo span {{
+                color: #4f46e5;
+                margin-left: 4px;
+            }}
+            .title {{
+                color: #111111;
+                font-size: 24px;
+                font-weight: 600;
+                margin-top: 0;
+                margin-bottom: 24px;
+                letter-spacing: -0.5px;
+            }}
+            .text {{
+                color: #444444;
+                font-size: 15px;
+                line-height: 24px;
+                margin-bottom: 24px;
+            }}
+            .footer {{
+                text-align: center;
+                margin-top: 32px;
+                color: #8898aa;
+                font-size: 12px;
+                line-height: 16px;
+            }}
         </style>
     </head>
     <body>
         <div class="container">
-            <div class="header">
-                <h1>SmartLearn <span>AI</span></h1>
-            </div>
-            <div class="content">
-                <h2>Welcome to the future of learning, {name}!</h2>
-                <p>We're thrilled to have you onboard. SmartLearn AI is designed to help you digest information faster, understand complex topics effortlessly, and unlock your true learning potential.</p>
-                <p>Upload your PDFs, ask questions, and let our advanced Retrieval-Augmented Generation engine do the heavy lifting.</p>
-                <div class="btn-container">
-                    <a href="https://smartlearn-ai-production.up.railway.app" class="btn">Get Started Now</a>
-                </div>
-                <p>If you have any questions, simply reply to this email. We're here to help!</p>
-            </div>
-            <div class="footer">
-                <p>&copy; {{{{ year }}}} SmartLearn AI. All rights reserved.</p>
-                <p>You received this email because you signed up for a SmartLearn AI account.</p>
-            </div>
+            <div class="logo">SmartLearn<span>AI</span></div>
+            <h1 class="title">{title}</h1>
+            {content_html}
+            {warning_block}
+        </div>
+        <div class="footer">
+            &copy; 2026 SmartLearn AI. All rights reserved.<br>
+            Secure automated communication system.
         </div>
     </body>
     </html>
-    """.replace("{{ year }}", "2026")
+    """
+
+def send_welcome_email(to_email: str, name: str):
+    subject = "Welcome to SmartLearn AI!"
+    content = f"""
+    <p class="text">Hi {name},</p>
+    <p class="text">Welcome to the future of learning. We're thrilled to have you onboard.</p>
+    <p class="text">SmartLearn AI is designed to help you digest information faster, understand complex topics effortlessly, and unlock your true learning potential using advanced retrieval-augmented generation.</p>
+    <div style="margin: 32px 0;">
+        <a href="https://smartlearn-ai-production.up.railway.app" style="background-color: #111111; color: #ffffff; font-weight: 600; font-size: 14px; text-decoration: none; padding: 12px 24px; border-radius: 6px; display: inline-block;">Get Started Now</a>
+    </div>
+    <p class="text" style="color: #666666; font-size: 14px;">If you have any questions or need assistance, simply reply to this email. We're here to help.</p>
+    """
+    body = get_premium_template("Welcome to SmartLearn!", content)
     return send_email(to_email, subject, body)
 
 def send_otp_email(to_email: str, otp: str):
     subject = "Your SmartLearn AI Password Reset Code"
-    body = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8">
-        <style>
-            body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f5; margin: 0; padding: 40px 0; }}
-            .container {{ max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }}
-            .header {{ background-color: #0a0a0a; padding: 30px; text-align: center; }}
-            .header h1 {{ color: #ffffff; margin: 0; font-size: 24px; letter-spacing: -0.5px; }}
-            .header span {{ color: #10b981; }}
-            .content {{ padding: 40px 30px; }}
-            .content h2 {{ color: #18181b; margin-top: 0; font-size: 20px; }}
-            .content p {{ color: #52525b; line-height: 1.6; font-size: 16px; }}
-            .otp-container {{ background-color: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 8px; padding: 20px; text-align: center; margin: 30px 0; }}
-            .otp-code {{ color: #10b981; font-size: 36px; font-weight: 700; letter-spacing: 8px; margin: 0; }}
-            .warning {{ color: #71717a; font-size: 14px; margin-top: 30px; border-top: 1px solid #e4e4e7; padding-top: 20px; }}
-            .footer {{ background-color: #fafafa; padding: 20px; text-align: center; border-top: 1px solid #e4e4e7; }}
-            .footer p {{ color: #a1a1aa; font-size: 13px; margin: 0; }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>SmartLearn <span>AI</span></h1>
-            </div>
-            <div class="content">
-                <h2>Password Reset Request</h2>
-                <p>We received a request to reset the password associated with your SmartLearn AI account. Please use the verification code below to securely reset your password:</p>
-                <div class="otp-container">
-                    <p class="otp-code">{otp}</p>
-                </div>
-                <p><strong>Note:</strong> This code is only valid for the next 15 minutes.</p>
-                <p class="warning">If you did not request a password reset, please ignore this email or contact support if you have concerns regarding your account security.</p>
-            </div>
-            <div class="footer">
-                <p>&copy; {{{{ year }}}} SmartLearn AI. All rights reserved.</p>
-                <p>This is an automated message, please do not reply directly to this email.</p>
-            </div>
-        </div>
-    </body>
-    </html>
-    """.replace("{{ year }}", "2026")
+    content = f"""
+    <p class="text">We received a request to reset the password associated with your account.</p>
+    <p class="text">Please use the verification code below to securely reset your password:</p>
+    <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 24px; text-align: center; margin: 32px 0;">
+        <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #111111;">{otp}</div>
+    </div>
+    <p class="text" style="font-size: 14px; color: #666666;">This code is valid for 15 minutes.</p>
+    """
+    warning = "If you did not request a password reset, please ignore this email or contact support immediately."
+    body = get_premium_template("Password Reset Request", content, show_warning=True, warning_text=warning)
     return send_email(to_email, subject, body)
 
 def send_password_reset_success_email(to_email: str):
     subject = "Your SmartLearn AI Password Has Been Reset"
-    body = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8">
-        <style>
-            body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f5; margin: 0; padding: 40px 0; }}
-            .container {{ max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }}
-            .header {{ background-color: #0a0a0a; padding: 30px; text-align: center; }}
-            .header h1 {{ color: #ffffff; margin: 0; font-size: 24px; letter-spacing: -0.5px; }}
-            .header span {{ color: #10b981; }}
-            .content {{ padding: 40px 30px; }}
-            .content h2 {{ color: #18181b; margin-top: 0; font-size: 20px; }}
-            .content p {{ color: #52525b; line-height: 1.6; font-size: 16px; }}
-            .success-icon {{ background-color: #d1fae5; color: #10b981; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 20px auto; }}
-            .btn-container {{ text-align: center; margin: 35px 0; }}
-            .btn {{ background-color: #10b981; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; }}
-            .footer {{ background-color: #fafafa; padding: 20px; text-align: center; border-top: 1px solid #e4e4e7; }}
-            .footer p {{ color: #a1a1aa; font-size: 13px; margin: 0; }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>SmartLearn <span>AI</span></h1>
-            </div>
-            <div class="content">
-                <div style="text-align: center;">
-                    <div class="success-icon" style="font-size: 40px; line-height: 64px;">✓</div>
-                </div>
-                <h2 style="text-align: center;">Password Reset Successful</h2>
-                <p>This email is to confirm that the password for your SmartLearn AI account has been successfully changed.</p>
-                <p>If you made this change, you don't need to do anything else. You can now log in using your new password.</p>
-                <div class="btn-container">
-                    <a href="https://smartlearn-ai-production.up.railway.app/login" class="btn">Log In Now</a>
-                </div>
-                <p><strong>Security Notice:</strong> If you did not authorize this change, please contact our support team immediately to secure your account.</p>
-            </div>
-            <div class="footer">
-                <p>&copy; {{{{ year }}}} SmartLearn AI. All rights reserved.</p>
-                <p>This is an automated security alert. Please do not reply directly to this email.</p>
-            </div>
-        </div>
-    </body>
-    </html>
-    """.replace("{{ year }}", "2026")
+    content = """
+    <p class="text">This email confirms that the password for your SmartLearn AI account has been successfully changed.</p>
+    <p class="text">You can now log in to your account using your new password.</p>
+    <div style="margin: 32px 0;">
+        <a href="https://smartlearn-ai-production.up.railway.app/login" style="background-color: #111111; color: #ffffff; font-weight: 600; font-size: 14px; text-decoration: none; padding: 12px 24px; border-radius: 6px; display: inline-block;">Log In to Account</a>
+    </div>
+    """
+    warning = "Security Notice: If you did not authorize this change, please contact our support team immediately."
+    body = get_premium_template("Password Reset Successful", content, show_warning=True, warning_text=warning)
     return send_email(to_email, subject, body)
 
 def send_verification_email(to_email: str, name: str, otp: str):
     subject = "Verify Your SmartLearn AI Account"
-    body = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8">
-        <style>
-            body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f5; margin: 0; padding: 40px 0; }}
-            .container {{ max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }}
-            .header {{ background-color: #0a0a0a; padding: 30px; text-align: center; }}
-            .header h1 {{ color: #ffffff; margin: 0; font-size: 24px; letter-spacing: -0.5px; }}
-            .header span {{ color: #10b981; }}
-            .content {{ padding: 40px 30px; }}
-            .content h2 {{ color: #18181b; margin-top: 0; font-size: 20px; }}
-            .content p {{ color: #52525b; line-height: 1.6; font-size: 16px; }}
-            .otp-container {{ background-color: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 8px; padding: 20px; text-align: center; margin: 30px 0; }}
-            .otp-code {{ color: #10b981; font-size: 36px; font-weight: 700; letter-spacing: 8px; margin: 0; }}
-            .footer {{ background-color: #fafafa; padding: 20px; text-align: center; border-top: 1px solid #e4e4e7; }}
-            .footer p {{ color: #a1a1aa; font-size: 13px; margin: 0; }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>SmartLearn <span>AI</span></h1>
-            </div>
-            <div class="content">
-                <h2>Hi {name}, almost there!</h2>
-                <p>Thank you for signing up for SmartLearn AI. To complete your registration and activate your account, please use the verification code below:</p>
-                <div class="otp-container">
-                    <p class="otp-code">{otp}</p>
-                </div>
-                <p><strong>Note:</strong> This code is only valid for the next 15 minutes.</p>
-                <p>If you didn't attempt to create an account, you can safely ignore this email.</p>
-            </div>
-            <div class="footer">
-                <p>&copy; {{{{ year }}}} SmartLearn AI. All rights reserved.</p>
-                <p>This is an automated message, please do not reply directly to this email.</p>
-            </div>
-        </div>
-    </body>
-    </html>
-    """.replace("{{ year }}", "2026")
+    content = f"""
+    <p class="text">Hi {name},</p>
+    <p class="text">Thank you for signing up. To complete your registration and activate your account, please use the verification code below:</p>
+    <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 24px; text-align: center; margin: 32px 0;">
+        <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #4f46e5;">{otp}</div>
+    </div>
+    <p class="text" style="font-size: 14px; color: #666666;">This code is valid for 15 minutes.</p>
+    """
+    warning = "If you didn't attempt to create an account, you can safely ignore this email."
+    body = get_premium_template("Verify Your Account", content, show_warning=True, warning_text=warning)
     return send_email(to_email, subject, body)
 
 def send_delete_account_otp_email(to_email: str, otp: str):
     subject = "⚠️ SmartLearn AI Account Deletion Request"
-    body = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8">
-        <style>
-            body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f5; margin: 0; padding: 40px 0; }}
-            .container {{ max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border-top: 4px solid #ef4444; }}
-            .header {{ background-color: #0a0a0a; padding: 30px; text-align: center; }}
-            .header h1 {{ color: #ffffff; margin: 0; font-size: 24px; letter-spacing: -0.5px; }}
-            .header span {{ color: #10b981; }}
-            .content {{ padding: 40px 30px; }}
-            .content h2 {{ color: #18181b; margin-top: 0; font-size: 20px; }}
-            .content p {{ color: #52525b; line-height: 1.6; font-size: 16px; }}
-            .otp-container {{ background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 20px; text-align: center; margin: 30px 0; }}
-            .otp-code {{ color: #ef4444; font-size: 36px; font-weight: 700; letter-spacing: 8px; margin: 0; }}
-            .warning {{ color: #ef4444; font-size: 14px; margin-top: 30px; border-top: 1px solid #fecaca; padding-top: 20px; font-weight: 600; }}
-            .footer {{ background-color: #fafafa; padding: 20px; text-align: center; border-top: 1px solid #e4e4e7; }}
-            .footer p {{ color: #a1a1aa; font-size: 13px; margin: 0; }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>SmartLearn <span>AI</span></h1>
-            </div>
-            <div class="content">
-                <h2>Account Deletion Request</h2>
-                <p>We received a request to permanently delete your SmartLearn AI account and all associated data. This action is irreversible.</p>
-                <p>If you wish to proceed, please use the verification code below:</p>
-                <div class="otp-container">
-                    <p class="otp-code">{otp}</p>
-                </div>
-                <p><strong>Note:</strong> This code is only valid for the next 15 minutes.</p>
-                <p class="warning">If you did not request this deletion, please ignore this email immediately and consider changing your password.</p>
-            </div>
-            <div class="footer">
-                <p>&copy; {{{{ year }}}} SmartLearn AI. All rights reserved.</p>
-                <p>This is an automated security alert. Please do not reply directly to this email.</p>
-            </div>
-        </div>
-    </body>
-    </html>
-    """.replace("{{ year }}", "2026")
+    content = f"""
+    <p class="text">We received a request to permanently delete your account and all associated data. <strong>This action is irreversible.</strong></p>
+    <p class="text">If you wish to proceed, please use the verification code below:</p>
+    <div style="background-color: #fef2f2; border: 1px solid #fee2e2; border-radius: 6px; padding: 24px; text-align: center; margin: 32px 0;">
+        <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #dc2626;">{otp}</div>
+    </div>
+    <p class="text" style="font-size: 14px; color: #666666;">This code is valid for 15 minutes.</p>
+    """
+    warning = "If you did not request this deletion, please ignore this email immediately and consider changing your password."
+    body = get_premium_template("Account Deletion Request", content, show_warning=True, warning_text=warning)
     return send_email(to_email, subject, body)
