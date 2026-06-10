@@ -183,6 +183,18 @@ function ChatDashboard() {
             
             if (parsed.status) {
               setStreamStatus(parsed.status);
+              if (parsed.urls && parsed.urls.length > 0) {
+                setActiveMessages(prev => {
+                  const updated = [...prev];
+                  const lastIdx = updated.length - 1;
+                  if (updated[lastIdx].role === "assistant") {
+                     updated[lastIdx] = { ...updated[lastIdx], sources: parsed.urls };
+                  } else {
+                     updated.push({ role: "assistant", content: "", sources: parsed.urls, timestamp: Date.now() });
+                  }
+                  return updated;
+                });
+              }
               continue;
             }
             

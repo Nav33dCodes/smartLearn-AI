@@ -203,11 +203,14 @@ async def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_use
             if should_search:
                 yield f"data: {json.dumps({'status': 'searching_web'})}\n\n"
                 print(f"🌐 Performing Web Search via Tavily for: {message}")
-                web_context = search_tavily(message)
+                web_context, urls = search_tavily(message)
                 if web_context:
                     context = (context + "\n\n### 🌐 Web Search Results:\n" + web_context) if context else ("### 🌐 Web Search Results:\n" + web_context)
-            
-            yield f"data: {json.dumps({'status': 'search_complete'})}\n\n"
+                    yield f"data: {json.dumps({'status': 'search_complete', 'urls': urls})}\n\n"
+                else:
+                    yield f"data: {json.dumps({'status': 'search_complete'})}\n\n"
+            else:
+                yield f"data: {json.dumps({'status': 'search_complete'})}\n\n"
 
             # 3. Inject Current Date/Time
             from datetime import datetime

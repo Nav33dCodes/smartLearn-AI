@@ -117,6 +117,25 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
                       <Logo size={18} className="text-primary" />
                     </div>
                     <div className="flex flex-col gap-1 w-full max-w-[90%]">
+                      
+                      {msg.sources && msg.sources.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-1 pt-1">
+                          {msg.sources.map((url, i) => {
+                            try {
+                              const domain = new URL(url).hostname.replace('www.', '');
+                              return (
+                                <a key={i} href={url} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-2.5 py-1 h-7 bg-muted/40 hover:bg-muted border border-border/60 rounded-full text-[11px] font-medium text-foreground/80 transition-colors cursor-pointer hover:border-primary/40 group/link">
+                                  <div className="w-4 h-4 rounded-full bg-background flex items-center justify-center shrink-0 shadow-sm border border-border/50 overflow-hidden">
+                                    <img src={`https://www.google.com/s2/favicons?domain=${domain}&sz=32`} className="w-3 h-3" alt={domain} />
+                                  </div>
+                                  <span className="truncate max-w-[120px] group-hover/link:text-primary transition-colors">{domain}</span>
+                                </a>
+                              );
+                            } catch (e) { return null; }
+                          })}
+                        </div>
+                      )}
+
                       <div className="text-foreground leading-relaxed text-base pt-1">
                         <AIMessage content={msg.content} />
                       </div>

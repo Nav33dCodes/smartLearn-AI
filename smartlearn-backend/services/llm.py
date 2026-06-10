@@ -80,26 +80,28 @@ graph TD
 # ────────────────────────────────────────────────────
 # TAVILY WEB SEARCH
 # ────────────────────────────────────────────────────
-def search_tavily(query: str) -> str:
-    """Uses Tavily API to fetch clean markdown web context for a given query."""
+def search_tavily(query: str):
+    """Uses Tavily API to fetch clean markdown web context for a given query, returning (context_str, urls_list)."""
     if not tavily_client:
-        return ""
+        return "", []
     try:
         response = tavily_client.search(query=query, search_depth="advanced", max_results=6)
         results = response.get('results', [])
         
-        # Format results into a clean text block
         formatted_results = []
+        urls = []
         for r in results:
             content = r.get('content', '')
             url = r.get('url', '')
             if content:
                 formatted_results.append(f"- **Source** ({url}):\n{content}")
+                if url and url not in urls:
+                    urls.append(url)
                 
-        return "\n\n".join(formatted_results)
+        return "\n\n".join(formatted_results), urls
     except Exception as e:
         print(f"Tavily search failed: {e}")
-        return ""
+        return "", []
 
 def needs_web_search(query: str) -> bool:
     """Uses a fast LLM to determine if the query requires live web search."""
