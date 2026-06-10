@@ -20,16 +20,16 @@ function CopyButton({ text }) {
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("Copy failed", err);
     }
   };
 
   return (
-    <button onClick={handleCopy} className="code-copy-btn" title="Copy code">
-      {copied ? <Check size={13} /> : <Copy size={13} />}
-      <span>{copied ? "Copied!" : "Copy"}</span>
+    <button onClick={handleCopy} className="code-copy-btn flex items-center gap-1.5 p-1.5 rounded-md hover:bg-muted/50 transition-colors text-xs text-muted-foreground hover:text-foreground" title="Copy code">
+      {copied ? <Check size={13} className="text-emerald-500" /> : <Copy size={13} />}
+      <span className={copied ? "text-emerald-500" : ""}>{copied ? "Copied" : "Copy"}</span>
     </button>
   );
 }
@@ -82,12 +82,17 @@ function DownloadButton({ text, language }) {
 // ── Code Block ──
 function CodeBlock({ language, codeText }) {
   const [wrapped, setWrapped] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div className="code-block-wrapper border border-border overflow-hidden rounded-2xl shadow-sm my-4">
-      <div className="code-block-header bg-muted/40 px-4 py-2 border-b border-border flex items-center justify-between">
-        <span className="code-lang text-xs font-semibold text-muted-foreground uppercase tracking-wider">{language}</span>
-        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+    <div 
+      className="code-block-wrapper border border-border overflow-hidden rounded-xl shadow-sm my-6 group relative"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="code-block-header bg-muted/20 px-4 py-2.5 border-b border-border flex items-center justify-between">
+        <span className="code-lang text-xs font-bold text-muted-foreground uppercase tracking-wider bg-muted/50 px-2 py-1 rounded-md">{language || "text"}</span>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }} className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <WrapToggle wrapped={wrapped} onToggle={() => setWrapped(w => !w)} />
           <DownloadButton text={codeText} language={language} />
           <CopyButton text={codeText} />
@@ -97,6 +102,7 @@ function CodeBlock({ language, codeText }) {
         style={vscDarkPlus}
         language={language}
         PreTag="div"
+        showLineNumbers={isHovered}
         wrapLines={wrapped}
         wrapLongLines={wrapped}
         customStyle={{
@@ -104,8 +110,7 @@ function CodeBlock({ language, codeText }) {
           padding: "1.25rem 1.25rem",
           fontSize: "0.85rem",
           borderRadius: "0",
-          backgroundColor: "#1e1e1e", // Dark background to match vscDarkPlus
-
+          backgroundColor: "#0d0d0d", // Darker background
           lineHeight: 1.65,
           overflowX: wrapped ? "hidden" : "auto",
         }}
