@@ -21,39 +21,7 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
   }
 
   if (messages.length === 0) {
-    const firstName = user?.name ? user.name.split(" ")[0] : "there";
-    
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center pt-14 pb-32 px-4 text-center">
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-md mx-auto"
-        >
-          <div className="mx-auto bg-primary/5 text-primary w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-border">
-            <Logo size={32} />
-          </div>
-          
-          <motion.h1 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 20 }}
-            className="text-3xl font-bold tracking-tight text-foreground mb-2"
-          >
-            Welcome, {firstName}!
-          </motion.h1>
-          
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-muted-foreground mb-8 text-[15px] leading-relaxed max-w-sm mx-auto"
-          >
-            Welcome to your intelligent learning space. Ask me anything, drop a document for deep analysis, or let me search the web to find the latest insights.
-          </motion.p>
-        </motion.div>
-      </div>
-    );
+    return null;
   }
 
   return (

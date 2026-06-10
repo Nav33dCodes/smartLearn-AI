@@ -6,7 +6,7 @@ import { useUploadPdf } from "../hooks/useChats";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function InputBox({ input, setInput, sendMessage, loading, stopGeneration, textareaRef, activeChatId }) {
+export default function InputBox({ input, setInput, sendMessage, loading, stopGeneration, textareaRef, activeChatId, isEmpty }) {
   const fileInputRef = useRef(null);
   const uploadPdfMutation = useUploadPdf();
   const [attachedFiles, setAttachedFiles] = useState([]);
@@ -168,8 +168,8 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
   }, [activeChatId]);
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background to-transparent pt-6 pb-6 px-4 pointer-events-none">
-      <div className="max-w-3xl mx-auto relative flex flex-col gap-2 pointer-events-auto">
+    <div className={isEmpty ? "w-full pointer-events-none" : "absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background to-transparent pt-6 pb-6 px-4 pointer-events-none"}>
+      <div className="max-w-3xl mx-auto relative flex flex-col gap-2 pointer-events-auto w-full">
         
         {loading && (
           <div className="flex justify-center absolute -top-12 left-0 right-0">
