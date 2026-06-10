@@ -2,6 +2,25 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 10, 2026 (Part 6)",
+    features: [
+      {
+        title: "⚡ Asynchronous Scaling & DOM Virtualization",
+        description: "A colossal performance overhaul of both the frontend rendering engine and backend database connections to handle immense traffic and massive chat histories.",
+        bullets: [
+          "True Async Database Queries: Integrated asyncpg into the FastAPI backend. Fetching chats and histories is now completely non-blocking, allowing thousands of simultaneous requests without locking up threads.",
+          "React Component Lazy Loading: Slashed the initial Javascript bundle size. The Chats Manager, Settings, and Auth routes are now dynamically loaded only when requested, drastically reducing Time To Interactive (TTI).",
+          "60 FPS DOM Virtualization: Integrated react-virtuoso into the Chats Manager. Instead of rendering thousands of chat nodes, the UI now surgically renders only the ~15 chats visible on screen, guaranteeing buttery smooth scrolling.",
+          "Premium Light Theme Redesign: Overhauled Light Mode to be vastly gentler on the eyes. Removed stark, glaring whites in favor of soft paper-grays, combined with highly elevated dark-gray accents for a sleek, Vercel-like premium aesthetic."
+        ]
+      }
+    ],
+    fixes: [
+      "Fixed an issue where the Chat Input dropdown was transparent in Light Mode, causing text bleed-through.",
+      "Resolved a critical bug where asyncpg failed to parse 'sslmode' parameters natively passed by Neon PostgreSQL."
+    ]
+  },
+  {
     date: "June 10, 2026 (Part 5)",
     features: [
       {
