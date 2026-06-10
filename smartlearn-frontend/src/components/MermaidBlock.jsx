@@ -58,7 +58,9 @@ export default function MermaidBlock({ data }) {
     URL.revokeObjectURL(url);
   };
 
-  if (error || !svgContent) {
+  // Only show loading state if we have no SVG content yet.
+  // We ignore temporary parsing errors during streaming so the UI doesn't shake!
+  if (!svgContent) {
     return (
       <div className="my-6 border border-border rounded-2xl bg-card shadow-sm overflow-hidden flex flex-col items-center justify-center min-h-[300px]">
         <div className="animate-pulse flex flex-col items-center gap-3 text-muted-foreground">
