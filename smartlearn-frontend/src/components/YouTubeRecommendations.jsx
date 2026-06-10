@@ -61,10 +61,9 @@ export default function YouTubeRecommendations({ userQuery, shouldFetch }) {
           >
             <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-muted shadow-sm">
               <img 
-                src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`}
+                src={`https://wsrv.nl/?url=i.ytimg.com/vi/${video.id}/hqdefault.jpg`}
                 alt={video.title} 
-                referrerPolicy="no-referrer"
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                 loading="lazy"
                 onError={(e) => {
                   if (!e.target.dataset.retried) {
