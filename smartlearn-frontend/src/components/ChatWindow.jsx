@@ -45,7 +45,13 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
           const isLast = index === messages.length - 1;
           
           return (
-            <div key={index} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <motion.div 
+              key={index} 
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
               {msg.role === 'user' ? (
                 <div className="flex flex-col items-end max-w-[85%] sm:max-w-[75%] group">
                   <div className="bg-muted/80 backdrop-blur-sm text-foreground px-6 py-4 rounded-3xl rounded-tr-sm leading-relaxed whitespace-pre-wrap text-[15px] border border-border/50">
@@ -57,7 +63,7 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
                         navigator.clipboard.writeText(msg.content);
                         import("sonner").then(m => m.toast.success("Copied to clipboard"));
                       }}
-                      className="p-1 text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 text-xs font-medium"
+                      className="p-1 text-muted-foreground hover:text-primary border border-transparent hover:border-primary transition-all duration-300 flex items-center gap-1.5 text-xs font-medium rounded-md"
                       title="Copy your message"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
@@ -82,7 +88,7 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
                         navigator.clipboard.writeText(msg.content);
                         import("sonner").then(m => m.toast.success("Copied to clipboard"));
                       }}
-                      className="p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground rounded-md transition-colors"
+                      className="p-1.5 text-muted-foreground hover:text-primary border border-transparent hover:border-primary rounded-md transition-all duration-300"
                       title="Copy"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
@@ -93,7 +99,7 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
                           const query = index > 0 && messages[index - 1]?.role === 'user' ? messages[index - 1].content : null;
                           setActiveSourcesQuery(query || "Learn about this topic");
                         }}
-                        className="p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground rounded-md transition-colors flex items-center gap-1.5"
+                        className="p-1.5 text-muted-foreground hover:text-primary border border-transparent hover:border-primary rounded-md transition-all duration-300 flex items-center gap-1.5"
                         title="View Sources & Videos"
                       >
                         <BookOpen size={14} />
@@ -103,7 +109,7 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
                       {isLast && !loading && (
                         <button
                           onClick={regenerateMessage}
-                          className="p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground rounded-md transition-colors"
+                          className="p-1.5 text-muted-foreground hover:text-primary border border-transparent hover:border-primary rounded-md transition-all duration-300"
                           title="Regenerate"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
@@ -112,21 +118,21 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
                     </div>
                   </div>
               )}
-            </div>
+            </motion.div>
           );
         })}
 
         {loading && messages[messages.length - 1]?.role === "user" && (
-          <div className="flex w-full justify-start gap-4">
-            <div className="w-8 h-8 rounded-md bg-card border border-border flex items-center justify-center shrink-0 shadow-sm mt-1">
-              <Logo size={18} />
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="flex w-full justify-start gap-4">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20 mb-3">
+              <Logo size={18} className="text-primary" />
             </div>
-            <div className="flex items-center gap-1.5 pt-3">
-              <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: '0ms' }} />
-              <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: '150ms' }} />
-              <div className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: '300ms' }} />
+            <div className="flex items-center gap-1.5 pt-2">
+              <motion.div animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1, ease: "easeInOut" }} className="w-2 h-2 rounded-full bg-primary" />
+              <motion.div animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1, ease: "easeInOut", delay: 0.2 }} className="w-2 h-2 rounded-full bg-primary" />
+              <motion.div animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1, ease: "easeInOut", delay: 0.4 }} className="w-2 h-2 rounded-full bg-primary" />
             </div>
-          </div>
+          </motion.div>
         )}
         
         <div ref={messagesEndRef} />
