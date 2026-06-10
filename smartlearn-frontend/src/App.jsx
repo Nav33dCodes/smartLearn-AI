@@ -289,48 +289,26 @@ function ChatDashboard() {
           )}
         </header>
 
-        {activeMessages.length === 0 && !isChatsLoading ? (
-          <div className="flex-1 flex flex-col items-center justify-center px-4 w-full h-full relative z-10 pb-32">
-            <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-8 text-center">
-              How can I help you today, {user?.name ? user.name.split(" ")[0] : "there"}?
-            </h1>
-            <div className="w-full max-w-3xl">
-              <InputBox 
-                input={input}
-                setInput={setInput}
-                sendMessage={sendMessage}
-                loading={loading}
-                stopGeneration={stopGeneration}
-                textareaRef={textareaRef}
-                activeChatId={activeChatId}
-                isEmpty={true}
-              />
-            </div>
-          </div>
-        ) : (
-          <>
-            <ChatWindow 
-              messages={activeMessages} 
-              loading={loading}
-              isChatsLoading={isChatsLoading}
-              onSuggestionClick={(text) => {
-                setInput(text);
-                setTimeout(() => textareaRef.current?.focus(), 50);
-              }}
-              regenerateMessage={regenerateMessage}
-            />
-            <InputBox 
-              input={input}
-              setInput={setInput}
-              sendMessage={sendMessage}
-              loading={loading}
-              stopGeneration={stopGeneration}
-              textareaRef={textareaRef}
-              activeChatId={activeChatId}
-              isEmpty={false}
-            />
-          </>
-        )}
+        <ChatWindow 
+          messages={activeMessages} 
+          loading={loading}
+          isChatsLoading={isChatsLoading}
+          onSuggestionClick={(text) => {
+            setInput(text);
+            setTimeout(() => textareaRef.current?.focus(), 50);
+          }}
+          regenerateMessage={regenerateMessage}
+        />
+
+        <InputBox 
+          input={input}
+          setInput={setInput}
+          sendMessage={sendMessage}
+          loading={loading}
+          stopGeneration={stopGeneration}
+          textareaRef={textareaRef}
+          activeChatId={activeChatId}
+        />
       </main>
     </div>
   );

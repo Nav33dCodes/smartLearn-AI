@@ -21,7 +21,30 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
   }
 
   if (messages.length === 0) {
-    return null;
+    const firstName = user?.name ? user.name.split(" ")[0] : "there";
+    
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center pt-14 pb-32 px-4 text-center">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md mx-auto"
+        >
+          <div className="mx-auto bg-primary/5 text-primary w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-border">
+            <Logo size={32} />
+          </div>
+          
+          <motion.h1 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 20 }}
+            className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-2"
+          >
+            How can I help you today, {firstName}?
+          </motion.h1>
+        </motion.div>
+      </div>
+    );
   }
 
   return (
