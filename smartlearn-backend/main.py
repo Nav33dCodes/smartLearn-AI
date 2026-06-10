@@ -186,45 +186,39 @@ async def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_use
         logger.error(f"❌ RAG search error: {e}")
         context = ""
 
-    should_search = False
-    if data.search_web == "on":
-        should_search = True
-    elif data.search_web == "auto":
-        print(f"🤖 Auto-evaluating if Web Search is needed for: {message}")
-        should_search = needs_web_search(message)
-        if should_search:
-            print("✅ Classifier determined Web Search is needed.")
-        else:
-            print("❌ Classifier determined Web Search is NOT needed.")
-
-    if should_search:
-        print(f"🌐 Performing Web Search via Tavily for: {message}")
-        web_context = search_tavily(message)
-        if web_context:
-            print("✅ Web Search successful! Injecting context.")
-            context = (context + "\n\n### 🌐 Web Search Results:\n" + web_context) if context else ("### 🌐 Web Search Results:\n" + web_context)
-        else:
-            print("⚠️ Web Search returned no results.")
-
-    if context:
-        prompt = f"""Document & Web Context:
-{context}
-
-Student question: {message}
-
-You are SmartLearn AI, an advanced, professional tutor. Please answer the student's question comprehensively using the provided Context. 
-Your response MUST be detailed, highly structured, and utilize rich Markdown formatting such as:
-- **Headings (##, ###)** to organize different sections
-- **Tables** to compare data or present statistics if applicable
-- **Bullet points** and **bold text** for key information
-
-CRITICAL INSTRUCTION: You must heavily synthesize and rely on the provided Context. If you pull facts from the Web Search Results, you MUST cite the source URL provided in the context (e.g. `[Source](URL)`). If the answer is absolutely not found in the context, you may use your internal knowledge, but explicitly state that you are doing so."""
-    else:
-        prompt = message
-
     def token_generator():
+        nonlocal context
         full_response = []
         try:
+            # 1. Yield evaluating status if auto
+            should_search = False
+            if data.search_web == "on":
+                should_search = True
+            elif data.search_web == "auto":
+                yield f"data: {json.dumps({'status': 'evaluating'})}\n\n"
+                print(f"🤖 Auto-evaluating if Web Search is needed for: {message}")
+                should_search = needs_web_search(message)
+
+            # 2. Perform Web Search if needed
+            if should_search:
+                yield f"data: {json.dumps({'status': 'searching_web'})}\n\n"
+                print(f"🌐 Performing Web Search via Tavily for: {message}")
+                web_context = search_tavily(message)
+                if web_context:
+                    context = (context + "\n\n### 🌐 Web Search Results:\n" + web_context) if context else ("### 🌐 Web Search Results:\n" + web_context)
+            
+            yield f"data: {json.dumps({'status': 'search_complete'})}\n\n"
+
+            # 3. Inject Current Date/Time
+            from datetime import datetime
+            current_time = datetime.now().strftime("%Y-%m-%d %I:%M %p")
+            
+            if context:
+                prompt = f"Document & Web Context:\n{context}\n\nCurrent Date and Time: {current_time}\n\nStudent question: {message}\n\nYou are SmartLearn AI, an advanced, professional tutor. Please answer the student's question comprehensively using the provided Context.\nYour response MUST be detailed, highly structured, and utilize rich Markdown formatting such as:\n- **Headings (##, ###)** to organize different sections\n- **Tables** to compare data or present statistics if applicable\n- **Bullet points** and **bold text** for key information\n\nCRITICAL INSTRUCTION: You must heavily synthesize and rely on the provided Context. If you pull facts from the Web Search Results, you MUST cite the source URL provided in the context (e.g. `[Source](URL)`). If the answer is absolutely not found in the context, you may use your internal knowledge, but explicitly state that you are doing so."
+            else:
+                prompt = f"Current Date and Time: {current_time}\n\nQuestion: {message}\n\nYou are SmartLearn AI, an advanced, professional tutor. Please answer the student's question comprehensively. Your response MUST be detailed, highly structured, and utilize rich Markdown formatting."
+
+            # 4. Stream actual LLM response
             for token in stream_llm_response(prompt, model_id=data.model):
                 full_response.append(token)
                 yield f"data: {json.dumps({'token': token})}\n\n"

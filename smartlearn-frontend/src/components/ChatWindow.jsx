@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, BookOpen } from "lucide-react";
+import { X, BookOpen, BrainCircuit, Globe, Check } from "lucide-react";
 import AIMessage from "./AIMessage";
 import Logo from "./Logo";
 import YouTubeRecommendations from "./YouTubeRecommendations";
@@ -21,7 +21,7 @@ const formatRelativeTime = (ts) => {
   return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ` ${d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
 };
 
-export default function ChatWindow({ messages, loading, isChatsLoading, isHistoryLoading, onSuggestionClick, regenerateMessage }) {
+export default function ChatWindow({ messages, loading, streamStatus, isChatsLoading, isHistoryLoading, onSuggestionClick, regenerateMessage }) {
   const { user } = useAuth();
   const messagesEndRef = useRef(null);
   const [openSources, setOpenSources] = useState({});
@@ -186,14 +186,29 @@ export default function ChatWindow({ messages, loading, isChatsLoading, isHistor
 
         {loading && messages[messages.length - 1]?.role === "user" && (
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="flex w-full justify-start gap-4">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20 mb-3">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20 mb-3 mt-1">
               <Logo size={18} className="text-primary" />
             </div>
-            <div className="flex items-center gap-1.5 pt-2">
-              <motion.div animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1, ease: "easeInOut" }} className="w-2 h-2 rounded-full bg-primary" />
-              <motion.div animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1, ease: "easeInOut", delay: 0.2 }} className="w-2 h-2 rounded-full bg-primary" />
-              <motion.div animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1, ease: "easeInOut", delay: 0.4 }} className="w-2 h-2 rounded-full bg-primary" />
-            </div>
+            
+            {streamStatus ? (
+              <div className="flex items-center gap-2.5 mt-1.5 h-8 px-4 rounded-full border border-primary/30 bg-primary/5 text-sm font-medium text-primary shadow-sm shadow-primary/5">
+                {streamStatus === 'evaluating' && (
+                  <><motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 3, ease: "linear" }}><BrainCircuit size={15} /></motion.div> Thinking...</>
+                )}
+                {streamStatus === 'searching_web' && (
+                  <><motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 3, ease: "linear" }}><Globe size={15} /></motion.div> Searching the web...</>
+                )}
+                {streamStatus === 'search_complete' && (
+                  <><Check size={15} /> Reading results...</>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 pt-2 ml-1">
+                <motion.div animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1, ease: "easeInOut" }} className="w-2 h-2 rounded-full bg-primary" />
+                <motion.div animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1, ease: "easeInOut", delay: 0.2 }} className="w-2 h-2 rounded-full bg-primary" />
+                <motion.div animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1, ease: "easeInOut", delay: 0.4 }} className="w-2 h-2 rounded-full bg-primary" />
+              </div>
+            )}
           </motion.div>
         )}
         

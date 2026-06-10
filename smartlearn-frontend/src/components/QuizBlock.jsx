@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, XCircle, BrainCircuit } from 'lucide-react';
 
 export default function QuizBlock({ data }) {
-  const [questions, setQuestions] = useState(() => {
+  const questions = useMemo(() => {
     try {
-      return JSON.parse(data);
+      const result = JSON.parse(data);
+      if (Array.isArray(result)) return result;
+      if (typeof result === 'object' && result !== null) return [result];
+      return [];
     } catch (e) {
-      console.error("Failed to parse quiz data", e);
       return [];
     }
-  });
+  }, [data]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);

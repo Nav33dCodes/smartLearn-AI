@@ -43,6 +43,7 @@ function ChatDashboard() {
   
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [streamStatus, setStreamStatus] = useState(null);
   const [abortController, setAbortController] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [darkMode, setDarkMode] = useState(() => {
@@ -135,6 +136,7 @@ function ChatDashboard() {
 
     if (!overrideText) setInput("");
     setLoading(true);
+    setStreamStatus(null);
 
     try {
       const res = await fetch(`${API}/chat`, {
@@ -178,7 +180,14 @@ function ChatDashboard() {
           try {
             const parsed = JSON.parse(line.slice(6));
             if (parsed.done) break;
+            
+            if (parsed.status) {
+              setStreamStatus(parsed.status);
+              continue;
+            }
+            
             if (parsed.token) {
+              setStreamStatus(null);
               accumulated += parsed.token;
               // Update local state for smooth typing
               setActiveMessages(prev => {
@@ -378,6 +387,7 @@ function ChatDashboard() {
             <ChatWindow 
               messages={activeMessages} 
               loading={loading}
+              streamStatus={streamStatus}
               isChatsLoading={isChatsLoading}
               isHistoryLoading={isHistoryLoading && !isNewChat}
               onSuggestionClick={(text) => {

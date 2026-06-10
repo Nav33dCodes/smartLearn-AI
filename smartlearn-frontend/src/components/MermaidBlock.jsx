@@ -26,7 +26,7 @@ export default function MermaidBlock({ data }) {
   useEffect(() => {
     let isMounted = true;
     
-    const renderChart = async () => {
+    const timer = setTimeout(async () => {
       try {
         const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
         const { svg } = await mermaid.render(id, data);
@@ -35,14 +35,14 @@ export default function MermaidBlock({ data }) {
           setError(false);
         }
       } catch (err) {
-        console.error("Mermaid parsing error:", err);
         if (isMounted) setError(true);
       }
-    };
-
-    renderChart();
+    }, 500); // Debounce to prevent browser freeze during streaming
     
-    return () => { isMounted = false; };
+    return () => { 
+      isMounted = false; 
+      clearTimeout(timer);
+    };
   }, [data]);
 
   const handleDownload = () => {
