@@ -85,7 +85,7 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
   }, [input, textareaRef]);
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       handleSend();
     }
@@ -243,11 +243,11 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors"
+                className="h-10 w-10 sm:h-8 sm:w-8 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-all focus-ring hover:-translate-y-[1px]"
                 onClick={() => setShowPlusMenu(!showPlusMenu)}
                 title="Attachments and Options"
               >
-                <Plus size={20} className={showPlusMenu ? "rotate-45 transition-transform duration-200" : "transition-transform duration-200"} />
+                <Plus size={20} className={showPlusMenu ? "rotate-45 transition-transform duration-300" : "transition-transform duration-300"} />
               </Button>
 
               <AnimatePresence>
@@ -322,7 +322,7 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
                 type="button"
                 variant="ghost"
                 size="icon"
-                className={`h-8 w-8 rounded-lg transition-colors ${isRecording ? 'text-destructive bg-destructive/10 hover:bg-destructive/20 hover:text-destructive' : 'text-muted-foreground hover:bg-muted'}`}
+                className={`h-10 w-10 sm:h-8 sm:w-8 rounded-lg transition-all focus-ring hover:-translate-y-[1px] ${isRecording ? 'text-destructive bg-destructive/10 hover:bg-destructive/20 hover:text-destructive' : 'text-muted-foreground hover:bg-muted'}`}
                 onClick={toggleRecording}
                 title={isRecording ? "Stop recording" : "Use microphone"}
               >
@@ -342,11 +342,12 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
                 onClick={handleSend}
                 disabled={(!input.trim() && attachedFiles.length === 0) || loading || attachedFiles.some(f => f.status === "uploading")}
                 size="icon"
-                className={`h-8 w-8 rounded-lg transition-all ${
+                className={`h-10 w-10 sm:h-8 sm:w-8 rounded-lg transition-all ${
                   (input.trim() || attachedFiles.length > 0) && !loading && !attachedFiles.some(f => f.status === "uploading")
                     ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
                     : 'bg-muted text-muted-foreground opacity-50'
                 }`}
+                title="Send message (Cmd/Ctrl + Enter)"
               >
                 <ArrowUp size={18} />
               </Button>

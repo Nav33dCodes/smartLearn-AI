@@ -380,7 +380,13 @@ function ChatDashboard() {
 export default function App() {
   return (
     <>
-      <Toaster position="top-center" richColors />
+      <Toaster 
+        position="bottom-right" 
+        duration={2000}
+        toastOptions={{
+          className: 'border-l-4 border-l-primary bg-card text-foreground shadow-2xl !rounded-xl',
+        }}
+      />
       <Routes>
         <Route path="/share/:shareId" element={<SharedChat />} />
         <Route path="/login" element={<Login />} />

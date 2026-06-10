@@ -100,6 +100,8 @@
 
 * {
   border-color: var(--border);
+  /* Global smooth cubic-bezier transitions for interactive elements */
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
@@ -131,4 +133,23 @@ input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 30px #18181b inset !important; /* bg-zinc-900 */
     -webkit-text-fill-color: #f4f4f5 !important; /* text-zinc-100 */
     caret-color: #f4f4f5 !important;
+}
+
+/* Premium Focus Ring Utility */
+@layer utilities {
+  .focus-ring {
+    @apply focus:outline-none focus:ring-[3px] focus:ring-primary/80 focus:ring-offset-2 focus:ring-offset-background transition-shadow duration-200;
+  }
+}
+
+/* Skeleton Shimmer Animation */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.animate-shimmer {
+  animation: shimmer 2.5s infinite linear;
+  background: linear-gradient(to right, var(--muted) 4%, var(--border) 25%, var(--muted) 36%);
+  background-size: 1000px 100%;
 }
