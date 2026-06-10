@@ -6,7 +6,7 @@ import { useUpdateName, useUpdatePassword, useUpdateAvatar, useExportData, useDe
 import { useChats, useUnarchiveChat, useDeleteChat, useRevokeShare, useArchiveAllChats } from '../hooks/useChats';
 import { toast } from 'sonner';
 
-export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode }) {
+export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode, themeColor, setThemeColor }) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
 
@@ -287,9 +287,10 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode }
               {activeTab === 'appearance' && (
                 <motion.div key="appearance" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="max-w-md">
                   <h3 className="text-lg font-medium mb-6 pb-2 border-b border-zinc-200 dark:border-zinc-800">Appearance</h3>
-                  <div className="flex items-center justify-between py-3">
+                  
+                  <div className="flex items-center justify-between py-4 border-b border-zinc-200 dark:border-zinc-800">
                     <div>
-                      <p className="font-medium text-sm">Theme</p>
+                      <p className="font-medium text-sm">Theme Mode</p>
                       <p className="text-xs text-muted-foreground mt-1">Select your preferred interface theme.</p>
                     </div>
                     <div className="flex bg-zinc-100 dark:bg-zinc-900 p-1 rounded-lg border border-zinc-200 dark:border-zinc-800">
@@ -299,6 +300,33 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode }
                       <button onClick={() => setDarkMode(true)} className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${darkMode ? 'bg-zinc-800 shadow-sm text-zinc-100' : 'text-muted-foreground hover:text-foreground'}`}>
                         <Moon size={14} /> Dark
                       </button>
+                    </div>
+                  </div>
+
+                  <div className="py-5">
+                    <div>
+                      <p className="font-medium text-sm">Accent Color</p>
+                      <p className="text-xs text-muted-foreground mt-1 mb-4">Choose a primary color for buttons, icons, and chat bubbles.</p>
+                    </div>
+                    <div className="flex flex-wrap gap-4">
+                      {[
+                        { id: 'emerald', hex: '#10b981', label: 'Emerald' },
+                        { id: 'blue', hex: '#3b82f6', label: 'Blue' },
+                        { id: 'violet', hex: '#8b5cf6', label: 'Violet' },
+                        { id: 'rose', hex: '#f43f5e', label: 'Rose' },
+                        { id: 'orange', hex: '#f97316', label: 'Orange' },
+                        { id: 'zinc', hex: '#52525b', label: 'Zinc' },
+                      ].map(color => (
+                        <button
+                          key={color.id}
+                          onClick={() => setThemeColor(color.hex)}
+                          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 ${themeColor === color.hex ? 'ring-2 ring-offset-2 ring-offset-background' : ''}`}
+                          style={{ backgroundColor: color.hex, '--tw-ring-color': color.hex }}
+                          title={color.label}
+                        >
+                          {themeColor === color.hex && <CheckCircle2 size={18} className="text-white" />}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </motion.div>
