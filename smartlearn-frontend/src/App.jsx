@@ -208,7 +208,8 @@ function ChatDashboard() {
                 if (updated[updated.length - 1].role === "user") {
                   updated.push({ role: "assistant", content: accumulated, timestamp: now });
                 } else {
-                  updated[updated.length - 1] = { role: "assistant", content: accumulated, timestamp: updated[updated.length - 1].timestamp || now };
+                  const existingMsg = updated[updated.length - 1];
+                  updated[updated.length - 1] = { ...existingMsg, role: "assistant", content: accumulated, timestamp: existingMsg.timestamp || now };
                 }
                 return updated;
               });

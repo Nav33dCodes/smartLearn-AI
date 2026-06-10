@@ -116,7 +116,7 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20 mt-1">
                       <Logo size={18} className="text-primary" />
                     </div>
-                    <div className="flex flex-col gap-1 w-full max-w-[90%]">
+                    <div className="flex flex-col gap-1 flex-1 min-w-0">
                       
                       {msg.sources && msg.sources.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-1 pt-1">
