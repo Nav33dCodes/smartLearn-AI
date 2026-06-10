@@ -223,8 +223,8 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={isDragging ? "Drop here..." : isRecording ? "Listening..." : "Message SmartLearn..."}
-            className={`w-full max-h-[200px] bg-transparent resize-none border-0 px-4 pb-12 focus:outline-none focus:ring-0 text-[15px] placeholder:text-muted-foreground ${
-              attachedFiles.length > 0 ? "pt-2" : "pt-3.5"
+            className={`w-full max-h-[200px] bg-transparent resize-none border-0 px-6 pb-12 focus:outline-none focus:ring-0 text-[15px] placeholder:text-muted-foreground ${
+              attachedFiles.length > 0 ? "pt-2" : "pt-4"
             }`}
             rows={1}
           />
@@ -257,7 +257,7 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute bottom-full left-0 mb-2 w-56 bg-card border border-border shadow-xl rounded-2xl overflow-hidden z-50 flex flex-col p-1.5"
+                    className="absolute bottom-full left-0 mb-3 w-56 glass border border-border/50 shadow-2xl rounded-2xl overflow-hidden z-50 flex flex-col p-1.5"
                   >
                     <button
                       type="button"

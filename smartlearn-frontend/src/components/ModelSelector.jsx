@@ -74,7 +74,7 @@ export default function ModelSelector({ selectedModelId, onModelSelect }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute top-full left-0 mt-2 w-72 bg-card border border-border shadow-xl rounded-2xl overflow-hidden p-1.5 z-50"
+              className="absolute top-full left-0 mt-3 w-72 glass border border-border/50 shadow-2xl rounded-2xl overflow-hidden p-1.5 z-50"
             >
             <div className="text-xs font-semibold text-muted-foreground px-3 py-2 uppercase tracking-wider">
               Models
