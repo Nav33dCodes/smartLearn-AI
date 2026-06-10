@@ -17,6 +17,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import SharedChat from "./pages/SharedChat";
 import ReleaseNotes from "./pages/ReleaseNotes";
 import ModelSelector from "./components/ModelSelector";
+import ChatsManager from "./components/ChatsManager";
 
 const API = import.meta.env.DEV
   ? "http://localhost:8000"
@@ -32,6 +33,8 @@ function ChatDashboard() {
   const [activeChatId, setActiveChatId] = useState(null);
   const { data: historyData, isFetching: isHistoryLoading } = useChatHistory(activeChatId);
   const [activeMessages, setActiveMessages] = useState([]);
+  
+  const [currentView, setCurrentView] = useState("chat"); // "chat" | "chats"
   
   const isNewChat = activeChatId ? !chatsData.some(c => String(c.id) === String(activeChatId)) : true;
   
@@ -83,6 +86,7 @@ function ChatDashboard() {
     const newId = Date.now().toString();
     setActiveChatId(newId);
     setActiveMessages([]);
+    setCurrentView("chat");
     if (isMobile) setSidebarOpen(false);
     setInput("");
     setTimeout(() => textareaRef.current?.focus(), 100);
@@ -235,11 +239,17 @@ function ChatDashboard() {
   return (
     <div className="flex h-screen mesh-bg text-foreground overflow-hidden">
       <Sidebar 
+        sidebarOpen={sidebarOpen} 
+        setSidebarOpen={setSidebarOpen} 
         activeChatId={activeChatId}
-        setActiveChatId={setActiveChatId}
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
+        setActiveChatId={(id) => {
+          setActiveChatId(id);
+          setCurrentView("chat");
+        }}
+        chatsData={chatsData}
         createNewChat={createNewChat}
+        currentView={currentView}
+        setCurrentView={setCurrentView}
         isMobile={isMobile}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
@@ -247,7 +257,7 @@ function ChatDashboard() {
         setThemeColor={setThemeColor}
       />
 
-      <main className="flex-1 flex flex-col relative min-w-0 transition-all duration-300">
+      <main className="flex-1 flex flex-col relative w-full h-full overflow-hidden transition-all duration-300">
         <header className="absolute top-0 left-0 right-0 h-14 px-4 flex items-center justify-between z-40 glass border-b border-border/50">
           <div className="flex items-center gap-2">
             {(!sidebarOpen || isMobile) && (
@@ -291,7 +301,16 @@ function ChatDashboard() {
           )}
         </header>
 
-        {activeMessages.length === 0 && !isChatsLoading && (!isHistoryLoading || isNewChat) ? (
+        {currentView === "chats" ? (
+          <ChatsManager 
+             chatsData={chatsData} 
+             onOpenChat={(id) => {
+               setActiveChatId(id);
+               setCurrentView("chat");
+               if (isMobile) setSidebarOpen(false);
+             }} 
+          />
+        ) : activeMessages.length === 0 && !isChatsLoading && (!isHistoryLoading || isNewChat) ? (
           <div className="flex-1 flex flex-col items-center justify-center px-4 w-full h-full relative z-10 pb-20">
             <h1 className="text-4xl md:text-[44px] font-semibold tracking-tight text-foreground mb-8 text-center">
               How can I help you today, {user?.name ? user.name.split(" ")[0] : "there"}?

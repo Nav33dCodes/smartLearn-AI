@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, memo } from 'react';
-import { Plus, Trash2, MessageSquare, Search, PanelLeftClose, LogOut, Edit2, Pin, PinOff, Archive, MoreHorizontal, Sparkles, Settings, ExternalLink } from "lucide-react";
+import { Plus, Trash2, MessageSquare, Search, PanelLeftClose, LogOut, Edit2, Pin, PinOff, Archive, MoreHorizontal, Sparkles, Settings, ExternalLink, Database } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useChats, useDeleteChat, useRenameChat, usePinChat, useArchiveChat } from "../hooks/useChats";
 import { useAuth } from "../context/AuthContext";
@@ -10,7 +10,7 @@ import SettingsModal from "./SettingsModal";
 import { Link } from "react-router-dom";
 
 function Sidebar({
-  activeChatId, setActiveChatId, sidebarOpen, setSidebarOpen, createNewChat, isMobile, darkMode, setDarkMode, themeColor, setThemeColor
+  activeChatId, setActiveChatId, sidebarOpen, setSidebarOpen, createNewChat, currentView, setCurrentView, isMobile, darkMode, setDarkMode, themeColor, setThemeColor
 }) {
   const { data: chatsData = [] } = useChats();
   const deleteChatMutation = useDeleteChat();
@@ -106,7 +106,7 @@ function Sidebar({
     if (chats.length === 0) return null;
     return (
       <div className="mb-4">
-        <div className="text-xs font-bold text-muted-foreground/70 uppercase tracking-wider px-3 mb-1 mt-4">
+        <div className="text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-widest px-3 mb-1.5 mt-4">
           {title}
         </div>
         <AnimatePresence mode="popLayout">
@@ -121,10 +121,10 @@ function Sidebar({
             >
               <div
                 onClick={() => { if (editingChatId !== chat.id) handleSelectChat(chat.id) }}
-                className={`group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer mb-[2px] transition-all duration-200 ease-out ${
-                  String(chat.id) === String(activeChatId) 
-                    ? 'bg-primary/10 text-primary font-medium' 
-                    : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+                className={`group flex items-center justify-between px-2.5 py-1.5 rounded-lg cursor-pointer mb-[2px] transition-colors ${
+                  String(chat.id) === String(activeChatId) && currentView !== "chats"
+                    ? 'bg-black/5 dark:bg-white/5 text-foreground font-medium' 
+                    : 'text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground'
                 }`}
               >
                 <div className="flex items-center gap-2 overflow-hidden flex-1">
@@ -232,26 +232,37 @@ function Sidebar({
           marginLeft: sidebarOpen || isMobile ? 0 : -260
         }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className={`flex flex-col h-full bg-sidebar border-r border-border z-50 ${isMobile ? 'fixed' : 'relative'}`}
+        className={`flex flex-col h-full bg-card/60 backdrop-blur-2xl border-r border-border/40 shadow-2xl z-50 ${isMobile ? 'fixed' : 'relative'}`}
       >
-        <div className="flex flex-col p-3">
-          <div className="flex items-center justify-between mb-4 px-1">
+        <div className="flex flex-col p-3 gap-1">
+          <div className="flex items-center justify-between mb-2 px-1">
             <div className="flex items-center gap-2">
-              <Logo size={22} />
-              <span className="font-semibold text-foreground tracking-tight text-lg">SmartLearn</span>
+              <Logo size={20} />
+              <span className="font-semibold text-foreground tracking-tight text-base">SmartLearn</span>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-muted rounded-lg transition-colors" onClick={() => setSidebarOpen(false)}>
-              <PanelLeftClose size={18} />
-            </Button>
+            <button className="h-8 w-8 text-muted-foreground/70 hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-colors flex items-center justify-center" onClick={() => setSidebarOpen(false)}>
+              <PanelLeftClose size={16} />
+            </button>
           </div>
 
-          <Button 
+          <button 
             onClick={createNewChat}
-            className="w-full justify-start gap-2 bg-transparent border border-border shadow-sm hover:bg-muted/60 text-foreground transition-all rounded-xl h-10 px-3"
+            className="w-full flex items-center gap-2 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 text-foreground transition-colors rounded-lg h-9 px-3 border-transparent"
           >
-            <Plus size={18} className="text-muted-foreground" />
-            <span className="font-semibold text-[15px]">New chat</span>
-          </Button>
+            <Plus size={16} className="text-muted-foreground" />
+            <span className="font-medium text-[14px]">New chat</span>
+          </button>
+          
+          <button 
+            onClick={() => {
+              setCurrentView("chats");
+              if (isMobile) setSidebarOpen(false);
+            }}
+            className={`w-full flex items-center gap-2 hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded-lg h-9 px-3 border-transparent ${currentView === "chats" ? "bg-black/5 dark:bg-white/5 text-foreground font-semibold" : "text-muted-foreground"}`}
+          >
+            <Database size={16} className={currentView === "chats" ? "text-foreground" : "text-muted-foreground"} />
+            <span className="font-medium text-[14px]">Chats</span>
+          </button>
         </div>
 
         <div className="px-3 pb-2">
