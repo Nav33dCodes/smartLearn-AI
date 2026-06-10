@@ -115,10 +115,8 @@ function ChatDashboard() {
     const token = localStorage.getItem('access_token');
 
     // Optimistic UI Update - Only add the user message
-    const newHistory = [
-      ...activeMessages,
-      { role: "user", content: textToSend }
-    ];
+    const userMessage = { role: "user", content: textToSend, timestamp: Date.now() };
+    const newHistory = [...activeMessages, userMessage];
     setActiveMessages(newHistory);
 
     if (activeMessages.length === 0) {
@@ -178,10 +176,11 @@ function ChatDashboard() {
               // Update local state for smooth typing
               setActiveMessages(prev => {
                 const updated = [...prev];
+                const now = Date.now();
                 if (updated[updated.length - 1].role === "user") {
-                  updated.push({ role: "assistant", content: accumulated });
+                  updated.push({ role: "assistant", content: accumulated, timestamp: now });
                 } else {
-                  updated[updated.length - 1] = { role: "assistant", content: accumulated };
+                  updated[updated.length - 1] = { role: "assistant", content: accumulated, timestamp: updated[updated.length - 1].timestamp || now };
                 }
                 return updated;
               });

@@ -6,6 +6,21 @@ import Logo from "./Logo";
 import YouTubeRecommendations from "./YouTubeRecommendations";
 import { useAuth } from "../context/AuthContext";
 
+const formatRelativeTime = (ts) => {
+  if (!ts) return "";
+  const diff = Date.now() - ts;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins} minute${mins === 1 ? '' : 's'} ago`;
+  
+  const d = new Date(ts);
+  const now = new Date();
+  if (d.toDateString() === now.toDateString()) {
+    return `Today ${d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+  }
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + ` ${d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+};
+
 export default function ChatWindow({ messages, loading, isChatsLoading, isHistoryLoading, onSuggestionClick, regenerateMessage }) {
   const { user } = useAuth();
   const messagesEndRef = useRef(null);
@@ -138,6 +153,12 @@ export default function ChatWindow({ messages, loading, isChatsLoading, isHistor
                       </button>
                     )}
                   </div>
+                  
+                  {msg.timestamp && (
+                    <div className="text-[11px] text-muted-foreground/50 mt-1 pl-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      {formatRelativeTime(msg.timestamp)}
+                    </div>
+                  )}
                   
                   {/* INLINE SOURCES */}
                   <AnimatePresence>
