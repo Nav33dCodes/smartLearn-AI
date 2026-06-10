@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User as UserIcon, Settings as SettingsIcon, Sun, Moon, Loader2, Info, Lock, Camera, CheckCircle2, Shield, Download, Trash2, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -201,8 +202,10 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode, 
     </button>
   );
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+  if (!isOpen) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -614,6 +617,7 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode, 
           </div>
         </div>
       </motion.div>
-    </div>
+    </div>,
+    document.body
   );
 }

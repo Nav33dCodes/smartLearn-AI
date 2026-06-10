@@ -54,27 +54,34 @@ export default function YouTubeRecommendations({ userQuery, shouldFetch }) {
             href={`https://www.youtube.com/watch?v=${video.id}`}
             target="_blank"
             rel="noopener noreferrer"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="group flex gap-3.5 bg-card/40 hover:bg-card border border-transparent hover:border-border/80 rounded-xl p-2 transition-all hover:shadow-lg cursor-pointer items-start focus-ring"
+            className="group flex flex-col gap-3 bg-card/40 hover:bg-card border border-transparent hover:border-border/80 rounded-2xl p-3 transition-all hover:shadow-xl cursor-pointer focus-ring"
           >
-            <div className="relative w-44 shrink-0 aspect-video rounded-lg overflow-hidden bg-muted shadow-sm">
+            <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-muted shadow-sm">
               <img 
                 src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`}
                 alt={video.title} 
+                referrerPolicy="no-referrer"
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                 loading="lazy"
+                onError={(e) => {
+                  if (!e.target.dataset.retried) {
+                    e.target.dataset.retried = "true";
+                    e.target.src = video.thumbnail;
+                  }
+                }}
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
-                <div className="w-10 h-10 rounded-full bg-white/90 text-red-600 flex items-center justify-center opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 shadow-xl backdrop-blur-md">
-                  <Play size={18} fill="currentColor" className="ml-1" />
+                <div className="w-14 h-14 rounded-full bg-white/90 text-red-600 flex items-center justify-center opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 shadow-xl backdrop-blur-md">
+                  <Play size={24} fill="currentColor" className="ml-1" />
                 </div>
               </div>
             </div>
-            <div className="flex flex-col gap-1.5 py-0.5 pr-1 w-full min-w-0">
-              <h4 className="font-semibold text-base leading-snug line-clamp-2 group-hover:text-primary transition-colors" dangerouslySetInnerHTML={{ __html: video.title }} />
-              <p className="text-[13px] font-medium text-muted-foreground flex items-center gap-1.5 mt-auto pt-1">
+            <div className="flex flex-col gap-1.5 px-1 w-full">
+              <h4 className="font-semibold text-[15px] leading-snug line-clamp-2 group-hover:text-primary transition-colors" dangerouslySetInnerHTML={{ __html: video.title }} />
+              <p className="text-[13px] font-medium text-muted-foreground flex items-center gap-1.5">
                 <span className="truncate">{video.channel}</span>
                 <ExternalLink size={12} className="shrink-0 opacity-40" />
               </p>
