@@ -53,9 +53,7 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
             const formData = new FormData();
             formData.append("audio", audioBlob, "recording.webm");
             
-            const res = await api.post('/api/voice', formData, {
-              headers: { 'Content-Type': 'multipart/form-data' }
-            });
+            const res = await api.post('/api/voice', formData);
             
             if (res.data?.text) {
               setInput(prev => (prev + " " + res.data.text).trim());
