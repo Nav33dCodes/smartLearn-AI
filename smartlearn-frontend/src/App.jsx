@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Moon, Sun, PanelLeftOpen } from "lucide-react";
+import { Layers, BrainCircuit, Network } from "lucide-react";
 import { Toaster, toast } from 'sonner';
 import { Routes, Route } from 'react-router-dom';
 
@@ -289,26 +290,88 @@ function ChatDashboard() {
           )}
         </header>
 
-        <ChatWindow 
-          messages={activeMessages} 
-          loading={loading}
-          isChatsLoading={isChatsLoading}
-          onSuggestionClick={(text) => {
-            setInput(text);
-            setTimeout(() => textareaRef.current?.focus(), 50);
-          }}
-          regenerateMessage={regenerateMessage}
-        />
+        {activeMessages.length === 0 && !isChatsLoading ? (
+          <div className="flex-1 flex flex-col items-center justify-center px-4 w-full h-full relative z-10 pb-20">
+            <h1 className="text-4xl md:text-[44px] font-semibold tracking-tight text-foreground mb-8 text-center">
+              How can I help you today, {user?.name ? user.name.split(" ")[0] : "there"}?
+            </h1>
+            
+            <div className="w-full max-w-3xl flex flex-col items-center">
+              <InputBox 
+                input={input}
+                setInput={setInput}
+                sendMessage={sendMessage}
+                loading={loading}
+                stopGeneration={stopGeneration}
+                textareaRef={textareaRef}
+                activeChatId={activeChatId}
+                isEmpty={true}
+              />
 
-        <InputBox 
-          input={input}
-          setInput={setInput}
-          sendMessage={sendMessage}
-          loading={loading}
-          stopGeneration={stopGeneration}
-          textareaRef={textareaRef}
-          activeChatId={activeChatId}
-        />
+              <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
+                <button 
+                  onClick={() => {
+                    setInput("Create a flashcard deck for: ");
+                    setTimeout(() => textareaRef.current?.focus(), 50);
+                  }}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-border bg-card hover:bg-muted hover:border-primary/50 text-sm font-medium transition-all shadow-sm group"
+                >
+                  <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                    <Layers size={16} className="text-primary" />
+                  </div>
+                  <span className="text-foreground/80 group-hover:text-foreground">Flashcards</span>
+                </button>
+                <button 
+                  onClick={() => {
+                    setInput("Give me a quick 3-question interactive quiz on: ");
+                    setTimeout(() => textareaRef.current?.focus(), 50);
+                  }}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-border bg-card hover:bg-muted hover:border-primary/50 text-sm font-medium transition-all shadow-sm group"
+                >
+                  <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                    <BrainCircuit size={16} className="text-primary" />
+                  </div>
+                  <span className="text-foreground/80 group-hover:text-foreground">Interactive Quiz</span>
+                </button>
+                <button 
+                  onClick={() => {
+                    setInput("Draw a detailed mind map explaining: ");
+                    setTimeout(() => textareaRef.current?.focus(), 50);
+                  }}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-border bg-card hover:bg-muted hover:border-primary/50 text-sm font-medium transition-all shadow-sm group"
+                >
+                  <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                    <Network size={16} className="text-primary" />
+                  </div>
+                  <span className="text-foreground/80 group-hover:text-foreground">Mind Map</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <ChatWindow 
+              messages={activeMessages} 
+              loading={loading}
+              isChatsLoading={isChatsLoading}
+              onSuggestionClick={(text) => {
+                setInput(text);
+                setTimeout(() => textareaRef.current?.focus(), 50);
+              }}
+              regenerateMessage={regenerateMessage}
+            />
+            <InputBox 
+              input={input}
+              setInput={setInput}
+              sendMessage={sendMessage}
+              loading={loading}
+              stopGeneration={stopGeneration}
+              textareaRef={textareaRef}
+              activeChatId={activeChatId}
+              isEmpty={false}
+            />
+          </>
+        )}
       </main>
     </div>
   );

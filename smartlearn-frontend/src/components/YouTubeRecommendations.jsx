@@ -15,7 +15,7 @@ export default function YouTubeRecommendations({ userQuery, shouldFetch }) {
             <MonitorPlay className="text-red-500" size={16} />
             <span>Finding relevant videos...</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="flex flex-col gap-4">
             {Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="flex flex-col gap-2 animate-pulse">
                 <div className="w-full aspect-video bg-zinc-200 dark:bg-zinc-800 rounded-xl" />
@@ -27,7 +27,17 @@ export default function YouTubeRecommendations({ userQuery, shouldFetch }) {
         </div>
       );
     }
-    return null;
+    return (
+      <div className="mt-8 flex flex-col items-center justify-center text-center px-4">
+        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+          <MonitorPlay className="text-muted-foreground opacity-50" size={24} />
+        </div>
+        <h4 className="text-sm font-semibold text-foreground mb-1">No video sources needed</h4>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          The AI determined that this specific response is straightforward and does not require supplementary video tutorials.
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -37,7 +47,7 @@ export default function YouTubeRecommendations({ userQuery, shouldFetch }) {
         <span>Recommended Videos</span>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="flex flex-col gap-4">
         {videos.map((video, i) => (
           <motion.a
             key={video.id}

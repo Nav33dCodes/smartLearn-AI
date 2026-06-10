@@ -1,14 +1,15 @@
-import React, { useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import React, { useRef, useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, BookOpen } from "lucide-react";
 import AIMessage from "./AIMessage";
 import Logo from "./Logo";
 import YouTubeRecommendations from "./YouTubeRecommendations";
 import { useAuth } from "../context/AuthContext";
-import { Layers, BrainCircuit, Network } from "lucide-react";
 
 export default function ChatWindow({ messages, loading, isChatsLoading, onSuggestionClick, regenerateMessage }) {
   const { user } = useAuth();
   const messagesEndRef = useRef(null);
+  const [activeSourcesQuery, setActiveSourcesQuery] = useState(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -22,65 +23,7 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
   }
 
   if (messages.length === 0) {
-    const firstName = user?.name ? user.name.split(" ")[0] : "there";
-    
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center pt-14 pb-32 px-4 text-center">
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-md mx-auto"
-        >
-          <div className="mx-auto bg-primary/5 text-primary w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-border">
-            <Logo size={32} />
-          </div>
-          
-          <motion.h1 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 20 }}
-            className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-2"
-          >
-            How can I help you today, {firstName}?
-          </motion.h1>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="flex flex-wrap items-center justify-center gap-3 mt-10 max-w-2xl mx-auto"
-          >
-            <button 
-              onClick={() => onSuggestionClick("Create a flashcard deck of 5 advanced Python concepts")}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-border bg-card hover:bg-muted hover:border-primary/50 text-sm font-medium transition-all shadow-sm group"
-            >
-              <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <Layers size={16} className="text-primary" />
-              </div>
-              <span className="text-foreground/80 group-hover:text-foreground">Flashcards</span>
-            </button>
-            <button 
-              onClick={() => onSuggestionClick("Give me a quick 3-question multiple choice quiz on the Solar System")}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-border bg-card hover:bg-muted hover:border-primary/50 text-sm font-medium transition-all shadow-sm group"
-            >
-              <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <BrainCircuit size={16} className="text-primary" />
-              </div>
-              <span className="text-foreground/80 group-hover:text-foreground">Interactive Quiz</span>
-            </button>
-            <button 
-              onClick={() => onSuggestionClick("Draw a detailed mind map explaining how photosynthesis works")}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-border bg-card hover:bg-muted hover:border-primary/50 text-sm font-medium transition-all shadow-sm group"
-            >
-              <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <Network size={16} className="text-primary" />
-              </div>
-              <span className="text-foreground/80 group-hover:text-foreground">Mind Map</span>
-            </button>
-          </motion.div>
-        </motion.div>
-      </div>
-    );
+    return null;
   }
 
   return (
@@ -118,13 +61,7 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
                   <div className="flex-1 min-w-0 flex flex-col gap-2">
                     <AIMessage content={msg.content} />
                     
-                    {/* YouTube Recommendations Component */}
-                    {msg.role === 'assistant' && (
-                      <YouTubeRecommendations 
-                        userQuery={index > 0 && messages[index - 1]?.role === 'user' ? messages[index - 1].content : null}
-                        shouldFetch={isLast && !loading} 
-                      />
-                    )}
+                    {/* YouTube Recommendations removed from inline, moved to side panel */}
 
                     {/* Action Bar */}
                     <div className="flex items-center gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -139,6 +76,18 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                       </button>
                       
+                      <button
+                        onClick={() => {
+                          const query = index > 0 && messages[index - 1]?.role === 'user' ? messages[index - 1].content : null;
+                          setActiveSourcesQuery(query || "Learn about this topic");
+                        }}
+                        className="p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground rounded-md transition-colors flex items-center gap-1.5"
+                        title="View Sources & Videos"
+                      >
+                        <BookOpen size={14} />
+                        <span className="text-xs font-medium">Sources</span>
+                      </button>
+
                       {isLast && !loading && (
                         <button
                           onClick={regenerateMessage}
@@ -171,6 +120,49 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
         
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Sources Slide-Over Panel */}
+      <AnimatePresence>
+        {activeSourcesQuery && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setActiveSourcesQuery(null)}
+              className="absolute inset-0 bg-background/50 backdrop-blur-sm z-40"
+            />
+            {/* Panel */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="absolute right-0 top-0 bottom-0 w-full sm:w-96 bg-card border-l border-border shadow-2xl z-50 flex flex-col"
+            >
+              <div className="flex items-center justify-between p-4 border-b border-border bg-muted/30">
+                <div className="flex items-center gap-2 text-foreground">
+                  <BookOpen size={18} className="text-primary" />
+                  <h3 className="font-semibold tracking-tight">Sources & Resources</h3>
+                </div>
+                <button
+                  onClick={() => setActiveSourcesQuery(null)}
+                  className="p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-md transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                <YouTubeRecommendations 
+                  userQuery={activeSourcesQuery}
+                  shouldFetch={true}
+                />
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
