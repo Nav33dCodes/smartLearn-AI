@@ -4,39 +4,39 @@ import { ChevronDown, Check, Sparkles, Zap, Brain, Rocket } from 'lucide-react';
 
 export const MODELS = [
   {
-    id: "meta-llama/llama-3-8b-instruct:free",
-    name: "Llama 3 (Free)",
-    provider: "Meta",
+    id: "groq:llama-3.1-8b-instant",
+    name: "Groq Llama 3.1 8B (Instant)",
+    provider: "Groq",
     icon: Zap,
-    description: "Lightning fast. Great for basic questions."
+    description: "Blistering native Groq speeds for general queries."
   },
   {
-    id: "google/gemma-2-9b-it:free",
-    name: "Gemma 2 (Free)",
-    provider: "Google",
-    icon: Brain,
-    description: "Incredibly smart, high-thinking open model."
+    id: "meta-llama/llama-3.3-70b-instruct",
+    name: "Llama 3.3 70B (Fast)",
+    provider: "Meta",
+    icon: Sparkles,
+    description: "Lightning fast responses for general queries."
   },
   {
-    id: "openai/gpt-4o",
-    name: "GPT-4o (Pro)",
-    provider: "OpenAI",
-    icon: Rocket,
-    description: "Flagship speed and reasoning. Requires credits."
-  },
-  {
-    id: "anthropic/claude-3.5-sonnet",
-    name: "Claude 3.5 Sonnet (Pro)",
+    id: "anthropic/claude-sonnet-4",
+    name: "Claude 4 Sonnet (Research)",
     provider: "Anthropic",
     icon: Brain,
-    description: "Unmatched for coding/logic. Requires credits."
+    description: "Unmatched depth and reasoning for heavy research."
   },
   {
-    id: "x-ai/grok-2",
-    name: "Grok 2 (Pro)",
-    provider: "xAI",
+    id: "deepseek/deepseek-chat",
+    name: "DeepSeek (Coding)",
+    provider: "DeepSeek",
+    icon: Rocket,
+    description: "Specialized powerhouse for software development."
+  },
+  {
+    id: "google/gemini-2.5-flash",
+    name: "Gemini 2.5 Flash (Study)",
+    provider: "Google",
     icon: Sparkles,
-    description: "Unfiltered, advanced reasoning. Requires credits."
+    description: "Highly capable multimodal study assistant."
   }
 ];
 

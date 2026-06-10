@@ -1,6 +1,7 @@
 import os
 import time
 from openai import OpenAI
+from groq import Groq
 from dotenv import load_dotenv
 from typing import Generator
 from tavily import TavilyClient
@@ -8,16 +9,21 @@ from tavily import TavilyClient
 load_dotenv()
 
 # OpenRouter is 100% compatible with the official OpenAI SDK
-client = OpenAI(
-    api_key=os.getenv("OPENROUTER_API_KEY", os.getenv("GROQ_API_KEY")), # Fallback to GROQ_API_KEY if testing
+openrouter_client = OpenAI(
+    api_key=os.getenv("OPENROUTER_API_KEY", os.getenv("GROQ_API_KEY")),
     base_url="https://openrouter.ai/api/v1"
+)
+
+# Groq Official Client (for instant, native speeds)
+groq_client = Groq(
+    api_key=os.getenv("GROQ_API_KEY")
 )
 
 tavily_client = None
 if os.getenv("TAVILY_API_KEY"):
     tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 
-DEFAULT_MODEL = "meta-llama/llama-3-8b-instruct:free"
+DEFAULT_MODEL = "groq:llama-3.1-8b-instant"
 
 SYSTEM_PROMPT = """You are SmartLearn AI — an advanced, highly intelligent learning assistant and professional tutor.
 
@@ -31,7 +37,7 @@ SYSTEM_PROMPT = """You are SmartLearn AI — an advanced, highly intelligent lea
 About SmartLearn AI:
 - You were created by the SmartLearn Team
 - CEO / Leader: Sanan Malik
-- Developers: Naveed Ahmed, Dua Fatima, Zeshan Sikandar, Shayan Umer, Fiza Imran
+- Lead Developer: Naveed Ahmed
 - You are NOT made by OpenAI, Anthropic, Google, or any other company
 - If anyone asks who made you, who your team is, or who the CEO is — answer from the info above only
 - Never say you are ChatGPT, Claude, Gemini, or any other AI"""
@@ -44,7 +50,7 @@ def search_tavily(query: str) -> str:
     if not tavily_client:
         return ""
     try:
-        response = tavily_client.search(query=query, search_depth="basic", max_results=3)
+        response = tavily_client.search(query=query, search_depth="advanced", max_results=6)
         results = response.get('results', [])
         
         # Format results into a clean text block
@@ -63,8 +69,8 @@ def search_tavily(query: str) -> str:
 def needs_web_search(query: str) -> bool:
     """Uses a fast LLM to determine if the query requires live web search."""
     try:
-        response = client.chat.completions.create(
-            model=DEFAULT_MODEL,
+        response = groq_client.chat.completions.create(
+            model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": "You are a classifier. Does the user's query require up-to-date, real-time, recent news, or live web knowledge to answer accurately? Respond with exactly 'YES' or 'NO'."},
                 {"role": "user", "content": query}
@@ -83,11 +89,18 @@ def needs_web_search(query: str) -> bool:
 # ────────────────────────────────────────────────────
 def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL) -> Generator[str, None, None]:
     """
-    Yields tokens one by one from OpenRouter streaming API.
+    Yields tokens one by one. Routes to Groq or OpenRouter dynamically.
     """
     try:
-        stream = client.chat.completions.create(
-            model=model_id,
+        if model_id.startswith("groq:"):
+            active_client = groq_client
+            actual_model = model_id.replace("groq:", "")
+        else:
+            active_client = openrouter_client
+            actual_model = model_id
+
+        stream = active_client.chat.completions.create(
+            model=actual_model,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user",   "content": prompt}
@@ -119,8 +132,15 @@ def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL) -> Generator
 # ────────────────────────────────────────────────────
 def get_llm_response(prompt: str, model_id: str = DEFAULT_MODEL) -> str:
     try:
-        response = client.chat.completions.create(
-            model=model_id,
+        if model_id.startswith("groq:"):
+            active_client = groq_client
+            actual_model = model_id.replace("groq:", "")
+        else:
+            active_client = openrouter_client
+            actual_model = model_id
+
+        response = active_client.chat.completions.create(
+            model=actual_model,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user",   "content": prompt}
@@ -141,8 +161,8 @@ def generate_chat_title(message: str) -> str:
     prompt = f"Generate a short, concise, 3 to 5 word title for the following message. Return ONLY the title text, nothing else, no quotes, no explanation:\n\n{message}"
     
     try:
-        response = client.chat.completions.create(
-            model=DEFAULT_MODEL,
+        response = groq_client.chat.completions.create(
+            model="llama-3.1-8b-instant",
             messages=[
                 {"role": "user", "content": prompt}
             ],

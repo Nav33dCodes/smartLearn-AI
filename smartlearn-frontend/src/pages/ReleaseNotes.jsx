@@ -1,7 +1,33 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-
 const releases = [
+  {
+    date: "June 10, 2026 (Part 2)",
+    features: [
+      {
+        title: "⚡ Dual-Provider Architecture & The 5 Pillars",
+        description: "Re-engineered the backend routing logic to support multiple API providers simultaneously, delivering unmatched speed and reasoning.",
+        bullets: [
+          "Native Groq Integration: Restored the official Groq client. Requests routed to 'Groq Instant' bypass OpenRouter entirely for blistering, near-zero-latency LPU inference.",
+          "The 5 Pillar Model Lineup: Curated the absolute best models in the world: Groq Instant (Speed), Llama 3.3 70B (Fast), Claude 4 Sonnet (Research), DeepSeek (Coding), and Gemini 2.5 Flash (Study).",
+          "Advanced Persona: Overhauled the core System Prompt to instruct the AI to generate profound, highly comprehensive, ChatGPT-tier markdown explanations."
+        ]
+      },
+      {
+        title: "🎨 Premium UI Overhaul & UX Polish",
+        description: "Implemented several highly requested quality-of-life interface upgrades to make the platform feel truly state-of-the-art.",
+        bullets: [
+          "Code Export Engine: Completely redesigned the syntax highlighter UI with darker, premium aesthetics and added a native 'Download' button that automatically detects file extensions (e.g. .py, .js).",
+          "User Action Bar: Added a sleek, hidden 'Copy' button beneath user messages that smoothly fades in on hover.",
+          "Leadership Recognition: Optimized system parameters to exclusively identify Sanan Malik as CEO/Leader and Naveed Ahmed as Lead Developer."
+        ]
+      }
+    ],
+    fixes: [
+      "Resolved a critical type-matching bug in the Sidebar where the active chat ID was not properly highlighted due to integer/string mismatch.",
+      "Removed restrictive AI prompt limits (e.g., 'keep answers to 3-4 lines'), unlocking the model's full expansive reasoning capabilities."
+    ]
+  },
   {
     date: "June 10, 2026",
     features: [

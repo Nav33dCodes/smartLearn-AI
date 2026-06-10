@@ -210,12 +210,13 @@ async def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_use
 
 Student question: {message}
 
-You are SmartLearn AI, an advanced, professional tutor. Please answer the student's question comprehensively using ONLY the provided Context. 
-Your response MUST be detailed and highly structured, utilizing rich Markdown formatting such as:
+You are SmartLearn AI, an advanced, professional tutor. Please answer the student's question comprehensively using the provided Context. 
+Your response MUST be detailed, highly structured, and utilize rich Markdown formatting such as:
 - **Headings (##, ###)** to organize different sections
 - **Tables** to compare data or present statistics if applicable
 - **Bullet points** and **bold text** for key information
-Ensure your explanation is thorough (medium-to-long length) and beautifully presented, exactly like a premium AI assistant. If the answer is not found in the context, briefly mention it and help generally."""
+
+CRITICAL INSTRUCTION: You must heavily synthesize and rely on the provided Context. If you pull facts from the Web Search Results, you MUST cite the source URL provided in the context (e.g. `[Source](URL)`). If the answer is absolutely not found in the context, you may use your internal knowledge, but explicitly state that you are doing so."""
     else:
         prompt = message
 

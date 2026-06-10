@@ -44,7 +44,7 @@ function ChatDashboard() {
     return localStorage.getItem("sl_theme_color") || "#10b981"; // default Emerald
   });
   const [selectedModelId, setSelectedModelId] = useState(() => {
-    return localStorage.getItem("sl_model") || "meta-llama/llama-3-8b-instruct:free";
+    return localStorage.getItem("sl_model") || "groq:llama-3.1-8b-instant";
   });
   const [isMobile, setIsMobile] = useState(false);
 

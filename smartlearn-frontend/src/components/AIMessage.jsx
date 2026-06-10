@@ -3,7 +3,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { Copy, Check, WrapText, Volume2, Square } from "lucide-react";
+import { Copy, Check, WrapText, Volume2, Square, Download } from "lucide-react";
 
 // ── Copy Button ──
 function CopyButton({ text }) {
@@ -42,16 +42,47 @@ function WrapToggle({ wrapped, onToggle }) {
   );
 }
 
+function DownloadButton({ text, language }) {
+  const handleDownload = () => {
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    
+    // Attempt to map common languages to extensions
+    const extMap = {
+      javascript: "js", typescript: "ts", python: "py", html: "html", css: "css",
+      json: "json", bash: "sh", shell: "sh", markdown: "md", sql: "sql",
+      java: "java", cpp: "cpp", c: "c", csharp: "cs", go: "go", rust: "rs"
+    };
+    const ext = extMap[language.toLowerCase()] || "txt";
+    
+    a.download = `code_snippet.${ext}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <button onClick={handleDownload} className="code-copy-btn" title="Download code">
+      <Download size={13} />
+      <span>Download</span>
+    </button>
+  );
+}
+
 // ── Code Block ──
 function CodeBlock({ language, codeText }) {
   const [wrapped, setWrapped] = useState(false);
 
   return (
-    <div className="code-block-wrapper">
-      <div className="code-block-header">
-        <span className="code-lang">{language}</span>
-        <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+    <div className="code-block-wrapper border border-border overflow-hidden rounded-2xl shadow-sm my-4">
+      <div className="code-block-header bg-muted/40 px-4 py-2 border-b border-border flex items-center justify-between">
+        <span className="code-lang text-xs font-semibold text-muted-foreground uppercase tracking-wider">{language}</span>
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
           <WrapToggle wrapped={wrapped} onToggle={() => setWrapped(w => !w)} />
+          <DownloadButton text={codeText} language={language} />
           <CopyButton text={codeText} />
         </div>
       </div>
@@ -63,9 +94,11 @@ function CodeBlock({ language, codeText }) {
         wrapLongLines={wrapped}
         customStyle={{
           margin: 0,
-          padding: "1.1rem 1rem",
-          fontSize: "0.83rem",
-          borderRadius: "0 0 14px 14px",
+          padding: "1.25rem 1.25rem",
+          fontSize: "0.85rem",
+          borderRadius: "0",
+          backgroundColor: "#1e1e1e", // Dark background to match vscDarkPlus
+
           lineHeight: 1.65,
           overflowX: wrapped ? "hidden" : "auto",
         }}

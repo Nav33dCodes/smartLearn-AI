@@ -65,8 +65,23 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
           return (
             <div key={index} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               {msg.role === 'user' ? (
-                <div className="bg-muted text-foreground px-5 py-3 rounded-3xl rounded-tr-sm max-w-[80%] sm:max-w-[70%] leading-relaxed whitespace-pre-wrap text-[15px]">
-                  {msg.content}
+                <div className="flex flex-col items-end max-w-[80%] sm:max-w-[70%] group">
+                  <div className="bg-muted text-foreground px-5 py-3 rounded-3xl rounded-tr-sm leading-relaxed whitespace-pre-wrap text-[15px]">
+                    {msg.content}
+                  </div>
+                  <div className="flex items-center mt-1 opacity-0 group-hover:opacity-100 transition-opacity pr-2">
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(msg.content);
+                        import("sonner").then(m => m.toast.success("Copied to clipboard"));
+                      }}
+                      className="p-1 text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 text-xs font-medium"
+                      title="Copy your message"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                      Copy
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="flex gap-4 max-w-[95%] sm:max-w-[85%] w-full group">
