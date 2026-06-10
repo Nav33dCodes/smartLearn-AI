@@ -54,7 +54,7 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
             >
               {msg.role === 'user' ? (
                 <div className="flex flex-col items-end max-w-[85%] sm:max-w-[75%] group">
-                  <div className="bg-muted/80 backdrop-blur-sm text-foreground px-6 py-4 rounded-3xl rounded-tr-sm leading-relaxed whitespace-pre-wrap text-[15px] border border-border/50">
+                  <div className="bg-muted/80 backdrop-blur-sm text-foreground px-6 py-4 rounded-3xl rounded-tr-sm leading-relaxed whitespace-pre-wrap text-base border border-border/50">
                     {msg.content}
                   </div>
                   <div className="flex items-center mt-2 opacity-0 group-hover:opacity-100 transition-opacity pr-2">
@@ -72,22 +72,11 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-start w-full group">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
+                <div className="flex w-full group">
+                  <div className="flex w-full justify-start gap-4">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20 mt-1">
                       <Logo size={18} className="text-primary" />
                     </div>
-                    <span className="text-sm font-semibold text-foreground/80">SmartLearn AI</span>
-                  </div>
-                  <div className="w-full text-[15px] leading-relaxed text-foreground">
-                    <AIMessage content={msg.content} />
-                  </div>
-                  <div className="flex items-center mt-3 opacity-0 group-hover:opacity-100 transition-opacity gap-1 pl-1">
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(msg.content);
-                        import("sonner").then(m => m.toast.success("Copied to clipboard"));
-                      }}
                       className="p-1.5 text-muted-foreground hover:text-primary border border-transparent hover:border-primary rounded-md transition-all duration-300"
                       title="Copy"
                     >
@@ -156,7 +145,7 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="absolute right-0 top-0 bottom-0 w-full sm:w-96 bg-card border-l border-border shadow-2xl z-50 flex flex-col"
+              className="absolute right-0 top-0 bottom-0 w-full sm:w-[450px] bg-card border-l border-border shadow-2xl z-50 flex flex-col"
             >
               <div className="flex items-center justify-between p-4 border-b border-border bg-muted/30">
                 <div className="flex items-center gap-2 text-foreground">
