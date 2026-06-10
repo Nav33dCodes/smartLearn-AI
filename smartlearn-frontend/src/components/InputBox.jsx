@@ -15,8 +15,7 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
   const [searchWeb, setSearchWeb] = useState("auto"); // "auto", "on", "off"
   const [showSearchMenu, setShowSearchMenu] = useState(false);
   const searchMenuRef = useRef(null);
-  const mediaRecorderRef = useRef(null);
-  const audioChunksRef = useRef([]);
+  const recognitionRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -28,57 +27,68 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
 
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          audioChunksRef.current.push(e.data);
-        }
+      let finalTranscript = "";
+
+      recognition.onstart = () => {
+        finalTranscript = "";
       };
 
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        const formData = new FormData();
-        formData.append("audio", audioBlob, "recording.webm");
+      recognition.onresult = (event) => {
+        let interimTranscript = "";
+        let newFinal = "";
         
-        try {
-          toast.loading("Transcribing...", { id: "transcribe" });
-          const res = await api.post('/api/voice/transcribe', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-          });
-          if (res.data.transcript) {
-            setInput(prev => (prev + " " + res.data.transcript).trim());
-            toast.success("Transcribed!", { id: "transcribe" });
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            newFinal += event.results[i][0].transcript + " ";
           } else {
-            toast.dismiss("transcribe");
+            interimTranscript += event.results[i][0].transcript;
           }
-        } catch (err) {
-          console.error(err);
-          toast.error("Transcription failed", { id: "transcribe" });
         }
         
-        stream.getTracks().forEach(track => track.stop());
+        if (newFinal) {
+          setInput(prev => (prev + " " + newFinal).trim());
+        }
       };
 
-      mediaRecorder.start();
-      setIsRecording(true);
-    } catch (err) {
-      console.error(err);
-      toast.error("Microphone access denied");
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error", event.error);
+        setIsRecording(false);
+        if (event.error === 'not-allowed') {
+          toast.error("Microphone access denied.");
+        }
+      };
+
+      recognition.onend = () => {
+        setIsRecording(false);
+      };
+
+      recognitionRef.current = recognition;
     }
-  };
+  }, [setInput]);
 
   const toggleRecording = () => {
     if (isRecording) {
-      mediaRecorderRef.current?.stop();
+      recognitionRef.current?.stop();
       setIsRecording(false);
     } else {
-      startRecording();
+      if (!recognitionRef.current) {
+        toast.error("Speech recognition is not supported in this browser.");
+        return;
+      }
+      try {
+        recognitionRef.current.start();
+        setIsRecording(true);
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
