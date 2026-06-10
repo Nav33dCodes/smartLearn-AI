@@ -15,6 +15,7 @@ import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import SharedChat from "./pages/SharedChat";
 import ReleaseNotes from "./pages/ReleaseNotes";
+import ModelSelector from "./components/ModelSelector";
 
 const API = import.meta.env.DEV
   ? "http://localhost:8000"
@@ -42,6 +43,9 @@ function ChatDashboard() {
   const [themeColor, setThemeColor] = useState(() => {
     return localStorage.getItem("sl_theme_color") || "#10b981"; // default Emerald
   });
+  const [selectedModelId, setSelectedModelId] = useState(() => {
+    return localStorage.getItem("sl_model") || "meta-llama/llama-3-8b-instruct:free";
+  });
   const [isMobile, setIsMobile] = useState(false);
 
   const textareaRef = useRef(null);
@@ -67,6 +71,10 @@ function ChatDashboard() {
     document.documentElement.style.setProperty("--primary", themeColor);
     document.documentElement.style.setProperty("--ring", themeColor);
   }, [themeColor]);
+
+  useEffect(() => {
+    localStorage.setItem("sl_model", selectedModelId);
+  }, [selectedModelId]);
 
   const createNewChat = useCallback(() => {
     const newId = Date.now().toString();
@@ -127,7 +135,7 @@ function ChatDashboard() {
             "Content-Type": "application/json",
             "Authorization": token ? `Bearer ${token}` : ""
         },
-        body: JSON.stringify({ message: textToSend, chat_id: currentChatId, search_web: searchWeb }),
+        body: JSON.stringify({ message: textToSend, chat_id: currentChatId, search_web: searchWeb, model: selectedModelId }),
         signal: controller.signal,
       });
 
@@ -249,9 +257,7 @@ function ChatDashboard() {
                 <PanelLeftOpen size={18} />
               </button>
             )}
-            <span className="text-sm font-medium text-muted-foreground ml-1">
-              {chatsData.find(c => c.id === activeChatId)?.title || "Chat"}
-            </span>
+            <ModelSelector selectedModelId={selectedModelId} onModelSelect={setSelectedModelId} />
           </div>
 
           {activeChatId && activeMessages.length > 0 && (

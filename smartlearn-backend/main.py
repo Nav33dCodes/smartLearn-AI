@@ -4,6 +4,7 @@ import json
 import gc
 import time
 from datetime import datetime, timezone
+from typing import Optional
 from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -106,8 +107,9 @@ async def startup_event():
 # ────────────────────────────────────────────────────
 class ChatRequest(BaseModel):
     message: str
-    chat_id: str = "default"
-    search_web: str = "auto"
+    chat_id: Optional[str] = None
+    search_web: Optional[str] = "off"
+    model: Optional[str] = "meta-llama/llama-3-8b-instruct:free"
 
 class RenameRequest(BaseModel):
     title: str
@@ -220,7 +222,7 @@ Ensure your explanation is thorough (medium-to-long length) and beautifully pres
     def token_generator():
         full_response = []
         try:
-            for token in stream_llm_response(prompt):
+            for token in stream_llm_response(prompt, model_id=data.model):
                 full_response.append(token)
                 yield f"data: {json.dumps({'token': token})}\n\n"
 

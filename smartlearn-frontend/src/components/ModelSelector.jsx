@@ -1,0 +1,121 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown, Check, Sparkles, Zap, Brain, Rocket } from 'lucide-react';
+
+export const MODELS = [
+  {
+    id: "meta-llama/llama-3-8b-instruct:free",
+    name: "Llama 3 (Free)",
+    provider: "Meta",
+    icon: Zap,
+    description: "High speed, zero cost. Great for basic questions."
+  },
+  {
+    id: "meta-llama/llama-3-70b-instruct",
+    name: "Llama 3 70B",
+    provider: "Meta",
+    icon: Sparkles,
+    description: "Open-source powerhouse for comprehensive answers."
+  },
+  {
+    id: "openai/gpt-4o",
+    name: "GPT-4o",
+    provider: "OpenAI",
+    icon: Rocket,
+    description: "Flagship reasoning and speed from OpenAI."
+  },
+  {
+    id: "anthropic/claude-3.5-sonnet",
+    name: "Claude 3.5 Sonnet",
+    provider: "Anthropic",
+    icon: Brain,
+    description: "Unmatched performance in coding and complex logic."
+  },
+  {
+    id: "x-ai/grok-2",
+    name: "Grok 2",
+    provider: "xAI",
+    icon: Rocket,
+    description: "xAI's powerful, unfiltered reasoning engine."
+  }
+];
+
+export default function ModelSelector({ selectedModelId, onModelSelect }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const selectedModel = MODELS.find(m => m.id === selectedModelId) || MODELS[0];
+  const SelectedIcon = selectedModel.icon;
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative z-50" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-muted/80 transition-colors border border-transparent hover:border-border/50 text-foreground font-medium text-sm group"
+      >
+        <span className="opacity-70 group-hover:opacity-100 transition-opacity">
+          SmartLearn <span className="font-bold">{selectedModel.name}</span>
+        </span>
+        <ChevronDown size={14} className={`text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            className="absolute top-full left-0 mt-2 w-72 bg-card border border-border shadow-xl rounded-2xl overflow-hidden p-1.5"
+          >
+            <div className="text-xs font-semibold text-muted-foreground px-3 py-2 uppercase tracking-wider">
+              Models
+            </div>
+            {MODELS.map((model) => {
+              const Icon = model.icon;
+              const isSelected = model.id === selectedModel.id;
+              
+              return (
+                <button
+                  key={model.id}
+                  onClick={() => {
+                    onModelSelect(model.id);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full flex items-start gap-3 px-3 py-2.5 rounded-xl text-left transition-colors ${
+                    isSelected ? 'bg-primary/10' : 'hover:bg-muted'
+                  }`}
+                >
+                  <div className={`mt-0.5 shrink-0 p-1.5 rounded-lg ${isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+                    <Icon size={16} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <span className={`font-medium text-[15px] leading-none ${isSelected ? 'text-primary' : 'text-foreground'}`}>
+                        {model.name}
+                      </span>
+                      {isSelected && <Check size={16} className="text-primary shrink-0" />}
+                    </div>
+                    <p className="text-muted-foreground text-[13px] leading-tight mt-1 line-clamp-2">
+                      {model.description}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

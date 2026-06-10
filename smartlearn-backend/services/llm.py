@@ -1,23 +1,23 @@
 import os
 import time
-from groq import Groq
+from openai import OpenAI
 from dotenv import load_dotenv
 from typing import Generator
 from tavily import TavilyClient
 
 load_dotenv()
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+# OpenRouter is 100% compatible with the official OpenAI SDK
+client = OpenAI(
+    api_key=os.getenv("OPENROUTER_API_KEY", os.getenv("GROQ_API_KEY")), # Fallback to GROQ_API_KEY if testing
+    base_url="https://openrouter.ai/api/v1"
+)
 
 tavily_client = None
 if os.getenv("TAVILY_API_KEY"):
     tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 
-MODELS = [
-    "llama-3.1-8b-instant",
-    "llama-3.2-11b-text-preview",
-    "mixtral-8x7b-32768",
-]
+DEFAULT_MODEL = "meta-llama/llama-3-8b-instruct:free"
 
 SYSTEM_PROMPT = """You are SmartLearn AI — a friendly, smart learning assistant.
 
@@ -35,7 +35,6 @@ About SmartLearn AI:
 - You are NOT made by OpenAI, Anthropic, Google, or any other company
 - If anyone asks who made you, who your team is, or who the CEO is — answer from the info above only
 - Never say you are ChatGPT, Claude, Gemini, or any other AI"""
-
 
 # ────────────────────────────────────────────────────
 # TAVILY WEB SEARCH
@@ -65,7 +64,7 @@ def needs_web_search(query: str) -> bool:
     """Uses a fast LLM to determine if the query requires live web search."""
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model=DEFAULT_MODEL,
             messages=[
                 {"role": "system", "content": "You are a classifier. Does the user's query require up-to-date, real-time, recent news, or live web knowledge to answer accurately? Respond with exactly 'YES' or 'NO'."},
                 {"role": "user", "content": query}
@@ -82,82 +81,57 @@ def needs_web_search(query: str) -> bool:
 # ────────────────────────────────────────────────────
 # STREAMING  (primary — used by /chat endpoint)
 # ────────────────────────────────────────────────────
-def stream_llm_response(prompt: str) -> Generator[str, None, None]:
+def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL) -> Generator[str, None, None]:
     """
-    Yields tokens one by one from Groq streaming API.
-    Falls back to next model on failure.
+    Yields tokens one by one from OpenRouter streaming API.
     """
-    last_error = None
+    try:
+        stream = client.chat.completions.create(
+            model=model_id,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user",   "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=2048,
+            top_p=0.9,
+            stream=True,
+        )
 
-    for model in MODELS:
-        try:
-            stream = client.chat.completions.create(
-                model=model,
-                messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user",   "content": prompt}
-                ],
-                temperature=0.7,
-                max_tokens=1024,
-                top_p=0.9,
-                stream=True,
-            )
-
-            for chunk in stream:
+        for chunk in stream:
+            if chunk.choices and len(chunk.choices) > 0:
                 token = chunk.choices[0].delta.content
                 if token:
                     yield token
-            return  # success
+        return  # success
 
-        except Exception as e:
-            last_error = e
-            err_str = str(e).lower()
-
-            if "rate_limit" in err_str or "429" in err_str:
-                yield "\n\n⚠️ Rate limit hit. Please wait a moment and try again."
-                return
-
-            continue
-
-    yield f"\n\n⚠️ All models unavailable. Please try again. (Error: {last_error})"
-
+    except Exception as e:
+        err_str = str(e).lower()
+        if "rate_limit" in err_str or "429" in err_str:
+            yield "\n\n⚠️ Rate limit hit on this model. Please wait a moment and try again."
+        elif "insufficient" in err_str or "credits" in err_str:
+            yield "\n\n⚠️ Your OpenRouter account ran out of credits for this premium model. Please switch to a free model or add credits."
+        else:
+            yield f"\n\n⚠️ Model '{model_id}' unavailable. (Error: {e})"
 
 # ────────────────────────────────────────────────────
 # NON-STREAMING  (fallback, kept for compatibility)
 # ────────────────────────────────────────────────────
-def get_llm_response(prompt: str, retries: int = 2) -> str:
-    last_error = None
-
-    for model in MODELS:
-        for attempt in range(retries):
-            try:
-                response = client.chat.completions.create(
-                    model=model,
-                    messages=[
-                        {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "user",   "content": prompt}
-                    ],
-                    temperature=0.7,
-                    max_tokens=1024,
-                    top_p=0.9,
-                )
-                return response.choices[0].message.content
-
-            except Exception as e:
-                last_error = e
-                err_str = str(e).lower()
-
-                if "rate_limit" in err_str or "429" in err_str:
-                    time.sleep((attempt + 1) * 2)
-                    continue
-
-                if "model" in err_str or "unavailable" in err_str:
-                    break
-
-                time.sleep(1)
-
-    return f"⚠️ SmartLearn AI is temporarily unavailable. (Error: {last_error})"
-
+def get_llm_response(prompt: str, model_id: str = DEFAULT_MODEL) -> str:
+    try:
+        response = client.chat.completions.create(
+            model=model_id,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user",   "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=2048,
+            top_p=0.9,
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"⚠️ SmartLearn AI is temporarily unavailable. (Error: {e})"
 
 # ────────────────────────────────────────────────────
 # TITLE GENERATION
@@ -166,20 +140,17 @@ def generate_chat_title(message: str) -> str:
     """Generates a short 3-5 word title for the chat based on the first message."""
     prompt = f"Generate a short, concise, 3 to 5 word title for the following message. Return ONLY the title text, nothing else, no quotes, no explanation:\n\n{message}"
     
-    for model in MODELS:
-        try:
-            response = client.chat.completions.create(
-                model=model,
-                messages=[
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.5,
-                max_tokens=15,
-                top_p=0.9,
-            )
-            title = response.choices[0].message.content.strip().strip('"').strip("'")
-            return title if title else message[:30]
-        except Exception:
-            continue
-            
-    return message[:30]
+    try:
+        response = client.chat.completions.create(
+            model=DEFAULT_MODEL,
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.5,
+            max_tokens=15,
+            top_p=0.9,
+        )
+        title = response.choices[0].message.content.strip().strip('"').strip("'")
+        return title if title else message[:30]
+    except Exception:
+        return message[:30]

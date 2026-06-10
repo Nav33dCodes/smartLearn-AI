@@ -6,6 +6,17 @@ const releases = [
     date: "June 10, 2026",
     features: [
       {
+        title: "🚀 OpenRouter Multi-Model Mastery (Most Advanced Update Yet)",
+        description: "Completely overhauled the core AI engine, granting you access to the world's most powerful frontier models within a single unified interface.",
+        bullets: [
+          "ChatGPT-Style Model Selector: A gorgeous new dropdown menu allowing instant, mid-conversation switching between leading AI models.",
+          "Claude 3.5 Sonnet: Unmatched coding and complex logic capabilities.",
+          "GPT-4o & Grok 2: Blisteringly fast reasoning and unfiltered intelligence from OpenAI and xAI.",
+          "Smart State Persistence: The platform now securely remembers your preferred model in localStorage across sessions.",
+          "Dynamic API Routing: The backend was migrated to OpenRouter's API, natively supporting seamless failovers and multiple architecture providers."
+        ]
+      },
+      {
         title: "Intelligent Video & UI Overhaul",
         description: "Transformed SmartLearn into a comprehensive educational platform with smart video integration and a sleek interface.",
         bullets: [
