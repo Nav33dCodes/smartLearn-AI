@@ -95,7 +95,7 @@ export default function Sidebar({
     if (chats.length === 0) return null;
     return (
       <div className="mb-4">
-        <div className="text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wider px-3 mb-1 mt-4">
+        <div className="text-xs font-bold text-muted-foreground/70 uppercase tracking-wider px-3 mb-1 mt-4">
           {title}
         </div>
         <AnimatePresence mode="popLayout">
@@ -127,10 +127,10 @@ export default function Sidebar({
                         if (e.key === "Enter") handleRename(chat.id);
                         if (e.key === "Escape") setEditingChatId(null);
                       }}
-                      className="bg-background border border-primary text-foreground text-[13px] rounded px-1 w-full outline-none shadow-sm"
+                      className="bg-background border border-primary text-foreground text-sm rounded px-1 w-full outline-none shadow-sm"
                     />
                   ) : (
-                    <span className="truncate text-[13px] tracking-tight">{chat.title}</span>
+                    <span className="truncate text-[15px] font-medium tracking-tight">{chat.title}</span>
                   )}
                 </div>
                 
@@ -236,10 +236,10 @@ export default function Sidebar({
 
           <Button 
             onClick={createNewChat}
-            className="w-full justify-start gap-2 bg-background border border-border shadow-sm hover:bg-muted text-foreground transition-all rounded-xl h-10 px-3"
+            className="w-full justify-start gap-2 bg-transparent border border-border shadow-sm hover:bg-muted/60 text-foreground transition-all rounded-xl h-10 px-3"
           >
-            <Plus size={16} className="text-muted-foreground" />
-            <span className="font-medium text-[13px]">New chat</span>
+            <Plus size={18} className="text-muted-foreground" />
+            <span className="font-semibold text-[15px]">New chat</span>
           </Button>
         </div>
 
@@ -249,7 +249,7 @@ export default function Sidebar({
             <Input 
               type="text"
               placeholder="Search..."
-              className="pl-9 bg-muted/40 border-transparent hover:bg-muted/60 focus:bg-background focus:border-ring focus:ring-1 h-9 text-[13px] rounded-xl transition-all shadow-none"
+              className="pl-9 bg-muted/40 border-transparent hover:bg-muted/60 focus:bg-background focus:border-ring focus:ring-1 h-10 text-sm rounded-xl transition-all shadow-none"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -274,14 +274,14 @@ export default function Sidebar({
               className="flex items-center justify-between p-2 rounded-xl cursor-pointer hover:bg-muted/60 transition-colors border border-transparent hover:border-border/50"
             >
               <div className="flex items-center gap-3 overflow-hidden">
-                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs shrink-0 overflow-hidden ring-1 ring-primary/20">
+                <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0 overflow-hidden ring-1 ring-primary/20">
                   {user?.avatar ? (
                     <img src={user.avatar} alt="Avatar" className="h-full w-full object-cover" />
                   ) : (
                     user.name ? user.name.charAt(0).toUpperCase() : "U"
                   )}
                 </div>
-                <span className="text-[13px] font-medium text-foreground truncate max-w-[110px] tracking-tight">{user.name}</span>
+                <span className="text-[15px] font-medium text-foreground truncate max-w-[110px] tracking-tight">{user.name}</span>
               </div>
               <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setShowLogoutModal(true); }} className="text-muted-foreground hover:text-destructive shrink-0 h-8 w-8 rounded-lg">
                 <LogOut size={16} />
