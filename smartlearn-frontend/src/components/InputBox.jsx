@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
-import { Paperclip, ArrowUp, Square, Loader2, FileText, X, Mic } from "lucide-react";
+import { Paperclip, ArrowUp, Square, Loader2, FileText, X, Mic, Globe } from "lucide-react";
+import api from '../lib/axios';
 import { Button } from "./ui/button";
 import { useUploadPdf } from "../hooks/useChats";
 import { toast } from "sonner";
@@ -11,70 +12,61 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
   const [attachedFiles, setAttachedFiles] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const recognitionRef = useRef(null);
+  const [searchWeb, setSearchWeb] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
 
-  useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = "en-US";
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
 
-      let finalTranscript = "";
-
-      recognition.onstart = () => {
-        finalTranscript = "";
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          audioChunksRef.current.push(e.data);
+        }
       };
 
-      recognition.onresult = (event) => {
-        let interimTranscript = "";
-        let newFinal = "";
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const formData = new FormData();
+        formData.append("audio", audioBlob, "recording.webm");
         
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            newFinal += event.results[i][0].transcript + " ";
+        try {
+          toast.loading("Transcribing...", { id: "transcribe" });
+          const res = await api.post('/api/voice/transcribe', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+          if (res.data.transcript) {
+            setInput(prev => (prev + " " + res.data.transcript).trim());
+            toast.success("Transcribed!", { id: "transcribe" });
           } else {
-            interimTranscript += event.results[i][0].transcript;
+            toast.dismiss("transcribe");
           }
+        } catch (err) {
+          console.error(err);
+          toast.error("Transcription failed", { id: "transcribe" });
         }
         
-        if (newFinal) {
-          setInput(prev => (prev + " " + newFinal).trim());
-        }
+        stream.getTracks().forEach(track => track.stop());
       };
 
-      recognition.onerror = (event) => {
-        console.error("Speech recognition error", event.error);
-        setIsRecording(false);
-        if (event.error === 'not-allowed') {
-          toast.error("Microphone access denied.");
-        }
-      };
-
-      recognition.onend = () => {
-        setIsRecording(false);
-      };
-
-      recognitionRef.current = recognition;
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      console.error(err);
+      toast.error("Microphone access denied");
     }
-  }, [setInput]);
+  };
 
   const toggleRecording = () => {
     if (isRecording) {
-      recognitionRef.current?.stop();
+      mediaRecorderRef.current?.stop();
       setIsRecording(false);
     } else {
-      if (!recognitionRef.current) {
-        toast.error("Speech recognition is not supported in this browser.");
-        return;
-      }
-      try {
-        recognitionRef.current.start();
-        setIsRecording(true);
-      } catch (err) {
-        console.error(err);
-      }
+      startRecording();
     }
   };
 
@@ -95,10 +87,10 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
   const handleSend = () => {
     if (!input.trim() && attachedFiles.length === 0) return;
     if (isRecording) {
-      recognitionRef.current?.stop();
+      mediaRecorderRef.current?.stop();
       setIsRecording(false);
     }
-    sendMessage();
+    sendMessage(null, searchWeb);
     setAttachedFiles([]);
   };
 
@@ -239,17 +231,29 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
               className="hidden"
             />
             
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-muted-foreground hover:bg-muted rounded-lg relative overflow-hidden"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploadPdfMutation.isPending || !activeChatId}
-              title="Attach document"
-            >
-              <Paperclip size={18} />
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:bg-muted rounded-lg relative overflow-hidden"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadPdfMutation.isPending || !activeChatId}
+                title="Attach document"
+              >
+                <Paperclip size={18} />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className={`h-8 w-8 rounded-lg transition-colors ${searchWeb ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:bg-muted'}`}
+                onClick={() => setSearchWeb(!searchWeb)}
+                title="Toggle Web Search"
+              >
+                <Globe size={18} />
+              </Button>
+            </div>
             
             <div className="flex items-center gap-1.5">
               <Button

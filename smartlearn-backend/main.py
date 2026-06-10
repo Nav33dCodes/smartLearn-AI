@@ -9,10 +9,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy import text
+import asyncio
 
-from services.llm import stream_llm_response
+from services.llm import stream_llm_response, search_tavily
 from services.pdf import extract_text, get_pdf_metadata
 from services.rag import store_pdf, search, clear_session, get_stats
+from services.voice import transcribe_audio
 from database import SessionLocal, Chat, get_db, User, ChatMetadata
 from routers import auth
 from services.jwt_handler import verify_token
@@ -104,6 +106,7 @@ async def startup_event():
 class ChatRequest(BaseModel):
     message: str
     chat_id: str = "default"
+    search_web: bool = False
 
 class RenameRequest(BaseModel):
     title: str
@@ -178,13 +181,22 @@ async def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_use
         logger.error(f"❌ RAG search error: {e}")
         context = ""
 
+    if data.search_web:
+        print(f"🌐 Performing Web Search via Tavily for: {message}")
+        web_context = search_tavily(message)
+        if web_context:
+            print("✅ Web Search successful! Injecting context.")
+            context = (context + "\n\n### 🌐 Web Search Results:\n" + web_context) if context else ("### 🌐 Web Search Results:\n" + web_context)
+        else:
+            print("⚠️ Web Search returned no results.")
+
     if context:
-        prompt = f"""Document context:
+        prompt = f"""Document & Web Context:
 {context}
 
 Student question: {message}
 
-You are SmartLearn AI, an advanced, professional tutor. Please answer the student's question comprehensively using ONLY the provided Document Context. 
+You are SmartLearn AI, an advanced, professional tutor. Please answer the student's question comprehensively using ONLY the provided Context. 
 Your response MUST be detailed and highly structured, utilizing rich Markdown formatting such as:
 - **Headings (##, ###)** to organize different sections
 - **Tables** to compare data or present statistics if applicable

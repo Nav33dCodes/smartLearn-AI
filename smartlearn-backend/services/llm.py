@@ -3,10 +3,15 @@ import time
 from groq import Groq
 from dotenv import load_dotenv
 from typing import Generator
+from tavily import TavilyClient
 
 load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+tavily_client = None
+if os.getenv("TAVILY_API_KEY"):
+    tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 
 MODELS = [
     "llama-3.1-8b-instant",
@@ -31,6 +36,30 @@ About SmartLearn AI:
 - If anyone asks who made you, who your team is, or who the CEO is — answer from the info above only
 - Never say you are ChatGPT, Claude, Gemini, or any other AI"""
 
+
+# ────────────────────────────────────────────────────
+# TAVILY WEB SEARCH
+# ────────────────────────────────────────────────────
+def search_tavily(query: str) -> str:
+    """Uses Tavily API to fetch clean markdown web context for a given query."""
+    if not tavily_client:
+        return ""
+    try:
+        response = tavily_client.search(query=query, search_depth="basic", max_results=3)
+        results = response.get('results', [])
+        
+        # Format results into a clean text block
+        formatted_results = []
+        for r in results:
+            content = r.get('content', '')
+            url = r.get('url', '')
+            if content:
+                formatted_results.append(f"- **Source** ({url}):\n{content}")
+                
+        return "\n\n".join(formatted_results)
+    except Exception as e:
+        print(f"Tavily search failed: {e}")
+        return ""
 
 # ────────────────────────────────────────────────────
 # STREAMING  (primary — used by /chat endpoint)

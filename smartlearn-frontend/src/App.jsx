@@ -83,7 +83,7 @@ function ChatDashboard() {
     }
   }, [activeChatId, historyData]);
 
-  const sendMessage = async (overrideText = null) => {
+  const sendMessage = async (overrideText = null, searchWeb = false) => {
     const textToSend = overrideText ?? input;
     if (!textToSend.trim() || loading) return;
 
@@ -117,7 +117,7 @@ function ChatDashboard() {
             "Content-Type": "application/json",
             "Authorization": token ? `Bearer ${token}` : ""
         },
-        body: JSON.stringify({ message: textToSend, chat_id: currentChatId }),
+        body: JSON.stringify({ message: textToSend, chat_id: currentChatId, search_web: searchWeb }),
         signal: controller.signal,
       });
 
