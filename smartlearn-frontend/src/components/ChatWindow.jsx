@@ -12,7 +12,12 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
   const [activeSourcesQuery, setActiveSourcesQuery] = useState(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Use 'auto' during loading to prevent the browser's smooth scroll engine from vibrating
+    // when receiving rapid updates multiple times a second.
+    messagesEndRef.current?.scrollIntoView({ 
+      behavior: loading ? "auto" : "smooth",
+      block: "end"
+    });
   }, [messages, loading]);
   if (isChatsLoading && messages.length === 0) {
     return (
