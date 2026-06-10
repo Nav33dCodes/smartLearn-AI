@@ -19,6 +19,7 @@ const Signup = lazy(() => import("./pages/Signup"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const SharedChat = lazy(() => import("./pages/SharedChat"));
 const ReleaseNotes = lazy(() => import("./pages/ReleaseNotes"));
+const Landing = lazy(() => import("./pages/Landing"));
 const ChatsManager = lazy(() => import("./components/ChatsManager"));
 
 const API = import.meta.env.DEV
@@ -414,12 +415,13 @@ export default function App() {
       />
       <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center mesh-bg"><div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin"></div></div>}>
         <Routes>
+          <Route path="/" element={<Landing />} />
           <Route path="/share/:shareId" element={<SharedChat />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/releases" element={<ReleaseNotes />} />
-          <Route path="/" element={
+          <Route path="/app" element={
             <ProtectedRoute>
               <ChatDashboard />
             </ProtectedRoute>

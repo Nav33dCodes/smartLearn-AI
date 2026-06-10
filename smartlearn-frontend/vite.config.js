@@ -7,10 +7,12 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          markdown: ['react-markdown', 'react-syntax-highlighter', 'remark-gfm'],
-          ui: ['lucide-react', 'framer-motion'],
-          vendor: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query'],
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react-markdown') || id.includes('react-syntax-highlighter') || id.includes('remark-gfm')) return 'markdown';
+            if (id.includes('lucide-react') || id.includes('framer-motion')) return 'ui';
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom') || id.includes('@tanstack')) return 'vendor';
+          }
         }
       }
     }

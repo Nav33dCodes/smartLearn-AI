@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
@@ -21,8 +21,12 @@ export default function Signup() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [otp, setOtp] = useState('');
 
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
+
+  if (user) {
+    return <Navigate to="/app" replace />;
+  }
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -46,7 +50,7 @@ export default function Signup() {
       } else {
         login(response.data.user, response.data.access_token, response.data.refresh_token);
         toast.success('Account created successfully!');
-        navigate('/');
+        navigate('/app');
       }
     } catch (err) {
       setError(err.response?.data?.detail || 'Registration failed.');
@@ -68,7 +72,7 @@ export default function Signup() {
       const response = await api.post('/auth/verify-account', { email, otp });
       login(response.data.user, response.data.access_token, response.data.refresh_token);
       toast.success('Email verified successfully! Welcome to SmartLearn AI.');
-      navigate('/');
+      navigate('/app');
     } catch (err) {
       setError(err.response?.data?.detail || 'Invalid or expired verification code.');
     } finally {
