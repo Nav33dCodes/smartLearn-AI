@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
-import { Paperclip, ArrowUp, Square, Loader2, FileText, X, Mic, Globe, Check } from "lucide-react";
+import { Paperclip, ArrowUp, Square, Loader2, FileText, X, Mic, Globe, Check, Plus } from "lucide-react";
 import api from '../lib/axios';
 import { Button } from "./ui/button";
 import { useUploadPdf } from "../hooks/useChats";
@@ -13,14 +13,14 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
   const [isDragging, setIsDragging] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [searchWeb, setSearchWeb] = useState("auto"); // "auto", "on", "off"
-  const [showSearchMenu, setShowSearchMenu] = useState(false);
-  const searchMenuRef = useRef(null);
+  const [showPlusMenu, setShowPlusMenu] = useState(false);
+  const plusMenuRef = useRef(null);
   const recognitionRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (searchMenuRef.current && !searchMenuRef.current.contains(event.target)) {
-        setShowSearchMenu(false);
+      if (plusMenuRef.current && !plusMenuRef.current.contains(event.target)) {
+        setShowPlusMenu(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -253,87 +253,83 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
               className="hidden"
             />
             
-            <div className="flex items-center gap-1">
+            <div className="relative" ref={plusMenuRef}>
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-muted-foreground hover:bg-muted rounded-lg relative overflow-hidden"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploadPdfMutation.isPending || !activeChatId}
-                title="Attach document"
+                className="h-8 w-8 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors"
+                onClick={() => setShowPlusMenu(!showPlusMenu)}
+                title="Attachments and Options"
               >
-                <Paperclip size={18} />
+                <Plus size={20} className={showPlusMenu ? "rotate-45 transition-transform duration-200" : "transition-transform duration-200"} />
               </Button>
-              
-              <div className="relative" ref={searchMenuRef}>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className={`h-8 w-8 rounded-lg transition-colors ${
-                    searchWeb === "on" ? 'text-primary bg-primary/10' : 
-                    searchWeb === "auto" ? 'text-blue-500 bg-blue-500/10' : 
-                    'text-muted-foreground hover:bg-muted'
-                  }`}
-                  onClick={() => setShowSearchMenu(!showSearchMenu)}
-                  title="Web Search Settings"
-                >
-                  <Globe size={18} />
-                </Button>
 
-                <AnimatePresence>
-                  {showSearchMenu && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute bottom-full left-0 mb-2 w-44 bg-card border border-border shadow-lg rounded-xl overflow-hidden z-50 flex flex-col"
+              <AnimatePresence>
+                {showPlusMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute bottom-full left-0 mb-2 w-56 bg-card border border-border shadow-xl rounded-2xl overflow-hidden z-50 flex flex-col p-1.5"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => { fileInputRef.current?.click(); setShowPlusMenu(false); }}
+                      className="flex items-center gap-3 px-3 py-2.5 text-sm hover:bg-muted rounded-xl transition-colors text-foreground"
+                      disabled={uploadPdfMutation.isPending || !activeChatId}
                     >
-                      <div className="px-3 py-2 text-xs font-semibold text-muted-foreground border-b border-border bg-muted/30">
-                        Web Search
+                      <div className="bg-primary/10 p-1.5 rounded-lg text-primary">
+                        <FileText size={16} />
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => { setSearchWeb("auto"); setShowSearchMenu(false); }}
-                        className={`flex items-center gap-2.5 px-3 py-2.5 text-sm hover:bg-muted transition-colors ${searchWeb === "auto" ? "text-blue-500 font-medium" : "text-foreground"}`}
-                      >
-                        <Globe size={14} className={searchWeb === "auto" ? "text-blue-500" : "text-muted-foreground"} /> 
-                        <div className="flex flex-col items-start">
-                          <span>Auto</span>
-                          <span className="text-[10px] text-muted-foreground font-normal leading-tight">Searches when needed</span>
-                        </div>
-                        {searchWeb === "auto" && <Check size={14} className="ml-auto" />}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => { setSearchWeb("on"); setShowSearchMenu(false); }}
-                        className={`flex items-center gap-2.5 px-3 py-2.5 text-sm hover:bg-muted transition-colors ${searchWeb === "on" ? "text-primary font-medium" : "text-foreground"}`}
-                      >
-                        <Globe size={14} className={searchWeb === "on" ? "text-primary" : "text-muted-foreground"} /> 
-                        <div className="flex flex-col items-start">
-                          <span>Always On</span>
-                          <span className="text-[10px] text-muted-foreground font-normal leading-tight">Forces web search</span>
-                        </div>
-                        {searchWeb === "on" && <Check size={14} className="ml-auto" />}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => { setSearchWeb("off"); setShowSearchMenu(false); }}
-                        className={`flex items-center gap-2.5 px-3 py-2.5 text-sm hover:bg-muted transition-colors ${searchWeb === "off" ? "text-muted-foreground font-medium" : "text-foreground"}`}
-                      >
-                        <X size={14} className="text-muted-foreground" /> 
-                        <div className="flex flex-col items-start">
-                          <span>Disabled</span>
-                          <span className="text-[10px] text-muted-foreground font-normal leading-tight">Uses only AI knowledge</span>
-                        </div>
-                        {searchWeb === "off" && <Check size={14} className="ml-auto" />}
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+                      <span className="font-medium">Upload Document</span>
+                    </button>
+                    
+                    <div className="h-px bg-border my-1.5 mx-2" />
+                    
+                    <div className="px-3 py-1.5 text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wider">
+                      Web Search Mode
+                    </div>
+                    
+                    <button
+                      type="button"
+                      onClick={() => { setSearchWeb("auto"); setShowPlusMenu(false); }}
+                      className={`flex items-center gap-3 px-3 py-2 text-[13px] hover:bg-muted rounded-xl transition-colors ${searchWeb === "auto" ? "text-blue-500 font-medium bg-blue-500/5" : "text-foreground"}`}
+                    >
+                      <Globe size={16} className={searchWeb === "auto" ? "text-blue-500" : "text-muted-foreground"} /> 
+                      <div className="flex flex-col items-start">
+                        <span>Auto Search</span>
+                      </div>
+                      {searchWeb === "auto" && <Check size={14} className="ml-auto" />}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => { setSearchWeb("on"); setShowPlusMenu(false); }}
+                      className={`flex items-center gap-3 px-3 py-2 text-[13px] hover:bg-muted rounded-xl transition-colors ${searchWeb === "on" ? "text-primary font-medium bg-primary/5" : "text-foreground"}`}
+                    >
+                      <Globe size={16} className={searchWeb === "on" ? "text-primary" : "text-muted-foreground"} /> 
+                      <div className="flex flex-col items-start">
+                        <span>Always On</span>
+                      </div>
+                      {searchWeb === "on" && <Check size={14} className="ml-auto" />}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => { setSearchWeb("off"); setShowPlusMenu(false); }}
+                      className={`flex items-center gap-3 px-3 py-2 text-[13px] hover:bg-muted rounded-xl transition-colors ${searchWeb === "off" ? "text-muted-foreground font-medium" : "text-foreground"}`}
+                    >
+                      <X size={16} className="text-muted-foreground" /> 
+                      <div className="flex flex-col items-start">
+                        <span>Disabled</span>
+                      </div>
+                      {searchWeb === "off" && <Check size={14} className="ml-auto text-muted-foreground" />}
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
             
             <div className="flex items-center gap-1.5">

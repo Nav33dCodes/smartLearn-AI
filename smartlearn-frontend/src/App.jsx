@@ -242,7 +242,7 @@ function ChatDashboard() {
             </span>
           </div>
 
-          {activeChatId && (
+          {activeChatId && activeMessages.length > 0 && (
             <button
               onClick={() => {
                 const chat = chatsData.find(c => c.id === activeChatId);

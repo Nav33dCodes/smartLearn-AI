@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import AIMessage from "./AIMessage";
 import Logo from "./Logo";
@@ -6,6 +6,11 @@ import { useAuth } from "../context/AuthContext";
 
 export default function ChatWindow({ messages, loading, isChatsLoading, onSuggestionClick, regenerateMessage }) {
   const { user } = useAuth();
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
   if (isChatsLoading && messages.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center pt-14 pb-32">
@@ -41,30 +46,10 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-muted-foreground mb-8"
+            className="text-muted-foreground mb-8 text-[15px] leading-relaxed max-w-sm mx-auto"
           >
-            How can I help you today? Upload a PDF to ask context-aware questions or just start chatting.
+            Welcome to your intelligent learning space. Ask me anything, drop a document for deep analysis, or let me search the web to find the latest insights.
           </motion.p>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
-            {[
-              "Explain quantum computing in simple terms",
-              "Summarize the uploaded PDF document",
-              "Write a python script for data analysis",
-              "Help me prepare for a frontend interview"
-            ].map((text, i) => (
-              <motion.div 
-                key={i} 
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + (i * 0.1), type: "spring", stiffness: 300, damping: 24 }}
-                onClick={() => onSuggestionClick?.(text)}
-                className="bg-card border border-border p-3 rounded-lg text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors shadow-sm"
-              >
-                {text}
-              </motion.div>
-            ))}
-          </div>
         </motion.div>
       </div>
     );
@@ -79,7 +64,7 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
           return (
             <div key={index} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               {msg.role === 'user' ? (
-                <div className="bg-primary text-primary-foreground px-5 py-3 rounded-2xl rounded-tr-sm max-w-[80%] sm:max-w-[70%] shadow-sm leading-relaxed whitespace-pre-wrap text-[15px]">
+                <div className="bg-muted text-foreground px-5 py-3 rounded-3xl rounded-tr-sm max-w-[80%] sm:max-w-[70%] leading-relaxed whitespace-pre-wrap text-[15px]">
                   {msg.content}
                 </div>
               ) : (
@@ -132,6 +117,8 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
             </div>
           </div>
         )}
+        
+        <div ref={messagesEndRef} />
       </div>
     </div>
   );
