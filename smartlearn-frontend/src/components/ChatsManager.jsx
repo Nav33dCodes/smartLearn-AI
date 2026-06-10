@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Trash2, X, MessageSquare, Check, CheckSquare, Square, Download, Archive, Filter, Edit2 } from 'lucide-react';
+import { GroupedVirtuoso } from 'react-virtuoso';
 import { useDeleteChat, useArchiveChat, useRenameChat } from '../hooks/useChats';
 import { Button } from './ui/button';
 
@@ -73,6 +74,14 @@ export default function ChatsManager({ chatsData, onOpenChat }) {
 
     return groups;
   }, [filteredChats]);
+
+  const { groupedKeys, groupCounts, flattenedChats } = useMemo(() => {
+    const keys = Object.keys(groupedChats).filter(k => groupedChats[k].length > 0);
+    const counts = keys.map(k => groupedChats[k].length);
+    const flattened = [];
+    keys.forEach(k => flattened.push(...groupedChats[k]));
+    return { groupedKeys: keys, groupCounts: counts, flattenedChats: flattened };
+  }, [groupedChats]);
 
   const handleSelectAll = () => {
     if (selectedIds.size === filteredChats.length && filteredChats.length > 0) {
@@ -254,12 +263,12 @@ export default function ChatsManager({ chatsData, onOpenChat }) {
       </div>
 
       {/* List Area */}
-      <div className="flex-1 overflow-y-auto px-6 md:px-12 py-6 scrollbar-thin">
-        <div className="max-w-5xl mx-auto flex flex-col gap-8 pb-20">
+      <div className="flex-1 px-6 md:px-12 py-6">
+        <div className="max-w-5xl mx-auto h-full flex flex-col gap-4">
           
           {/* Global Select All */}
           {filteredChats.length > 0 && (
-            <div className="flex items-center gap-3 px-3">
+            <div className="flex items-center gap-3 px-3 flex-none pb-2">
               <button 
                 onClick={handleSelectAll}
                 className="text-muted-foreground hover:text-foreground transition-colors"
@@ -282,77 +291,81 @@ export default function ChatsManager({ chatsData, onOpenChat }) {
             </div>
           )}
 
-          {Object.entries(groupedChats).map(([groupName, chats]) => {
-            if (chats.length === 0) return null;
-            return (
-              <div key={groupName} className="flex flex-col">
-                <h3 className="text-xs font-semibold text-muted-foreground/60 uppercase tracking-widest px-3 mb-3">
-                  {groupName}
-                </h3>
-                <div className="flex flex-col">
-                  {chats.map(chat => {
-                    const isSelected = selectedIds.has(chat.id);
-                    return (
-                      <div 
-                        key={chat.id}
-                        onClick={() => onOpenChat(chat.id)}
-                        className={`group flex items-center justify-between px-3 py-3 md:py-4 rounded-xl cursor-pointer transition-colors border border-transparent ${
-                          isSelected ? 'bg-primary/5 border-primary/20' : 'hover:bg-muted/40'
-                        }`}
-                      >
-                        <div className="flex items-center gap-4 min-w-0">
-                          <button 
-                            onClick={(e) => toggleSelect(e, chat.id)}
-                            className={`shrink-0 transition-colors ${isSelected ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground/70'}`}
-                          >
-                            {isSelected ? <CheckSquare size={18} /> : <Square size={18} />}
-                          </button>
-                          
-                          <MessageSquare size={18} className="text-muted-foreground/40 hidden md:block shrink-0" />
-                          
-                          {editingId === chat.id ? (
-                            <input 
-                              autoFocus
-                              value={editTitle}
-                              onChange={(e) => setEditTitle(e.target.value)}
-                              onBlur={() => handleRename(chat.id)}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") handleRename(chat.id);
-                                if (e.key === "Escape") setEditingId(null);
-                              }}
-                              onClick={(e) => e.stopPropagation()}
-                              className="bg-background border border-primary text-foreground text-sm rounded px-2 w-full outline-none shadow-sm h-7"
-                            />
-                          ) : (
-                            <span className="truncate font-medium text-foreground tracking-tight text-[15px]">
-                              {chat.title}
-                            </span>
-                          )}
-                        </div>
-                        
-                        <div className="flex items-center gap-3 shrink-0 pl-4">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditingId(chat.id);
-                              setEditTitle(chat.title);
-                            }}
-                            className="p-1.5 text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-foreground hover:bg-muted/50 rounded-md transition-all hidden md:block"
-                          >
-                            <Edit2 size={14} />
-                          </button>
-                          
-                          <span className="text-[13px] text-muted-foreground/60 hidden sm:block whitespace-nowrap">
-                            {formatDate(chat.id)}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
+          {filteredChats.length > 0 && (
+            <GroupedVirtuoso
+              style={{ height: '100%', width: '100%' }}
+              groupCounts={groupCounts}
+              className="scrollbar-thin"
+              groupContent={(index) => (
+                <div className="bg-card/40 backdrop-blur-xl py-2 z-10 sticky top-0">
+                  <h3 className="text-xs font-semibold text-muted-foreground/60 uppercase tracking-widest px-3">
+                    {groupedKeys[index]}
+                  </h3>
                 </div>
-              </div>
-            );
-          })}
+              )}
+              itemContent={(index) => {
+                const chat = flattenedChats[index];
+                const isSelected = selectedIds.has(chat.id);
+                return (
+                  <div className="pb-1">
+                    <div 
+                      onClick={() => onOpenChat(chat.id)}
+                      className={`group flex items-center justify-between px-3 py-3 md:py-4 rounded-xl cursor-pointer transition-colors border border-transparent ${
+                        isSelected ? 'bg-primary/5 border-primary/20' : 'hover:bg-muted/40'
+                      }`}
+                    >
+                      <div className="flex items-center gap-4 min-w-0">
+                        <button 
+                          onClick={(e) => toggleSelect(e, chat.id)}
+                          className={`shrink-0 transition-colors ${isSelected ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground/70'}`}
+                        >
+                          {isSelected ? <CheckSquare size={18} /> : <Square size={18} />}
+                        </button>
+                        
+                        <MessageSquare size={18} className="text-muted-foreground/40 hidden md:block shrink-0" />
+                        
+                        {editingId === chat.id ? (
+                          <input 
+                            autoFocus
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            onBlur={() => handleRename(chat.id)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") handleRename(chat.id);
+                              if (e.key === "Escape") setEditingId(null);
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-background border border-primary text-foreground text-sm rounded px-2 w-full outline-none shadow-sm h-7"
+                          />
+                        ) : (
+                          <span className="truncate font-medium text-foreground tracking-tight text-[15px]">
+                            {chat.title}
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center gap-3 shrink-0 pl-4">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingId(chat.id);
+                            setEditTitle(chat.title);
+                          }}
+                          className="p-1.5 text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-foreground hover:bg-muted/50 rounded-md transition-all hidden md:block"
+                        >
+                          <Edit2 size={14} />
+                        </button>
+                        
+                        <span className="text-[13px] text-muted-foreground/60 hidden sm:block whitespace-nowrap">
+                          {formatDate(chat.id)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback, useRef, Suspense, lazy } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Moon, Sun, PanelLeftOpen } from "lucide-react";
 import { Layers, BrainCircuit, Network } from "lucide-react";
@@ -11,13 +11,15 @@ import InputBox from "./components/InputBox";
 import { useChats, useChatHistory, useShareChat } from "./hooks/useChats";
 import { useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import ForgotPassword from "./pages/ForgotPassword";
-import SharedChat from "./pages/SharedChat";
-import ReleaseNotes from "./pages/ReleaseNotes";
 import ModelSelector from "./components/ModelSelector";
-import ChatsManager from "./components/ChatsManager";
+
+// Lazy Loaded Routes & Heavy Components
+const Login = lazy(() => import("./pages/Login"));
+const Signup = lazy(() => import("./pages/Signup"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const SharedChat = lazy(() => import("./pages/SharedChat"));
+const ReleaseNotes = lazy(() => import("./pages/ReleaseNotes"));
+const ChatsManager = lazy(() => import("./components/ChatsManager"));
 
 const API = import.meta.env.DEV
   ? "http://localhost:8000"
@@ -302,14 +304,16 @@ function ChatDashboard() {
         </header>
 
         {currentView === "chats" ? (
-          <ChatsManager 
-             chatsData={chatsData} 
-             onOpenChat={(id) => {
-               setActiveChatId(id);
-               setCurrentView("chat");
-               if (isMobile) setSidebarOpen(false);
-             }} 
-          />
+          <Suspense fallback={<div className="flex-1 flex items-center justify-center h-full"><div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin"></div></div>}>
+            <ChatsManager 
+               chatsData={chatsData} 
+               onOpenChat={(id) => {
+                 setActiveChatId(id);
+                 setCurrentView("chat");
+                 if (isMobile) setSidebarOpen(false);
+               }} 
+            />
+          </Suspense>
         ) : activeMessages.length === 0 && !isChatsLoading && (!isHistoryLoading || isNewChat) ? (
           <div className="flex-1 flex flex-col items-center justify-center px-4 w-full h-full relative z-10 pb-20">
             <h1 className="text-4xl md:text-[44px] font-semibold tracking-tight text-foreground mb-8 text-center">
@@ -408,18 +412,20 @@ export default function App() {
           className: 'border-l-4 border-l-primary bg-card text-foreground shadow-2xl !rounded-xl',
         }}
       />
-      <Routes>
-        <Route path="/share/:shareId" element={<SharedChat />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/releases" element={<ReleaseNotes />} />
-        <Route path="/" element={
-          <ProtectedRoute>
-            <ChatDashboard />
-          </ProtectedRoute>
-        } />
-      </Routes>
+      <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center mesh-bg"><div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin"></div></div>}>
+        <Routes>
+          <Route path="/share/:shareId" element={<SharedChat />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/releases" element={<ReleaseNotes />} />
+          <Route path="/" element={
+            <ProtectedRoute>
+              <ChatDashboard />
+            </ProtectedRoute>
+          } />
+        </Routes>
+      </Suspense>
     </>
   );
 }

@@ -17,11 +17,13 @@ from services.pdf import extract_text, get_pdf_metadata
 from services.rag import store_pdf, search, clear_session, get_stats
 from services.voice import transcribe_audio
 from services.youtube import get_youtube_recommendations
-from database import SessionLocal, Chat, get_db, User, ChatMetadata
+from database import SessionLocal, Chat, get_db, get_async_db, User, ChatMetadata
 from routers import auth
 from services.jwt_handler import verify_token
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func
 
 security = HTTPBearer()
 
@@ -254,11 +256,11 @@ CRITICAL INSTRUCTION: You must heavily synthesize and rely on the provided Conte
 # GET CHATS
 # ────────────────────────────────────────────────────
 @app.get("/chats")
-def get_chats(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+async def get_chats(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_async_db)):
     try:
-        from sqlalchemy import func
         # 1. Fetch metadata
-        metadata = db.query(ChatMetadata).filter(ChatMetadata.user_id == current_user.id).all()
+        result = await db.execute(select(ChatMetadata).filter(ChatMetadata.user_id == current_user.id))
+        metadata = result.scalars().all()
         metadata_map = {
             m.chat_id: {
                 "title": m.title, 
@@ -270,8 +272,9 @@ def get_chats(current_user: User = Depends(get_current_user), db: Session = Depe
         }
         
         # 2. Fetch ONLY the first message of each chat (for fallback titles) to save massive amounts of RAM
-        subquery = db.query(Chat.chat_id, func.min(Chat.id).label("min_id")).filter(Chat.user_id == current_user.id).group_by(Chat.chat_id).subquery()
-        first_messages = db.query(Chat).join(subquery, Chat.id == subquery.c.min_id).all()
+        subquery = select(Chat.chat_id, func.min(Chat.id).label("min_id")).filter(Chat.user_id == current_user.id).group_by(Chat.chat_id).subquery()
+        result = await db.execute(select(Chat).join(subquery, Chat.id == subquery.c.min_id))
+        first_messages = result.scalars().all()
         
         grouped: dict = {}
         for c in first_messages:
@@ -287,10 +290,11 @@ def get_chats(current_user: User = Depends(get_current_user), db: Session = Depe
 # GET CHAT MESSAGES
 # ────────────────────────────────────────────────────
 @app.get("/chat/{chat_id}/messages")
-def get_chat_messages(chat_id: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+async def get_chat_messages(chat_id: str, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_async_db)):
     full_chat_id = get_full_chat_id(current_user.id, chat_id)
     try:
-        chats = db.query(Chat).filter(Chat.chat_id == full_chat_id, Chat.user_id == current_user.id).order_by(Chat.id.asc()).all()
+        result = await db.execute(select(Chat).filter(Chat.chat_id == full_chat_id, Chat.user_id == current_user.id).order_by(Chat.id.asc()))
+        chats = result.scalars().all()
         messages = []
         for c in chats:
             messages.append({"role": "user", "content": c.message})

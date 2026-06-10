@@ -3,6 +3,7 @@ load_dotenv()
 
 from sqlalchemy import create_engine, Column, Integer, Text, DateTime, func, Boolean, ForeignKey, Index
 from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from datetime import datetime
 import os
 
@@ -15,18 +16,34 @@ if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 # ── FIXED: Railway free tier has limited RAM
-# pool_size=5 + max_overflow=10 = 15 connections = memory killer
-# Reduced to 2+3 which is plenty for a single-user app
+# pool_size=2 + max_overflow=3
 engine = create_engine(
     DATABASE_URL,
     pool_pre_ping=True,
-    pool_size=2,        # was 5 — overkill for Railway free tier
-    max_overflow=3,     # was 10 — was eating RAM
+    pool_size=2,        
+    max_overflow=3,     
     pool_recycle=300,
     pool_timeout=30,
 )
-
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# ── NEW: High Performance Async Engine for Scaling
+ASYNC_DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+
+# asyncpg does not support sslmode in the URL query string
+if "?sslmode=" in ASYNC_DATABASE_URL:
+    ASYNC_DATABASE_URL = ASYNC_DATABASE_URL.split("?")[0]
+
+async_engine = create_async_engine(
+    ASYNC_DATABASE_URL,
+    pool_pre_ping=True,
+    pool_size=5,
+    max_overflow=10,
+    pool_recycle=300,
+    connect_args={"ssl": "require"} if "neon.tech" in ASYNC_DATABASE_URL else {}
+)
+AsyncSessionLocal = async_sessionmaker(bind=async_engine, class_=AsyncSession, expire_on_commit=False)
+
 Base = declarative_base()
 
 
@@ -94,6 +111,10 @@ def get_db():
         yield db
     finally:
         db.close()
+
+async def get_async_db():
+    async with AsyncSessionLocal() as session:
+        yield session
 
 
 def get_chat_count(db, chat_id: str) -> int:
