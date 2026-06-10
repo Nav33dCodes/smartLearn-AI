@@ -48,7 +48,7 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
             <div key={index} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               {msg.role === 'user' ? (
                 <div className="flex flex-col items-end max-w-[80%] sm:max-w-[70%] group">
-                  <div className="bg-muted text-foreground px-5 py-3 rounded-3xl rounded-tr-sm leading-relaxed whitespace-pre-wrap text-[15px]">
+                  <div className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-md px-5 py-3 rounded-3xl rounded-tr-sm leading-relaxed whitespace-pre-wrap text-[15px]">
                     {msg.content}
                   </div>
                   <div className="flex items-center mt-1 opacity-0 group-hover:opacity-100 transition-opacity pr-2">
@@ -66,20 +66,28 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
                   </div>
                 </div>
               ) : (
-                <div className="flex gap-4 max-w-[95%] sm:max-w-[85%] w-full group">
-                  <div className="w-8 h-8 rounded-md bg-card border border-border flex items-center justify-center shrink-0 shadow-sm mt-1">
-                    <Logo size={18} />
+                <div className="flex flex-col items-start w-full group">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
+                      <Logo size={18} />
+                    </div>
+                    <span className="text-sm font-semibold text-foreground/80">SmartLearn AI</span>
                   </div>
-                  <div className="flex-1 min-w-0 flex flex-col gap-2">
+                  <div className="bg-card/50 backdrop-blur-md border border-border/50 shadow-sm rounded-3xl rounded-tl-sm px-6 py-5 w-full max-w-[95%] sm:max-w-[85%]">
                     <AIMessage content={msg.content} />
+                  </div>
+                  <div className="flex items-center mt-2 opacity-0 group-hover:opacity-100 transition-opacity pl-2">
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(msg.content);
+                        import("sonner").then(m => m.toast.success("Copied to clipboard"));
+                      }}
+                      className="p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground rounded-md transition-colors"
+                      title="Copy"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                    </button>
                     
-                    {/* YouTube Recommendations removed from inline, moved to side panel */}
-
-                    {/* Action Bar */}
-                    <div className="flex items-center gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => {
-                          navigator.clipboard.writeText(msg.content);
                           import("sonner").then(m => m.toast.success("Copied to clipboard"));
                         }}
                         className="p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground rounded-md transition-colors"
