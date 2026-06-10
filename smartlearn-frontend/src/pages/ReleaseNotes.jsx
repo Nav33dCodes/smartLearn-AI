@@ -2,6 +2,33 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 10, 2026 (Part 5)",
+    features: [
+      {
+        title: "✨ Premium Architecture & Shimmering UX",
+        description: "Implemented high-end UX transitions and robust layout fixes to ensure a flawless experience.",
+        bullets: [
+          "Chat History Skeleton Loaders: Replaced the jarring layout shift when loading old chats with a beautiful, shimmering skeleton loader effect that perfectly traces the shape of your messages while data is fetched.",
+          "React Portal Overlays: The Settings modal was entirely decoupled from the main DOM and injected via a React Portal with max-level z-indexing, guaranteeing it perfectly covers the background without clipping.",
+          "ChatGPT Typography Sync: Re-aligned the global font stack to strictly mirror ChatGPT's premium reading experience using Söhne and optimized line heights."
+        ]
+      },
+      {
+        title: "📚 Inline Sources Carousel",
+        description: "Dramatically improved how educational video sources are presented.",
+        bullets: [
+          "Inline Architecture: Abandoned the intrusive right-hand slide-over panel. Sources now expand smoothly directly beneath the AI's message, keeping your eyes perfectly focused on the chat stream.",
+          "Sleek Horizontal Carousel: Redesigned the video cards into a horizontally scrollable row, ensuring large, beautiful thumbnails without overflowing the text or crashing the layout.",
+          "Bulletproof Proxy Network: Integrated a global edge image proxy (wsrv.nl) to natively fetch YouTube thumbnails, completely neutralizing broken images caused by strict ad-blockers, CORS limits, or ISP firewalls."
+        ]
+      }
+    ],
+    fixes: [
+      "Fixed Settings modal clipping issue by restructuring CSS constraints.",
+      "Fixed thumbnail display bugs and implemented a smart retry fallback mechanism."
+    ]
+  },
+  {
     date: "June 10, 2026 (Part 4)",
     features: [
       {
