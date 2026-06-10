@@ -153,6 +153,7 @@ def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL) -> Generator
                 token = chunk.choices[0].delta.content
                 if token:
                     yield token
+                    time.sleep(0.015) # Artificial delay for smooth ChatGPT typing feel
         return  # success
 
     except Exception as e:

@@ -187,6 +187,10 @@ function ChatDashboard() {
                 setActiveMessages(prev => {
                   const updated = [...prev];
                   const lastIdx = updated.length - 1;
+                  if (lastIdx < 0) {
+                    updated.push({ role: "assistant", content: "", sources: parsed.urls, timestamp: Date.now() });
+                    return updated;
+                  }
                   if (updated[lastIdx].role === "assistant") {
                      updated[lastIdx] = { ...updated[lastIdx], sources: parsed.urls };
                   } else {
@@ -205,11 +209,16 @@ function ChatDashboard() {
               setActiveMessages(prev => {
                 const updated = [...prev];
                 const now = Date.now();
-                if (updated[updated.length - 1].role === "user") {
+                if (updated.length === 0) {
+                  updated.push({ role: "assistant", content: accumulated, timestamp: now });
+                  return updated;
+                }
+                const lastIdx = updated.length - 1;
+                if (updated[lastIdx].role === "user") {
                   updated.push({ role: "assistant", content: accumulated, timestamp: now });
                 } else {
-                  const existingMsg = updated[updated.length - 1];
-                  updated[updated.length - 1] = { ...existingMsg, role: "assistant", content: accumulated, timestamp: existingMsg.timestamp || now };
+                  const existingMsg = updated[lastIdx];
+                  updated[lastIdx] = { ...existingMsg, role: "assistant", content: accumulated, timestamp: existingMsg.timestamp || now };
                 }
                 return updated;
               });
@@ -221,6 +230,10 @@ function ChatDashboard() {
       if (err.name !== "AbortError") {
         setActiveMessages(prev => {
           const updated = [...prev];
+          if (updated.length === 0) {
+            updated.push({ role: "assistant", content: "⚠️ An error occurred. Please try again." });
+            return updated;
+          }
           if (updated[updated.length - 1].role === "user") {
             updated.push({ role: "assistant", content: "⚠️ An error occurred. Please try again." });
           } else {

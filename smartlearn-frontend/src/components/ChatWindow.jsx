@@ -25,21 +25,21 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
   const { user } = useAuth();
   const messagesEndRef = useRef(null);
   const [openSources, setOpenSources] = useState({});
-  const lastScrollTime = useRef(0);
+  const scrollContainerRef = useRef(null);
 
   useEffect(() => {
-    const now = Date.now();
-    if (loading) {
-      // Throttle instant scrolling during generation to at most once every 100ms
-      // to prevent synchronous layout thrashing from freezing the browser.
-      if (now - lastScrollTime.current > 100) {
-        messagesEndRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
-        lastScrollTime.current = now;
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 150;
+      
+      // If we are generating and near the bottom, pin the scroll to the bottom smoothly
+      if (loading && isNearBottom) {
+        container.scrollTop = scrollHeight;
+      } else if (!loading && messages[messages.length - 1]?.role === "user") {
+        // Smooth scroll for new user messages
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
       }
-    } else {
-      // Smooth scroll for new user messages
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-      lastScrollTime.current = now;
     }
   }, [messages, loading]);
   if ((isChatsLoading || isHistoryLoading) && messages.length === 0) {
@@ -78,7 +78,7 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
   }
 
   return (
-    <div className="flex-1 overflow-y-auto pt-14 pb-40 px-4 sm:px-6 md:px-8">
+    <div ref={scrollContainerRef} className="flex-1 overflow-y-auto pt-14 pb-40 px-4 sm:px-6 md:px-8">
       <div className="max-w-3xl mx-auto flex flex-col gap-12 py-10">
         {messages.map((msg, index) => {
           const isLast = index === messages.length - 1;
