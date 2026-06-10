@@ -19,7 +19,14 @@ export default function QuizBlock({ data }) {
   const [isFinished, setIsFinished] = useState(false);
 
   if (!questions || questions.length === 0) {
-    return <div className="text-destructive p-4 border border-destructive/20 bg-destructive/10 rounded-xl my-4">Invalid quiz data.</div>;
+    return (
+      <div className="my-6 border border-border rounded-2xl bg-card shadow-sm overflow-hidden p-6 flex flex-col items-center justify-center min-h-[300px]">
+        <div className="animate-pulse flex flex-col items-center gap-3 text-muted-foreground">
+          <BrainCircuit className="animate-pulse" size={24} /> 
+          <span className="text-sm font-medium">Generating Quiz...</span>
+        </div>
+      </div>
+    );
   }
 
   const currentQ = questions[currentIndex];

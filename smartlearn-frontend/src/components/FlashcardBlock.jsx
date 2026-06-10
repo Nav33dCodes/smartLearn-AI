@@ -16,7 +16,14 @@ export default function FlashcardBlock({ data }) {
   const [isFlipped, setIsFlipped] = useState(false);
 
   if (!cards || cards.length === 0) {
-    return <div className="text-destructive p-4 border border-destructive/20 bg-destructive/10 rounded-xl my-4">Invalid flashcard data.</div>;
+    return (
+      <div className="my-6 border border-border rounded-2xl bg-card shadow-sm overflow-hidden p-6 flex flex-col items-center justify-center min-h-[300px]">
+        <div className="animate-pulse flex flex-col items-center gap-3 text-muted-foreground">
+          <Layers className="animate-spin-slow" size={24} /> 
+          <span className="text-sm font-medium">Generating Flashcards...</span>
+        </div>
+      </div>
+    );
   }
 
   const handleNext = () => {
