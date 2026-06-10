@@ -83,7 +83,7 @@ function ChatDashboard() {
     }
   }, [activeChatId, historyData]);
 
-  const sendMessage = async (overrideText = null, searchWeb = false) => {
+  const sendMessage = async (overrideText = null, searchWeb = "auto") => {
     const textToSend = overrideText ?? input;
     if (!textToSend.trim() || loading) return;
 

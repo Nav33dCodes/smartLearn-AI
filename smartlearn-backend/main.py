@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from sqlalchemy import text
 import asyncio
 
-from services.llm import stream_llm_response, search_tavily
+from services.llm import stream_llm_response, search_tavily, needs_web_search, generate_chat_title
 from services.pdf import extract_text, get_pdf_metadata
 from services.rag import store_pdf, search, clear_session, get_stats
 from services.voice import transcribe_audio
@@ -106,7 +106,7 @@ async def startup_event():
 class ChatRequest(BaseModel):
     message: str
     chat_id: str = "default"
-    search_web: bool = False
+    search_web: str = "auto"
 
 class RenameRequest(BaseModel):
     title: str
@@ -181,7 +181,18 @@ async def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_use
         logger.error(f"❌ RAG search error: {e}")
         context = ""
 
-    if data.search_web:
+    should_search = False
+    if data.search_web == "on":
+        should_search = True
+    elif data.search_web == "auto":
+        print(f"🤖 Auto-evaluating if Web Search is needed for: {message}")
+        should_search = needs_web_search(message)
+        if should_search:
+            print("✅ Classifier determined Web Search is needed.")
+        else:
+            print("❌ Classifier determined Web Search is NOT needed.")
+
+    if should_search:
         print(f"🌐 Performing Web Search via Tavily for: {message}")
         web_context = search_tavily(message)
         if web_context:

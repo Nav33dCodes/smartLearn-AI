@@ -12,7 +12,7 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
   const [attachedFiles, setAttachedFiles] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [searchWeb, setSearchWeb] = useState(false);
+  const [searchWeb, setSearchWeb] = useState("auto"); // "auto", "on", "off"
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
@@ -247,9 +247,17 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
                 type="button"
                 variant="ghost"
                 size="icon"
-                className={`h-8 w-8 rounded-lg transition-colors ${searchWeb ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:bg-muted'}`}
-                onClick={() => setSearchWeb(!searchWeb)}
-                title="Toggle Web Search"
+                className={`h-8 w-8 rounded-lg transition-colors ${
+                  searchWeb === "on" ? 'text-primary bg-primary/10' : 
+                  searchWeb === "auto" ? 'text-blue-500 bg-blue-500/10' : 
+                  'text-muted-foreground hover:bg-muted'
+                }`}
+                onClick={() => {
+                  if (searchWeb === "auto") setSearchWeb("on");
+                  else if (searchWeb === "on") setSearchWeb("off");
+                  else setSearchWeb("auto");
+                }}
+                title={`Web Search: ${searchWeb.toUpperCase()}`}
               >
                 <Globe size={18} />
               </Button>

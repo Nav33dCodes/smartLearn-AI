@@ -61,6 +61,24 @@ def search_tavily(query: str) -> str:
         print(f"Tavily search failed: {e}")
         return ""
 
+def needs_web_search(query: str) -> bool:
+    """Uses a fast LLM to determine if the query requires live web search."""
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": "You are a classifier. Does the user's query require up-to-date, real-time, recent news, or live web knowledge to answer accurately? Respond with exactly 'YES' or 'NO'."},
+                {"role": "user", "content": query}
+            ],
+            temperature=0,
+            max_tokens=10,
+        )
+        answer = response.choices[0].message.content.strip().upper()
+        return "YES" in answer
+    except Exception as e:
+        print(f"Classification failed: {e}")
+        return False
+
 # ────────────────────────────────────────────────────
 # STREAMING  (primary — used by /chat endpoint)
 # ────────────────────────────────────────────────────
