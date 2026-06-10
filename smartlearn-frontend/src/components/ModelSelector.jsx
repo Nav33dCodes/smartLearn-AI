@@ -112,6 +112,7 @@ export default function ModelSelector({ selectedModelId, onModelSelect }) {
               );
             })}
           </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>
