@@ -4,6 +4,9 @@ import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Copy, Check, WrapText, Volume2, Square, Download } from "lucide-react";
+import QuizBlock from "./QuizBlock";
+import FlashcardBlock from "./FlashcardBlock";
+import MermaidBlock from "./MermaidBlock";
 
 // ── Copy Button ──
 function CopyButton({ text }) {
@@ -182,6 +185,16 @@ function AIMessage({ content }) {
             const codeText = String(children).replace(/\n$/, "");
 
             if (!inline && match) {
+              const lang = match[1].toLowerCase();
+              if (lang === "quiz") {
+                return <QuizBlock data={codeText} />;
+              }
+              if (lang === "flashcard" || lang === "flashcards") {
+                return <FlashcardBlock data={codeText} />;
+              }
+              if (lang === "mermaid") {
+                return <MermaidBlock data={codeText} />;
+              }
               return <CodeBlock language={match[1]} codeText={codeText} />;
             }
 
