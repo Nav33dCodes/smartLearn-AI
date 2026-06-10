@@ -38,6 +38,7 @@ function ChatDashboard() {
   const [activeMessages, setActiveMessages] = useState([]);
   
   const [currentView, setCurrentView] = useState("chat"); // "chat" | "chats"
+  const loadedChatIdRef = useRef(null);
   
   const isNewChat = activeChatId ? !chatsData.some(c => String(c.id) === String(activeChatId)) : true;
   
@@ -89,6 +90,7 @@ function ChatDashboard() {
   const createNewChat = useCallback(() => {
     const newId = Date.now().toString();
     setActiveChatId(newId);
+    loadedChatIdRef.current = newId;
     setActiveMessages([]);
     setCurrentView("chat");
     if (isMobile) setSidebarOpen(false);
@@ -105,10 +107,13 @@ function ChatDashboard() {
     }
   }, [isChatsLoading, hasInitialized, createNewChat]);
 
-  // When activeChatId changes, load its dynamic history
+  // When activeChatId changes, load its dynamic history ONLY ONCE
   useEffect(() => {
-    if (activeChatId) {
-      setActiveMessages(historyData?.messages || []);
+    if (activeChatId && historyData?.messages) {
+      if (loadedChatIdRef.current !== activeChatId) {
+        setActiveMessages(historyData.messages);
+        loadedChatIdRef.current = activeChatId;
+      }
     }
   }, [activeChatId, historyData]);
 
