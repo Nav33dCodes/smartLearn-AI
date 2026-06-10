@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
-import { Paperclip, ArrowUp, Square, Loader2, FileText, X, Mic, Globe } from "lucide-react";
+import { Paperclip, ArrowUp, Square, Loader2, FileText, X, Mic, Globe, Check } from "lucide-react";
 import api from '../lib/axios';
 import { Button } from "./ui/button";
 import { useUploadPdf } from "../hooks/useChats";
@@ -13,8 +13,20 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
   const [isDragging, setIsDragging] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [searchWeb, setSearchWeb] = useState("auto"); // "auto", "on", "off"
+  const [showSearchMenu, setShowSearchMenu] = useState(false);
+  const searchMenuRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchMenuRef.current && !searchMenuRef.current.contains(event.target)) {
+        setShowSearchMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const startRecording = async () => {
     try {
@@ -243,24 +255,75 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
               >
                 <Paperclip size={18} />
               </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className={`h-8 w-8 rounded-lg transition-colors ${
-                  searchWeb === "on" ? 'text-primary bg-primary/10' : 
-                  searchWeb === "auto" ? 'text-blue-500 bg-blue-500/10' : 
-                  'text-muted-foreground hover:bg-muted'
-                }`}
-                onClick={() => {
-                  if (searchWeb === "auto") setSearchWeb("on");
-                  else if (searchWeb === "on") setSearchWeb("off");
-                  else setSearchWeb("auto");
-                }}
-                title={`Web Search: ${searchWeb.toUpperCase()}`}
-              >
-                <Globe size={18} />
-              </Button>
+              
+              <div className="relative" ref={searchMenuRef}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className={`h-8 w-8 rounded-lg transition-colors ${
+                    searchWeb === "on" ? 'text-primary bg-primary/10' : 
+                    searchWeb === "auto" ? 'text-blue-500 bg-blue-500/10' : 
+                    'text-muted-foreground hover:bg-muted'
+                  }`}
+                  onClick={() => setShowSearchMenu(!showSearchMenu)}
+                  title="Web Search Settings"
+                >
+                  <Globe size={18} />
+                </Button>
+
+                <AnimatePresence>
+                  {showSearchMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute bottom-full left-0 mb-2 w-44 bg-card border border-border shadow-lg rounded-xl overflow-hidden z-50 flex flex-col"
+                    >
+                      <div className="px-3 py-2 text-xs font-semibold text-muted-foreground border-b border-border bg-muted/30">
+                        Web Search
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => { setSearchWeb("auto"); setShowSearchMenu(false); }}
+                        className={`flex items-center gap-2.5 px-3 py-2.5 text-sm hover:bg-muted transition-colors ${searchWeb === "auto" ? "text-blue-500 font-medium" : "text-foreground"}`}
+                      >
+                        <Globe size={14} className={searchWeb === "auto" ? "text-blue-500" : "text-muted-foreground"} /> 
+                        <div className="flex flex-col items-start">
+                          <span>Auto</span>
+                          <span className="text-[10px] text-muted-foreground font-normal leading-tight">Searches when needed</span>
+                        </div>
+                        {searchWeb === "auto" && <Check size={14} className="ml-auto" />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setSearchWeb("on"); setShowSearchMenu(false); }}
+                        className={`flex items-center gap-2.5 px-3 py-2.5 text-sm hover:bg-muted transition-colors ${searchWeb === "on" ? "text-primary font-medium" : "text-foreground"}`}
+                      >
+                        <Globe size={14} className={searchWeb === "on" ? "text-primary" : "text-muted-foreground"} /> 
+                        <div className="flex flex-col items-start">
+                          <span>Always On</span>
+                          <span className="text-[10px] text-muted-foreground font-normal leading-tight">Forces web search</span>
+                        </div>
+                        {searchWeb === "on" && <Check size={14} className="ml-auto" />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setSearchWeb("off"); setShowSearchMenu(false); }}
+                        className={`flex items-center gap-2.5 px-3 py-2.5 text-sm hover:bg-muted transition-colors ${searchWeb === "off" ? "text-muted-foreground font-medium" : "text-foreground"}`}
+                      >
+                        <X size={14} className="text-muted-foreground" /> 
+                        <div className="flex flex-col items-start">
+                          <span>Disabled</span>
+                          <span className="text-[10px] text-muted-foreground font-normal leading-tight">Uses only AI knowledge</span>
+                        </div>
+                        {searchWeb === "off" && <Check size={14} className="ml-auto" />}
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
             
             <div className="flex items-center gap-1.5">
