@@ -137,6 +137,85 @@ function InlineCopyCode({ children }) {
   );
 }
 
+// ── Static Renderers Map ──
+const markdownRenderers = {
+  code({ inline, className, children, ...props }) {
+    const match = /language-(\w+)/.exec(className || "");
+    const codeText = String(children).replace(/\n$/, "");
+
+    if (!inline && match) {
+      const lang = match[1].toLowerCase();
+      if (lang === "quiz") {
+        return <QuizBlock data={codeText} />;
+      }
+      if (lang === "flashcard" || lang === "flashcards") {
+        return <FlashcardBlock data={codeText} />;
+      }
+      if (lang === "mermaid") {
+        return <MermaidBlock data={codeText} />;
+      }
+      return <CodeBlock language={match[1]} codeText={codeText} />;
+    }
+
+    if (!inline && !match) {
+      return (
+        <div className="code-block-wrapper">
+          <div className="code-block-header">
+            <span className="code-lang">code</span>
+            <CopyButton text={codeText} />
+          </div>
+          <pre style={{
+            margin: 0,
+            padding: "1rem",
+            fontSize: "0.83rem",
+            overflowX: "auto",
+            background: "#0d0d0d",
+            color: "#d4d4d4",
+            lineHeight: 1.65,
+            borderRadius: "0 0 14px 14px",
+            fontFamily: "'JetBrains Mono', monospace",
+          }}>
+            <code {...props}>{codeText}</code>
+          </pre>
+        </div>
+      );
+    }
+
+    return <InlineCopyCode {...props}>{children}</InlineCopyCode>;
+  },
+  p: ({ children }) => <p className="leading-7 [&:not(:first-child)]:mt-5 text-foreground">{children}</p>,
+  ul: ({ children }) => <ul className="my-5 ml-6 list-disc marker:text-muted-foreground [&>li]:mt-2">{children}</ul>,
+  ol: ({ children }) => <ol className="my-5 ml-6 list-decimal marker:text-muted-foreground [&>li]:mt-2">{children}</ol>,
+  li: ({ children }) => <li className="text-foreground">{children}</li>,
+  h1: ({ children }) => <h1 className="scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-4xl mt-8 mb-4">{children}</h1>,
+  h2: ({ children }) => <h2 className="scroll-m-20 border-b border-border pb-2 text-2xl font-semibold tracking-tight transition-colors mt-8 mb-4">{children}</h2>,
+  h3: ({ children }) => <h3 className="scroll-m-20 text-xl font-semibold tracking-tight mt-6 mb-3">{children}</h3>,
+  blockquote: ({ children }) => (
+    <blockquote className="mt-6 border-l-2 border-primary pl-6 italic text-muted-foreground bg-muted/30 py-1 pr-4 rounded-r-lg">{children}</blockquote>
+  ),
+  hr: () => <hr className="my-8 border-border" />,
+  table: ({ children }) => (
+    <div className="my-6 w-full max-w-[100%] overflow-x-auto rounded-lg border border-border shadow-sm bg-card">
+      <table className="w-full text-left text-[15px] border-collapse">{children}</table>
+    </div>
+  ),
+  thead: ({ children }) => <thead className="bg-muted text-muted-foreground border-b border-border">{children}</thead>,
+  tbody: ({ children }) => <tbody className="divide-y divide-border">{children}</tbody>,
+  tr: ({ children }) => <tr className="transition-colors hover:bg-muted/30">{children}</tr>,
+  th: ({ children }) => <th className="px-4 py-3 font-semibold text-foreground border-r border-border last:border-r-0 whitespace-nowrap">{children}</th>,
+  td: ({ children }) => <td className="px-4 py-3 align-top leading-relaxed border-r border-border last:border-r-0 break-words min-w-[120px]">{children}</td>,
+  a: ({ children, href }) => (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="font-medium text-primary underline underline-offset-4 hover:text-primary/80 transition-colors">
+      {children}
+    </a>
+  ),
+  img: ({ src, alt }) => (
+    <img src={src} alt={alt} className="rounded-lg border border-border shadow-sm max-w-full my-4" />
+  ),
+  strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+  em: ({ children }) => <em className="italic text-foreground/90">{children}</em>,
+};
+
 // ── Main ──
 function AIMessage({ content }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -179,100 +258,7 @@ function AIMessage({ content }) {
     <div className="group relative">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        components={{
-          code({ inline, className, children, ...props }) {
-            const match = /language-(\w+)/.exec(className || "");
-            const codeText = String(children).replace(/\n$/, "");
-
-            if (!inline && match) {
-              const lang = match[1].toLowerCase();
-              if (lang === "quiz") {
-                return <QuizBlock data={codeText} />;
-              }
-              if (lang === "flashcard" || lang === "flashcards") {
-                return <FlashcardBlock data={codeText} />;
-              }
-              if (lang === "mermaid") {
-                return <MermaidBlock data={codeText} />;
-              }
-              return <CodeBlock language={match[1]} codeText={codeText} />;
-            }
-
-            if (!inline && !match) {
-              return (
-                <div className="code-block-wrapper">
-                  <div className="code-block-header">
-                    <span className="code-lang">code</span>
-                    <CopyButton text={codeText} />
-                  </div>
-                  <pre style={{
-                    margin: 0,
-                    padding: "1rem",
-                    fontSize: "0.83rem",
-                    overflowX: "auto",
-                    background: "#0d0d0d",
-                    color: "#d4d4d4",
-                    lineHeight: 1.65,
-                    borderRadius: "0 0 14px 14px",
-                    fontFamily: "'JetBrains Mono', monospace",
-                  }}>
-                    <code {...props}>{codeText}</code>
-                  </pre>
-                </div>
-              );
-            }
-
-            return <InlineCopyCode {...props}>{children}</InlineCopyCode>;
-          },
-
-          p: ({ children }) => <p className="leading-7 [&:not(:first-child)]:mt-5 text-foreground">{children}</p>,
-          ul: ({ children }) => <ul className="my-5 ml-6 list-disc marker:text-muted-foreground [&>li]:mt-2">{children}</ul>,
-          ol: ({ children }) => <ol className="my-5 ml-6 list-decimal marker:text-muted-foreground [&>li]:mt-2">{children}</ol>,
-          li: ({ children }) => <li className="text-foreground">{children}</li>,
-
-          h1: ({ children }) => <h1 className="scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-4xl mt-8 mb-4">{children}</h1>,
-          h2: ({ children }) => <h2 className="scroll-m-20 border-b border-border pb-2 text-2xl font-semibold tracking-tight transition-colors mt-8 mb-4">{children}</h2>,
-          h3: ({ children }) => <h3 className="scroll-m-20 text-xl font-semibold tracking-tight mt-6 mb-3">{children}</h3>,
-
-          blockquote: ({ children }) => (
-            <blockquote className="mt-6 border-l-2 border-primary pl-6 italic text-muted-foreground bg-muted/30 py-1 pr-4 rounded-r-lg">{children}</blockquote>
-          ),
-
-          hr: () => <hr className="my-8 border-border" />,
-
-          table: ({ children }) => (
-            <div className="my-6 w-full max-w-[100%] overflow-x-auto rounded-lg border border-border shadow-sm bg-card">
-              <table className="w-full text-left text-[15px] border-collapse">{children}</table>
-            </div>
-          ),
-          thead: ({ children }) => <thead className="bg-muted text-muted-foreground border-b border-border">{children}</thead>,
-          tbody: ({ children }) => <tbody className="divide-y divide-border">{children}</tbody>,
-          tr: ({ children }) => <tr className="transition-colors hover:bg-muted/30">{children}</tr>,
-          th: ({ children }) => <th className="px-4 py-3 font-semibold text-foreground border-r border-border last:border-r-0 whitespace-nowrap">{children}</th>,
-          td: ({ children }) => <td className="px-4 py-3 align-top leading-relaxed border-r border-border last:border-r-0 break-words min-w-[120px]">{children}</td>,
-
-          a: ({ children, href }) => (
-            <a href={href} target="_blank" rel="noopener noreferrer" className="font-medium text-primary underline underline-offset-4 hover:text-primary/80 transition-colors">
-              {children}
-            </a>
-          ),
-
-          img: ({ src, alt }) => (
-            <img
-              src={src}
-              alt={alt}
-              className="rounded-lg border border-border shadow-sm max-w-full my-4"
-            />
-          ),
-
-          strong: ({ children }) => (
-            <strong className="font-semibold text-foreground">{children}</strong>
-          ),
-
-          em: ({ children }) => (
-            <em className="italic text-foreground/90">{children}</em>
-          ),
-        }}
+        components={markdownRenderers}
       >
         {content}
       </ReactMarkdown>
