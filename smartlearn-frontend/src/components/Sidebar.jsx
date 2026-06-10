@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { Plus, Trash2, MessageSquare, Search, PanelLeftClose, LogOut, Edit2, Pin, PinOff, Archive, MoreHorizontal, Sparkles, Settings, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useChats, useDeleteChat, useRenameChat, usePinChat, useArchiveChat } from "../hooks/useChats";
@@ -9,7 +9,7 @@ import { Button } from "./ui/button";
 import SettingsModal from "./SettingsModal";
 import { Link } from "react-router-dom";
 
-export default function Sidebar({
+function Sidebar({
   activeChatId, setActiveChatId, sidebarOpen, setSidebarOpen, createNewChat, isMobile, darkMode, setDarkMode, themeColor, setThemeColor
 }) {
   const { data: chatsData = [] } = useChats();
@@ -63,7 +63,8 @@ export default function Sidebar({
   }, [chatsData, searchQuery]);
 
   const pinnedChats = useMemo(() => filteredChats.filter(c => c.is_pinned), [filteredChats]);
-  const unpinnedChats = useMemo(() => filteredChats.filter(c => !c.is_pinned), [filteredChats]);
+  // Slice to max 100 chats to prevent DOM crash (Lightweight Virtualization)
+  const unpinnedChats = useMemo(() => filteredChats.filter(c => !c.is_pinned).slice(0, 100), [filteredChats]);
 
   const handleSelectChat = (id) => {
     setActiveChatId(id);
@@ -375,3 +376,5 @@ export default function Sidebar({
     </>
   );
 }
+
+export default memo(Sidebar);
