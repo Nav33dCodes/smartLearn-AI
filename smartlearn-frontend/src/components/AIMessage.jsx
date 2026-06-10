@@ -196,7 +196,7 @@ function AIMessage({ content }) {
 
           table: ({ children }) => (
             <div className="my-6 w-full max-w-[100%] overflow-x-auto rounded-lg border border-border shadow-sm bg-card">
-              <table className="w-full text-left text-sm border-collapse">{children}</table>
+              <table className="w-full text-left text-[15px] border-collapse">{children}</table>
             </div>
           ),
           thead: ({ children }) => <thead className="bg-muted text-muted-foreground border-b border-border">{children}</thead>,
