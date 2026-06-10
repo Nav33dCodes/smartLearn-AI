@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import { Plus, Trash2, MessageSquare, Search, PanelLeftClose, LogOut, Edit2, Pin, PinOff, Archive, MoreHorizontal } from "lucide-react";
+import { Plus, Trash2, MessageSquare, Search, PanelLeftClose, LogOut, Edit2, Pin, PinOff, Archive, MoreHorizontal, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useChats, useDeleteChat, useRenameChat, usePinChat, useArchiveChat } from "../hooks/useChats";
 import { useAuth } from "../context/AuthContext";
@@ -7,6 +7,7 @@ import Logo from "./Logo";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import SettingsModal from "./SettingsModal";
+import { Link } from "react-router-dom";
 
 export default function Sidebar({
   activeChatId, setActiveChatId, sidebarOpen, setSidebarOpen, createNewChat, isMobile, darkMode, setDarkMode, themeColor, setThemeColor
@@ -267,8 +268,17 @@ export default function Sidebar({
           {renderChatList(unpinnedChats, searchQuery ? `Results (${unpinnedChats.length})` : "Recent")}
         </div>
 
-        {user && (
-          <div className="p-3 mt-auto">
+        <div className="mt-auto flex flex-col">
+          <Link to="/releases" className="mx-3 mt-1 mb-2 flex items-center gap-2.5 p-2 rounded-xl text-[14px] font-medium text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors border border-transparent">
+            <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+              <Sparkles size={16} />
+            </div>
+            <span>Release Notes</span>
+            <span className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-primary text-primary-foreground">NEW</span>
+          </Link>
+
+          {user && (
+            <div className="p-3 border-t border-border/50">
             <div 
               onClick={() => setIsSettingsOpen(true)}
               className="flex items-center justify-between p-2 rounded-xl cursor-pointer hover:bg-muted/60 transition-colors border border-transparent hover:border-border/50"
@@ -289,6 +299,7 @@ export default function Sidebar({
             </div>
           </div>
         )}
+        </div>
       </motion.aside>
 
       <SettingsModal 

@@ -14,6 +14,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import SharedChat from "./pages/SharedChat";
+import ReleaseNotes from "./pages/ReleaseNotes";
 
 const API = import.meta.env.DEV
   ? "http://localhost:8000"
@@ -316,6 +317,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/releases" element={<ReleaseNotes />} />
         <Route path="/" element={
           <ProtectedRoute>
             <ChatDashboard />
