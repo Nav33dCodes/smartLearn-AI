@@ -247,7 +247,7 @@ function ChatDashboard() {
       />
 
       <main className="flex-1 flex flex-col relative min-w-0 transition-all duration-300">
-        <header className="absolute top-0 left-0 right-0 h-14 px-4 flex items-center justify-between z-10 bg-background/80 backdrop-blur-md border-b">
+        <header className="absolute top-0 left-0 right-0 h-14 px-4 flex items-center justify-between z-40 bg-background/80 backdrop-blur-md border-b">
           <div className="flex items-center gap-2">
             {(!sidebarOpen || isMobile) && (
               <button 
