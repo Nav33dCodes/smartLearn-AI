@@ -8,35 +8,35 @@ export const MODELS = [
     name: "Llama 3 (Free)",
     provider: "Meta",
     icon: Zap,
-    description: "High speed, zero cost. Great for basic questions."
+    description: "Lightning fast. Great for basic questions."
   },
   {
-    id: "meta-llama/llama-3-70b-instruct",
-    name: "Llama 3 70B",
-    provider: "Meta",
-    icon: Sparkles,
-    description: "Open-source powerhouse for comprehensive answers."
+    id: "google/gemma-2-9b-it:free",
+    name: "Gemma 2 (Free)",
+    provider: "Google",
+    icon: Brain,
+    description: "Incredibly smart, high-thinking open model."
   },
   {
     id: "openai/gpt-4o",
-    name: "GPT-4o",
+    name: "GPT-4o (Pro)",
     provider: "OpenAI",
     icon: Rocket,
-    description: "Flagship reasoning and speed from OpenAI."
+    description: "Flagship speed and reasoning. Requires credits."
   },
   {
     id: "anthropic/claude-3.5-sonnet",
-    name: "Claude 3.5 Sonnet",
+    name: "Claude 3.5 Sonnet (Pro)",
     provider: "Anthropic",
     icon: Brain,
-    description: "Unmatched performance in coding and complex logic."
+    description: "Unmatched for coding/logic. Requires credits."
   },
   {
     id: "x-ai/grok-2",
-    name: "Grok 2",
+    name: "Grok 2 (Pro)",
     provider: "xAI",
-    icon: Rocket,
-    description: "xAI's powerful, unfiltered reasoning engine."
+    icon: Sparkles,
+    description: "Unfiltered, advanced reasoning. Requires credits."
   }
 ];
 
