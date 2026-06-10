@@ -39,27 +39,27 @@
 }
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --card: rgba(255, 255, 255, 0.7);
-  --card-foreground: #0f172a;
-  --popover: rgba(255, 255, 255, 0.8);
-  --popover-foreground: #0f172a;
-  --primary: #6366f1;
+  --background: #f7f7f8;
+  --foreground: #1f2023;
+  --card: rgba(252, 252, 253, 0.85);
+  --card-foreground: #1f2023;
+  --popover: #fcfcfd;
+  --popover-foreground: #1f2023;
+  --primary: #2d2e32; 
   --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --accent: #e0e7ff;
-  --accent-foreground: #4f46e5;
+  --secondary: #f0f0f2;
+  --secondary-foreground: #1f2023;
+  --muted: #f0f0f2;
+  --muted-foreground: #6b6d76;
+  --accent: #e8e8eb;
+  --accent-foreground: #1f2023;
   --destructive: #ef4444;
-  --destructive-foreground: #fafafa;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #6366f1;
+  --destructive-foreground: #ffffff;
+  --border: #e8e8eb;
+  --input: #e8e8eb;
+  --ring: #d3d4d8;
   --radius: 1rem;
-  --sidebar: #ffffff;
+  --sidebar: #f0f0f2;
 }
 
 .dark {
