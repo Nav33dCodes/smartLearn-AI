@@ -4,6 +4,7 @@ import { Network, Maximize2, Download } from 'lucide-react';
 
 mermaid.initialize({
   startOnLoad: false,
+  suppressErrorRendering: true,
   theme: 'base',
   themeVariables: {
     fontFamily: 'Inter, sans-serif',
@@ -57,10 +58,13 @@ export default function MermaidBlock({ data }) {
     URL.revokeObjectURL(url);
   };
 
-  if (error) {
+  if (error || !svgContent) {
     return (
-      <div className="text-destructive p-4 border border-destructive/20 bg-destructive/10 rounded-xl my-4 text-sm font-mono">
-        Syntax error in Mermaid diagram generation.
+      <div className="my-6 border border-border rounded-2xl bg-card shadow-sm overflow-hidden flex flex-col items-center justify-center min-h-[300px]">
+        <div className="animate-pulse flex flex-col items-center gap-3 text-muted-foreground">
+          <Network className="animate-spin" size={24} /> 
+          <span className="text-sm font-medium">Generating Mind Map...</span>
+        </div>
       </div>
     );
   }
