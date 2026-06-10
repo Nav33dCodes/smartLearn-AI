@@ -2,6 +2,30 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 10, 2026 (Part 3)",
+    features: [
+      {
+        title: "🎓 Next-Gen Interactive Educational Tools",
+        description: "Completely transformed the chatbot from a standard text generator into a highly interactive, dynamic learning platform using a custom 'Artifact' architecture.",
+        bullets: [
+          "Dynamic Component Interception: Re-engineered the Markdown engine to seamlessly intercept specific AI code block formats and instantly render premium, interactive React components in the chat stream.",
+          "Interactive Quizzes: A beautiful multiple-choice testing engine featuring real-time scoring algorithms, vibrant Green/Red feedback states, and a dynamic drawer that reveals the AI's step-by-step explanations.",
+          "3D Physics Flashcards: A sophisticated flashcard engine utilizing Framer Motion physics to render a stunning 3D flip animation (rotateY axis), allowing students to memorize complex concepts interactively.",
+          "Vector-Rendered Mind Maps: Integrated the official Mermaid.js engine to parse AI structural logic into gorgeous, highly scalable SVG flowcharts and mind maps directly inside the chat window."
+        ]
+      },
+      {
+        title: "✨ ChatGPT-Style Dashboard Redesign",
+        description: "Overhauled the empty-state layout to deliver a flawless, deeply focused aesthetic mirroring industry-leading AI platforms.",
+        bullets: [
+          "Centric Greeting Architecture: The welcome message ('How can I help you today, Name?') is now perfectly centered in a massive, premium font size.",
+          "Dynamic Input Repositioning: The Input Box now begins perfectly centered beneath the greeting, and smoothly locks to the absolute bottom of the screen only after the first message is sent.",
+          "Intelligent Web Context: Upgraded the backend Tavily web crawler to 'Advanced' deep-crawl mode and doubled the extraction volume (from 3 to 6 sites). The AI is now explicitly forced to cite its sources with clickable markdown links."
+        ]
+      }
+    ]
+  },
+  {
     date: "June 10, 2026 (Part 2)",
     features: [
       {
