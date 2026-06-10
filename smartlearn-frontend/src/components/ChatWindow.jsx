@@ -111,7 +111,6 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
                       )}
                     </div>
                   </div>
-                </div>
               )}
             </div>
           );
