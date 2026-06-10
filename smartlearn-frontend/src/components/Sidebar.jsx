@@ -9,7 +9,7 @@ import { Button } from "./ui/button";
 import SettingsModal from "./SettingsModal";
 
 export default function Sidebar({
-  activeChatId, setActiveChatId, sidebarOpen, setSidebarOpen, createNewChat, isMobile, darkMode, setDarkMode
+  activeChatId, setActiveChatId, sidebarOpen, setSidebarOpen, createNewChat, isMobile, darkMode, setDarkMode, themeColor, setThemeColor
 }) {
   const { data: chatsData = [] } = useChats();
   const deleteChatMutation = useDeleteChat();
@@ -296,6 +296,8 @@ export default function Sidebar({
         onClose={() => setIsSettingsOpen(false)} 
         darkMode={darkMode}
         setDarkMode={setDarkMode}
+        themeColor={themeColor}
+        setThemeColor={setThemeColor}
       />
 
       {/* Logout Confirmation Modal */}

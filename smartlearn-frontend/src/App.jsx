@@ -38,6 +38,9 @@ function ChatDashboard() {
     const savedTheme = localStorage.getItem("sl_theme_pro");
     return savedTheme !== null ? savedTheme === "true" : true;
   });
+  const [themeColor, setThemeColor] = useState(() => {
+    return localStorage.getItem("sl_theme_color") || "#10b981"; // default Emerald
+  });
   const [isMobile, setIsMobile] = useState(false);
 
   const textareaRef = useRef(null);
@@ -57,6 +60,12 @@ function ChatDashboard() {
       document.documentElement.classList.remove("dark");
     }
   }, [darkMode]);
+
+  useEffect(() => {
+    localStorage.setItem("sl_theme_color", themeColor);
+    document.documentElement.style.setProperty("--primary", themeColor);
+    document.documentElement.style.setProperty("--ring", themeColor);
+  }, [themeColor]);
 
   const createNewChat = useCallback(() => {
     const newId = Date.now().toString();
@@ -223,6 +232,8 @@ function ChatDashboard() {
         isMobile={isMobile}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
+        themeColor={themeColor}
+        setThemeColor={setThemeColor}
       />
 
       <main className="flex-1 flex flex-col relative min-w-0 transition-all duration-300">
