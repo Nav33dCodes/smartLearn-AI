@@ -2,6 +2,34 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 10, 2026 (Part 4)",
+    features: [
+      {
+        title: "🎨 SmartLearn Premium UI Redesign",
+        description: "We completely abandoned the standard 'ChatGPT Clone' aesthetic in favor of a sleek, modern, and engaging premium design.",
+        bullets: [
+          "Chat Bubble Aesthetics: Replaced full-width message bands with dynamic chat bubbles. Your messages now feature a vibrant, modern color gradient, and AI messages sit inside beautiful elevated glass cards.",
+          "Glassmorphism & Floating Elements: The chat input is no longer stuck to the bottom; it is now a sleek, floating glass pill with soft shadows.",
+          "Mesh Gradients: Introduced subtle, animated mesh gradient backgrounds for an incredibly immersive Dark Mode experience.",
+          "Updated Typography & Spacing: Fine-tuned padding, borders, and margins to make reading long AI responses effortless."
+        ]
+      },
+      {
+        title: "🎙️ Premium AI Voice Engine (STT & TTS)",
+        description: "Ripped out the buggy native browser speech tools and replaced them with a state-of-the-art backend AI audio pipeline.",
+        bullets: [
+          "Groq Whisper Speech-to-Text: Native microphone recording now routes directly through Groq's Whisper API, delivering flawless, near-instantaneous transcription regardless of your browser or device.",
+          "Microsoft Edge Neural Voices: The 'Read Aloud' button now utilizes hyper-realistic Neural Voices (en-US-JennyNeural) instead of the robotic browser speech synthesis.",
+          "Seamless Streaming: Text-to-Speech audio is generated as high-quality MP3s and instantly streamed to your browser for immediate playback."
+        ]
+      }
+    ],
+    fixes: [
+      "Fixed an issue where Speech-to-Text would fail to process due to missing boundary headers in Axios.",
+      "Fixed GitHub Secret Scanning block by removing temporary test API keys from git history."
+    ]
+  },
+  {
     date: "June 10, 2026 (Part 3)",
     features: [
       {
