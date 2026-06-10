@@ -61,7 +61,7 @@ export default function YouTubeRecommendations({ userQuery, shouldFetch }) {
           >
             <div className="relative w-44 shrink-0 aspect-video rounded-lg overflow-hidden bg-muted shadow-sm">
               <img 
-                src={video.thumbnail} 
+                src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`}
                 alt={video.title} 
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                 loading="lazy"
