@@ -22,6 +22,7 @@ function Sidebar({
   
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [chatToDelete, setChatToDelete] = useState(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef(null);
 
@@ -71,13 +72,15 @@ function Sidebar({
     if (isMobile) setSidebarOpen(false);
   };
 
-  const handleDelete = (e, id) => {
-    e.stopPropagation();
-    deleteChatMutation.mutate(id, {
+  const confirmDelete = () => {
+    if (!chatToDelete) return;
+    deleteChatMutation.mutate(chatToDelete, {
       onSuccess: () => {
-        if (activeChatId === id && chatsData.length > 0) {
-          setActiveChatId(chatsData[0].id);
+        if (activeChatId === chatToDelete && chatsData.length > 0) {
+          const nextChat = chatsData.find(c => c.id !== chatToDelete);
+          setActiveChatId(nextChat ? nextChat.id : null);
         }
+        setChatToDelete(null);
       }
     });
   };
@@ -187,7 +190,7 @@ function Sidebar({
                           </button>
                           <div className="h-px bg-border my-1" />
                           <button
-                            onClick={(e) => { handleDelete(e, chat.id); setOpenDropdownId(null); }}
+                            onClick={(e) => { e.stopPropagation(); setChatToDelete(chat.id); setOpenDropdownId(null); }}
                             className="flex items-center gap-2 px-2 py-1.5 text-xs text-destructive hover:bg-destructive/10 rounded-sm transition-colors text-left"
                           >
                             <Trash2 size={14} />
@@ -368,6 +371,34 @@ function Sidebar({
               <div className="flex items-center gap-3 justify-end">
                 <Button variant="ghost" onClick={() => setShowLogoutModal(false)}>Cancel</Button>
                 <Button variant="destructive" onClick={logout}>Sign Out</Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Chat Confirmation Modal */}
+      <AnimatePresence>
+        {chatToDelete && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 10 }}
+              className="bg-card border border-border shadow-2xl rounded-3xl p-6 max-w-sm w-full"
+            >
+              <h3 className="text-xl font-bold text-foreground mb-2">Delete Chat</h3>
+              <p className="text-muted-foreground text-sm mb-6">Are you sure you want to delete this chat? This action cannot be undone.</p>
+              <div className="flex items-center gap-3 justify-end">
+                <Button variant="ghost" onClick={() => setChatToDelete(null)}>Cancel</Button>
+                <Button variant="destructive" onClick={confirmDelete} disabled={deleteChatMutation.isPending}>
+                  {deleteChatMutation.isPending ? "Deleting..." : "Delete"}
+                </Button>
               </div>
             </motion.div>
           </motion.div>
