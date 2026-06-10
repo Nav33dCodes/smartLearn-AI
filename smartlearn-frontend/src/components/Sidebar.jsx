@@ -95,7 +95,7 @@ export default function Sidebar({
     if (chats.length === 0) return null;
     return (
       <div className="mb-4">
-        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2 mb-2 mt-2">
+        <div className="text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wider px-3 mb-1 mt-4">
           {title}
         </div>
         <AnimatePresence mode="popLayout">
@@ -110,14 +110,13 @@ export default function Sidebar({
             >
               <div
                 onClick={() => { if (editingChatId !== chat.id) handleSelectChat(chat.id) }}
-                className={`group flex items-center justify-between px-3 py-2.5 rounded-md cursor-pointer mb-1 transition-colors ${
+                className={`group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer mb-[2px] transition-all duration-200 ease-out ${
                   chat.id === activeChatId 
-                    ? 'bg-accent text-accent-foreground font-medium' 
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    ? 'bg-primary/10 text-primary font-medium' 
+                    : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground'
                 }`}
               >
-                <div className="flex items-center gap-3 overflow-hidden flex-1">
-                  <MessageSquare size={16} className="shrink-0" />
+                <div className="flex items-center gap-2 overflow-hidden flex-1">
                   {editingChatId === chat.id ? (
                     <input
                       autoFocus
@@ -128,10 +127,10 @@ export default function Sidebar({
                         if (e.key === "Enter") handleRename(chat.id);
                         if (e.key === "Escape") setEditingChatId(null);
                       }}
-                      className="bg-background border border-primary text-foreground text-sm rounded-sm px-1 w-full outline-none"
+                      className="bg-background border border-primary text-foreground text-[13px] rounded px-1 w-full outline-none shadow-sm"
                     />
                   ) : (
-                    <span className="truncate text-sm">{chat.title}</span>
+                    <span className="truncate text-[13px] tracking-tight">{chat.title}</span>
                   )}
                 </div>
                 
@@ -224,28 +223,33 @@ export default function Sidebar({
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
         className={`flex flex-col h-full bg-sidebar border-r border-border z-50 ${isMobile ? 'fixed' : 'relative'}`}
       >
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <div className="flex items-center gap-2">
-            <Logo size={24} />
-            <span className="font-semibold text-foreground tracking-tight">SmartLearn</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={createNewChat}>
-              <Plus size={18} />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={() => setSidebarOpen(false)}>
+        <div className="flex flex-col p-3">
+          <div className="flex items-center justify-between mb-4 px-1">
+            <div className="flex items-center gap-2">
+              <Logo size={22} />
+              <span className="font-semibold text-foreground tracking-tight text-lg">SmartLearn</span>
+            </div>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-muted rounded-lg transition-colors" onClick={() => setSidebarOpen(false)}>
               <PanelLeftClose size={18} />
             </Button>
           </div>
+
+          <Button 
+            onClick={createNewChat}
+            className="w-full justify-start gap-2 bg-background border border-border shadow-sm hover:bg-muted text-foreground transition-all rounded-xl h-10 px-3"
+          >
+            <Plus size={16} className="text-muted-foreground" />
+            <span className="font-medium text-[13px]">New chat</span>
+          </Button>
         </div>
 
-        <div className="p-3">
+        <div className="px-3 pb-2">
           <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground/70" />
             <Input 
               type="text"
-              placeholder="Search chats..."
-              className="pl-8 bg-muted/50 border-none h-9 text-sm"
+              placeholder="Search..."
+              className="pl-9 bg-muted/40 border-transparent hover:bg-muted/60 focus:bg-background focus:border-ring focus:ring-1 h-9 text-[13px] rounded-xl transition-all shadow-none"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -264,23 +268,25 @@ export default function Sidebar({
         </div>
 
         {user && (
-          <div 
-            onClick={() => setIsSettingsOpen(true)}
-            className="p-4 border-t border-border flex items-center justify-between cursor-pointer hover:bg-muted/50 transition-colors"
-          >
-            <div className="flex items-center gap-3 overflow-hidden">
-              <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm shrink-0 overflow-hidden">
-                {user?.avatar ? (
-                  <img src={user.avatar} alt="Avatar" className="h-full w-full object-cover" />
-                ) : (
-                  user.name ? user.name.charAt(0).toUpperCase() : "U"
-                )}
+          <div className="p-3 mt-auto">
+            <div 
+              onClick={() => setIsSettingsOpen(true)}
+              className="flex items-center justify-between p-2 rounded-xl cursor-pointer hover:bg-muted/60 transition-colors border border-transparent hover:border-border/50"
+            >
+              <div className="flex items-center gap-3 overflow-hidden">
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs shrink-0 overflow-hidden ring-1 ring-primary/20">
+                  {user?.avatar ? (
+                    <img src={user.avatar} alt="Avatar" className="h-full w-full object-cover" />
+                  ) : (
+                    user.name ? user.name.charAt(0).toUpperCase() : "U"
+                  )}
+                </div>
+                <span className="text-[13px] font-medium text-foreground truncate max-w-[110px] tracking-tight">{user.name}</span>
               </div>
-              <span className="text-sm font-medium text-foreground truncate max-w-[120px]">{user.name}</span>
+              <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setShowLogoutModal(true); }} className="text-muted-foreground hover:text-destructive shrink-0 h-8 w-8 rounded-lg">
+                <LogOut size={16} />
+              </Button>
             </div>
-            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setShowLogoutModal(true); }} className="text-muted-foreground hover:text-destructive shrink-0">
-              <LogOut size={18} />
-            </Button>
           </div>
         )}
       </motion.aside>
