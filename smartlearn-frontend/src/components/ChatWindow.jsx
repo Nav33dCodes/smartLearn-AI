@@ -40,18 +40,18 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
 
   return (
     <div className="flex-1 overflow-y-auto pt-14 pb-40 px-4 sm:px-6 md:px-8">
-      <div className="max-w-3xl mx-auto flex flex-col gap-6 py-6">
+      <div className="max-w-3xl mx-auto flex flex-col gap-12 py-10">
         {messages.map((msg, index) => {
           const isLast = index === messages.length - 1;
           
           return (
             <div key={index} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               {msg.role === 'user' ? (
-                <div className="flex flex-col items-end max-w-[80%] sm:max-w-[70%] group">
-                  <div className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-md px-5 py-3 rounded-3xl rounded-tr-sm leading-relaxed whitespace-pre-wrap text-[15px]">
+                <div className="flex flex-col items-end max-w-[85%] sm:max-w-[75%] group">
+                  <div className="bg-muted/80 backdrop-blur-sm text-foreground px-6 py-4 rounded-3xl rounded-tr-sm leading-relaxed whitespace-pre-wrap text-[15px] border border-border/50">
                     {msg.content}
                   </div>
-                  <div className="flex items-center mt-1 opacity-0 group-hover:opacity-100 transition-opacity pr-2">
+                  <div className="flex items-center mt-2 opacity-0 group-hover:opacity-100 transition-opacity pr-2">
                     <button
                       onClick={() => {
                         navigator.clipboard.writeText(msg.content);
@@ -67,16 +67,16 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
                 </div>
               ) : (
                 <div className="flex flex-col items-start w-full group">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
-                      <Logo size={18} />
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
+                      <Logo size={18} className="text-primary" />
                     </div>
                     <span className="text-sm font-semibold text-foreground/80">SmartLearn AI</span>
                   </div>
-                  <div className="bg-card/50 backdrop-blur-md border border-border/50 shadow-sm rounded-3xl rounded-tl-sm px-6 py-5 w-full max-w-[95%] sm:max-w-[85%]">
+                  <div className="w-full text-[15px] leading-relaxed text-foreground">
                     <AIMessage content={msg.content} />
                   </div>
-                  <div className="flex items-center mt-2 opacity-0 group-hover:opacity-100 transition-opacity pl-2">
+                  <div className="flex items-center mt-3 opacity-0 group-hover:opacity-100 transition-opacity gap-1 pl-1">
                     <button
                       onClick={() => {
                         navigator.clipboard.writeText(msg.content);

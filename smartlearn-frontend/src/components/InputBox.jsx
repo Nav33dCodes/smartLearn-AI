@@ -153,7 +153,7 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
   }, [activeChatId]);
 
   return (
-    <div className={isEmpty ? "w-full pointer-events-none relative pb-6" : "absolute bottom-4 left-0 right-0 pt-6 pb-6 px-4 pointer-events-none z-50"}>
+    <div className={isEmpty ? "w-full pointer-events-none relative" : "absolute bottom-0 left-0 right-0 pt-8 pb-6 px-4 pointer-events-none z-50 bg-gradient-to-t from-background via-background/90 to-transparent"}>
       <div className="max-w-3xl mx-auto relative flex flex-col gap-2 pointer-events-auto w-full">
         
         {loading && (
@@ -174,14 +174,14 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          className={`glass shadow-2xl rounded-[32px] relative flex flex-col transition-all overflow-hidden ${
+          className={`glass shadow-2xl rounded-[32px] border-b-4 border-t border-l border-r relative flex flex-col transition-all ${
             isDragging 
               ? 'border-primary ring-2 ring-primary/20 bg-primary/5' 
-              : 'border-border/50 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-transparent hover:shadow-primary/5'
+              : 'border-border/50 border-b-primary focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-transparent focus-within:border-b-primary hover:shadow-primary/5'
           }`}
         >
           {isDragging && (
-            <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/80 backdrop-blur-sm rounded-2xl">
+            <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/80 backdrop-blur-sm rounded-[32px]">
               <p className="font-medium text-primary">Drop document to attach</p>
             </div>
           )}
