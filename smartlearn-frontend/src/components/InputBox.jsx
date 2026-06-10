@@ -153,11 +153,11 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
   }, [activeChatId]);
 
   return (
-    <div className={isEmpty ? "w-full pointer-events-none relative" : "absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background to-transparent pt-6 pb-6 px-4 pointer-events-none"}>
+    <div className={isEmpty ? "w-full pointer-events-none relative pb-6" : "absolute bottom-4 left-0 right-0 pt-6 pb-6 px-4 pointer-events-none z-50"}>
       <div className="max-w-3xl mx-auto relative flex flex-col gap-2 pointer-events-auto w-full">
         
         {loading && (
-          <div className="flex justify-center absolute -top-12 left-0 right-0">
+          <div className="flex justify-center absolute -top-14 left-0 right-0">
             <Button 
               variant="outline" 
               size="sm" 
@@ -174,10 +174,10 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          className={`bg-card border shadow-sm rounded-2xl relative flex flex-col transition-all ${
+          className={`glass shadow-2xl rounded-[32px] relative flex flex-col transition-all overflow-hidden ${
             isDragging 
               ? 'border-primary ring-2 ring-primary/20 bg-primary/5' 
-              : 'border-border focus-within:ring-2 focus-within:ring-ring focus-within:border-transparent'
+              : 'border-border/50 focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-transparent hover:shadow-primary/5'
           }`}
         >
           {isDragging && (
