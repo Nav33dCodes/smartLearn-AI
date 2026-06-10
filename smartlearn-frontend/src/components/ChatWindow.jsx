@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import AIMessage from "./AIMessage";
 import Logo from "./Logo";
+import YouTubeRecommendations from "./YouTubeRecommendations";
 import { useAuth } from "../context/AuthContext";
 
 export default function ChatWindow({ messages, loading, isChatsLoading, onSuggestionClick, regenerateMessage }) {
@@ -75,6 +76,14 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
                   <div className="flex-1 min-w-0 flex flex-col gap-2">
                     <AIMessage content={msg.content} />
                     
+                    {/* YouTube Recommendations Component */}
+                    {msg.role === 'assistant' && (
+                      <YouTubeRecommendations 
+                        userQuery={index > 0 && messages[index - 1]?.role === 'user' ? messages[index - 1].content : null}
+                        shouldFetch={isLast && !loading} 
+                      />
+                    )}
+
                     {/* Action Bar */}
                     <div className="flex items-center gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button

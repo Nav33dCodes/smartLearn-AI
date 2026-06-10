@@ -15,6 +15,7 @@ from services.llm import stream_llm_response, search_tavily, needs_web_search, g
 from services.pdf import extract_text, get_pdf_metadata
 from services.rag import store_pdf, search, clear_session, get_stats
 from services.voice import transcribe_audio
+from services.youtube import get_youtube_recommendations
 from database import SessionLocal, Chat, get_db, User, ChatMetadata
 from routers import auth
 from services.jwt_handler import verify_token
@@ -509,6 +510,29 @@ async def upload(file: UploadFile = File(...), chat_id: str = "default", current
     except Exception as e:
         logger.error(f"❌ Upload error: {e}")
         return JSONResponse(status_code=500, content={"error": f"Upload failed: {str(e)}"})
+
+@app.post("/api/voice")
+async def process_voice(audio: UploadFile = File(...)):
+    try:
+        contents = await audio.read()
+        logger.info(f"Received audio file: {audio.filename}, size: {len(contents)} bytes")
+        text = await transcribe_audio(contents, audio.filename)
+        return {"text": text}
+    except Exception as e:
+        logger.error(f"Voice processing error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+class YouTubeRequest(BaseModel):
+    query: str
+
+@app.post("/api/youtube")
+async def get_youtube_videos(req: YouTubeRequest):
+    try:
+        videos = await get_youtube_recommendations(req.query)
+        return {"videos": videos}
+    except Exception as e:
+        logger.error(f"YouTube Route Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ────────────────────────────────────────────────────
