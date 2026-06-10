@@ -8,7 +8,7 @@ import { useAuth } from "../context/AuthContext";
 export default function ChatWindow({ messages, loading, isChatsLoading, onSuggestionClick, regenerateMessage }) {
   const { user } = useAuth();
   const messagesEndRef = useRef(null);
-  const [activeSourcesQuery, setActiveSourcesQuery] = useState(null);
+  const [openSources, setOpenSources] = useState({});
   const lastScrollTime = useRef(0);
 
   useEffect(() => {
@@ -95,11 +95,10 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
                       
                     <button
                       onClick={() => {
-                        const query = index > 0 && messages[index - 1]?.role === 'user' ? messages[index - 1].content : null;
-                        setActiveSourcesQuery(query || "Learn about this topic");
+                        setOpenSources(prev => ({ ...prev, [index]: !prev[index] }));
                       }}
-                      className="p-1.5 text-muted-foreground hover:text-primary border border-transparent hover:border-primary rounded-md transition-all duration-300 flex items-center gap-1.5"
-                      title="View Sources & Videos"
+                      className={`p-1.5 rounded-md transition-all duration-300 flex items-center gap-1.5 border ${openSources[index] ? 'bg-primary/10 text-primary border-primary/20' : 'text-muted-foreground hover:text-primary border-transparent hover:border-primary'}`}
+                      title="Toggle Sources & Videos"
                     >
                       <BookOpen size={14} />
                       <span className="text-xs font-medium">Sources</span>
@@ -115,6 +114,23 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
                       </button>
                     )}
                   </div>
+                  
+                  {/* INLINE SOURCES */}
+                  <AnimatePresence>
+                    {openSources[index] && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                        animate={{ opacity: 1, height: "auto", marginTop: 16 }}
+                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <YouTubeRecommendations 
+                          userQuery={index > 0 && messages[index - 1]?.role === 'user' ? messages[index - 1].content : "Learn about this topic"}
+                          shouldFetch={true}
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
             </div>
@@ -138,49 +154,6 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
         
         <div ref={messagesEndRef} />
       </div>
-
-      {/* Sources Slide-Over Panel */}
-      <AnimatePresence>
-        {activeSourcesQuery && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setActiveSourcesQuery(null)}
-              className="absolute inset-0 bg-background/50 backdrop-blur-sm z-40"
-            />
-            {/* Panel */}
-            <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="absolute right-0 top-0 bottom-0 w-full sm:w-[450px] bg-card border-l border-border shadow-2xl z-50 flex flex-col"
-            >
-              <div className="flex items-center justify-between p-4 border-b border-border bg-muted/30">
-                <div className="flex items-center gap-2 text-foreground">
-                  <BookOpen size={18} className="text-primary" />
-                  <h3 className="font-semibold tracking-tight">Sources & Resources</h3>
-                </div>
-                <button
-                  onClick={() => setActiveSourcesQuery(null)}
-                  className="p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-md transition-colors"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-                <YouTubeRecommendations 
-                  userQuery={activeSourcesQuery}
-                  shouldFetch={true}
-                />
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
