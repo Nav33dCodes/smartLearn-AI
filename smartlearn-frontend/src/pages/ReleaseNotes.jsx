@@ -14,6 +14,11 @@ const releases = [
           "Redesign: Unified the input box into a sleek '+' menu for attachments and web search toggles. User bubbles updated to a refined muted tone."
         ]
       }
+    ],
+    fixes: [
+      "Resolved a critical React runtime crash caused by missing state variables in the Sidebar chat manager.",
+      "Fixed a build error caused by deprecated brand icons in the lucide-react library.",
+      "Optimized the User Menu to correctly open Release Notes in a new browser tab without interrupting active chat sessions."
     ]
   },
   {
@@ -28,6 +33,11 @@ const releases = [
           "Inter Font & Zinc Palette: Global typography overhaul to Inter font."
         ]
       }
+    ],
+    fixes: [
+      "Eliminated the 'flash of unstyled content' (FOUC) when loading custom themes from localStorage.",
+      "Fixed contrast ratio issues with user chat bubbles in Dark Mode.",
+      "Resolved an issue where changing the theme did not immediately update focus rings on input fields."
     ]
   },
   {
@@ -42,6 +52,11 @@ const releases = [
           "Smooth Auto-Scroll: Implemented fluid scrolling during AI streaming and message generation."
         ]
       }
+    ],
+    fixes: [
+      "Fixed persistent timeout errors caused by third-party speech recognition APIs (Deepgram).",
+      "Resolved a scrolling bug where the chat window would abruptly jump when generating extremely long LLM responses.",
+      "Fixed an edge case where disabling Web Search toggles did not clear the search context correctly."
     ]
   },
   {
@@ -57,6 +72,12 @@ const releases = [
           "SMTP Email Verification: Added robust email OTP systems for account recovery and privacy management."
         ]
       }
+    ],
+    fixes: [
+      "Fixed fatal SQLite 'database is locked' errors during high-concurrency requests by migrating to Neon DB.",
+      "Resolved an issue where expired JWT tokens would silently fail instead of redirecting the user to the login screen.",
+      "Fixed SMTP connection drops by properly initializing the TLS context for outbound recovery emails.",
+      "Resolved an infinite loading state when the sentence-transformer model initialized on cold starts."
     ]
   }
 ];
@@ -78,7 +99,7 @@ export default function ReleaseNotes() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white text-[#0d0d0d] font-sans selection:bg-black selection:text-white">
+    <div className="min-h-screen bg-white text-[#0d0d0d] font-sans selection:bg-black selection:text-white pb-20">
       <div className="max-w-3xl mx-auto px-6 py-24 md:py-32">
         <h1 className="text-[40px] md:text-[56px] font-bold tracking-tight mb-20 leading-tight">
           Release notes
@@ -99,6 +120,7 @@ export default function ReleaseNotes() {
               </h2>
               
               <div className="space-y-12">
+                {/* Features Section */}
                 {release.features.map((feature, fIdx) => (
                   <div key={fIdx} className="space-y-4">
                     <h3 className="text-[20px] font-semibold tracking-tight">
@@ -114,6 +136,20 @@ export default function ReleaseNotes() {
                     </ul>
                   </div>
                 ))}
+
+                {/* Bug Fixes Section */}
+                {release.fixes && release.fixes.length > 0 && (
+                  <div className="space-y-4 pt-4">
+                    <h3 className="text-[20px] font-semibold tracking-tight">
+                      Bug Fixes
+                    </h3>
+                    <ul className="list-disc pl-5 space-y-2 mt-4 text-[16px] leading-relaxed text-[#333333] marker:text-[#888888]">
+                      {release.fixes.map((fix, fixIdx) => (
+                        <li key={fixIdx} className="pl-2">{fix}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
               
               {index < releases.length - 1 && (
