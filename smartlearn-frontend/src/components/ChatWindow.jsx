@@ -77,35 +77,45 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20 mt-1">
                       <Logo size={18} className="text-primary" />
                     </div>
+                    <div className="flex flex-col gap-1 w-full max-w-[90%]">
+                      <div className="text-foreground leading-relaxed text-base pt-1">
+                        <AIMessage content={msg.content} />
+                      </div>
+                      <div className="flex items-center mt-3 opacity-0 group-hover:opacity-100 transition-opacity gap-1 pl-1">
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(msg.content);
+                            import("sonner").then(m => m.toast.success("Copied to clipboard"));
+                          }}
                       className="p-1.5 text-muted-foreground hover:text-primary border border-transparent hover:border-primary rounded-md transition-all duration-300"
                       title="Copy"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                     </button>
                       
-                      <button
-                        onClick={() => {
-                          const query = index > 0 && messages[index - 1]?.role === 'user' ? messages[index - 1].content : null;
-                          setActiveSourcesQuery(query || "Learn about this topic");
-                        }}
-                        className="p-1.5 text-muted-foreground hover:text-primary border border-transparent hover:border-primary rounded-md transition-all duration-300 flex items-center gap-1.5"
-                        title="View Sources & Videos"
-                      >
-                        <BookOpen size={14} />
-                        <span className="text-xs font-medium">Sources</span>
-                      </button>
+                    <button
+                      onClick={() => {
+                        const query = index > 0 && messages[index - 1]?.role === 'user' ? messages[index - 1].content : null;
+                        setActiveSourcesQuery(query || "Learn about this topic");
+                      }}
+                      className="p-1.5 text-muted-foreground hover:text-primary border border-transparent hover:border-primary rounded-md transition-all duration-300 flex items-center gap-1.5"
+                      title="View Sources & Videos"
+                    >
+                      <BookOpen size={14} />
+                      <span className="text-xs font-medium">Sources</span>
+                    </button>
 
-                      {isLast && !loading && (
-                        <button
-                          onClick={regenerateMessage}
-                          className="p-1.5 text-muted-foreground hover:text-primary border border-transparent hover:border-primary rounded-md transition-all duration-300"
-                          title="Regenerate"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                        </button>
-                      )}
-                    </div>
+                    {isLast && !loading && (
+                      <button
+                        onClick={regenerateMessage}
+                        className="p-1.5 text-muted-foreground hover:text-primary border border-transparent hover:border-primary rounded-md transition-all duration-300"
+                        title="Regenerate"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                      </button>
+                    )}
                   </div>
+                </div>
               )}
             </motion.div>
           );
