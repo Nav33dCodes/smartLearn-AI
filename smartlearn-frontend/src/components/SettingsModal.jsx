@@ -216,7 +216,7 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode, 
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 10 }}
         transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
-        className="relative w-full max-w-4xl h-[650px] max-h-[85vh] bg-background border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl flex overflow-hidden z-10"
+        className="relative w-full max-w-5xl h-[85vh] max-h-[800px] bg-background border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl flex overflow-hidden z-10"
       >
         {/* Sidebar */}
         <div className="w-48 sm:w-64 bg-zinc-50 dark:bg-zinc-900/50 border-r border-zinc-200 dark:border-zinc-800 p-4 flex flex-col gap-2 shrink-0">
