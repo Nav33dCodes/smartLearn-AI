@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import { Plus, Trash2, MessageSquare, Search, PanelLeftClose, LogOut, Edit2, Pin, PinOff, Archive, MoreHorizontal, Sparkles } from "lucide-react";
+import { Plus, Trash2, MessageSquare, Search, PanelLeftClose, LogOut, Edit2, Pin, PinOff, Archive, MoreHorizontal, Sparkles, Settings, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useChats, useDeleteChat, useRenameChat, usePinChat, useArchiveChat } from "../hooks/useChats";
 import { useAuth } from "../context/AuthContext";
@@ -19,9 +19,12 @@ export default function Sidebar({
   const archiveChatMutation = useArchiveChat();
   const [searchQuery, setSearchQuery] = useState("");
   const { user, logout } = useAuth();
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef(null);
+
   const [editingChatId, setEditingChatId] = useState(null);
   const [editTitle, setEditTitle] = useState("");
   const [openDropdownId, setOpenDropdownId] = useState(null);
@@ -29,6 +32,9 @@ export default function Sidebar({
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setOpenDropdownId(null);
       }
@@ -269,36 +275,66 @@ export default function Sidebar({
         </div>
 
         <div className="mt-auto flex flex-col">
-          <Link to="/releases" className="mx-3 mt-1 mb-2 flex items-center gap-2.5 p-2 rounded-xl text-[14px] font-medium text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors border border-transparent">
-            <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-              <Sparkles size={16} />
-            </div>
-            <span>Release Notes</span>
-            <span className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-primary text-primary-foreground">NEW</span>
-          </Link>
-
           {user && (
-            <div className="p-3 border-t border-border/50">
-            <div 
-              onClick={() => setIsSettingsOpen(true)}
-              className="flex items-center justify-between p-2 rounded-xl cursor-pointer hover:bg-muted/60 transition-colors border border-transparent hover:border-border/50"
-            >
-              <div className="flex items-center gap-3 overflow-hidden">
-                <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0 overflow-hidden ring-1 ring-primary/20">
-                  {user?.avatar ? (
-                    <img src={user.avatar} alt="Avatar" className="h-full w-full object-cover" />
-                  ) : (
-                    user.name ? user.name.charAt(0).toUpperCase() : "U"
-                  )}
+            <div className="relative p-2 border-t border-border/50" ref={userMenuRef}>
+              <AnimatePresence>
+                {showUserMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute bottom-full left-2 right-2 mb-2 bg-card border border-border shadow-xl rounded-2xl overflow-hidden z-50 flex flex-col p-1.5"
+                  >
+                    <button
+                      onClick={() => { setIsSettingsOpen(true); setShowUserMenu(false); }}
+                      className="flex items-center gap-3 px-3 py-2.5 text-sm hover:bg-muted rounded-xl transition-colors text-foreground text-left"
+                    >
+                      <Settings size={16} className="text-muted-foreground" />
+                      <span className="font-medium">Settings</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => { window.open('/releases', '_blank'); setShowUserMenu(false); }}
+                      className="flex items-center justify-between px-3 py-2.5 text-sm hover:bg-muted rounded-xl transition-colors text-foreground text-left"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Sparkles size={16} className="text-muted-foreground" />
+                        <span className="font-medium">Release notes</span>
+                      </div>
+                      <ExternalLink size={14} className="text-muted-foreground opacity-50" />
+                    </button>
+
+                    <div className="h-px bg-border my-1.5 mx-2" />
+                    
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setShowLogoutModal(true); setShowUserMenu(false); }}
+                      className="flex items-center gap-3 px-3 py-2.5 text-sm hover:bg-destructive/10 text-destructive rounded-xl transition-colors text-left"
+                    >
+                      <LogOut size={16} />
+                      <span className="font-medium">Log out</span>
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <div 
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center justify-between p-2 rounded-xl cursor-pointer hover:bg-muted/60 transition-colors border border-transparent hover:border-border/50"
+              >
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0 overflow-hidden ring-1 ring-primary/20">
+                    {user?.avatar ? (
+                      <img src={user.avatar} alt="Avatar" className="h-full w-full object-cover" />
+                    ) : (
+                      user.name ? user.name.charAt(0).toUpperCase() : "U"
+                    )}
+                  </div>
+                  <span className="text-[15px] font-medium text-foreground truncate max-w-[150px] tracking-tight">{user.name}</span>
                 </div>
-                <span className="text-[15px] font-medium text-foreground truncate max-w-[110px] tracking-tight">{user.name}</span>
               </div>
-              <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setShowLogoutModal(true); }} className="text-muted-foreground hover:text-destructive shrink-0 h-8 w-8 rounded-lg">
-                <LogOut size={16} />
-              </Button>
             </div>
-          </div>
-        )}
+          )}
         </div>
       </motion.aside>
 
