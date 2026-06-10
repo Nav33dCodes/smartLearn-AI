@@ -5,7 +5,8 @@ import AIMessage from "./AIMessage";
 import Logo from "./Logo";
 import YouTubeRecommendations from "./YouTubeRecommendations";
 import { useAuth } from "../context/AuthContext";
-export default function ChatWindow({ messages, loading, isChatsLoading, onSuggestionClick, regenerateMessage }) {
+
+export default function ChatWindow({ messages, loading, isChatsLoading, isHistoryLoading, onSuggestionClick, regenerateMessage }) {
   const { user } = useAuth();
   const messagesEndRef = useRef(null);
   const [openSources, setOpenSources] = useState({});
@@ -26,10 +27,33 @@ export default function ChatWindow({ messages, loading, isChatsLoading, onSugges
       lastScrollTime.current = now;
     }
   }, [messages, loading]);
-  if (isChatsLoading && messages.length === 0) {
+  if ((isChatsLoading || isHistoryLoading) && messages.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center pt-14 pb-32">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="flex-1 overflow-y-auto pt-14 pb-40 px-4 sm:px-6 md:px-8">
+        <div className="max-w-3xl mx-auto flex flex-col gap-12 py-10 w-full">
+          {/* Skeleton User Message */}
+          <div className="flex w-full justify-end">
+            <div className="flex flex-col items-end max-w-[85%] sm:max-w-[75%] w-full gap-2">
+              <div className="h-16 w-3/4 sm:w-1/2 bg-muted/60 rounded-3xl rounded-tr-sm animate-pulse" />
+            </div>
+          </div>
+          
+          {/* Skeleton AI Message */}
+          <div className="flex w-full justify-start mt-2">
+            <div className="flex w-full justify-start gap-4">
+              <div className="w-8 h-8 rounded-full bg-primary/10 shrink-0 border border-primary/20 animate-pulse" />
+              <div className="flex flex-col gap-3 w-full max-w-[90%] pt-1">
+                <div className="h-4 w-full bg-muted/60 rounded animate-pulse" />
+                <div className="h-4 w-[90%] bg-muted/60 rounded animate-pulse" />
+                <div className="h-4 w-[95%] bg-muted/60 rounded animate-pulse" />
+                <div className="h-4 w-[60%] bg-muted/60 rounded animate-pulse" />
+                
+                {/* Simulated code block skeleton */}
+                <div className="h-32 w-full bg-muted/40 rounded-xl mt-2 animate-pulse" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

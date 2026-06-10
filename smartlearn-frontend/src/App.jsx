@@ -30,7 +30,7 @@ function ChatDashboard() {
   
   // We use local state for the *active* session to handle streaming updates optimally
   const [activeChatId, setActiveChatId] = useState(null);
-  const { data: historyData } = useChatHistory(activeChatId);
+  const { data: historyData, isFetching: isHistoryLoading } = useChatHistory(activeChatId);
   const [activeMessages, setActiveMessages] = useState([]);
   
   const [input, setInput] = useState("");
@@ -290,7 +290,7 @@ function ChatDashboard() {
           )}
         </header>
 
-        {activeMessages.length === 0 && !isChatsLoading ? (
+        {activeMessages.length === 0 && !isChatsLoading && !isHistoryLoading ? (
           <div className="flex-1 flex flex-col items-center justify-center px-4 w-full h-full relative z-10 pb-20">
             <h1 className="text-4xl md:text-[44px] font-semibold tracking-tight text-foreground mb-8 text-center">
               How can I help you today, {user?.name ? user.name.split(" ")[0] : "there"}?
@@ -354,6 +354,7 @@ function ChatDashboard() {
               messages={activeMessages} 
               loading={loading}
               isChatsLoading={isChatsLoading}
+              isHistoryLoading={isHistoryLoading}
               onSuggestionClick={(text) => {
                 setInput(text);
                 setTimeout(() => textareaRef.current?.focus(), 50);
