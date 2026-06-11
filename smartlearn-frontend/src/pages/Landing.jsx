@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, BrainCircuit, Zap, Shield, FileText, Sparkles, Code2, Database, PlaySquare, Image as ImageIcon, CheckCircle2, Cpu, Network, Globe, Mail } from 'lucide-react';
+import { ArrowRight, BrainCircuit, Zap, Shield, FileText, Sparkles, Code2, Database, PlaySquare, Image as ImageIcon, CheckCircle2, Cpu, Network, Globe, Mail, ChevronDown } from 'lucide-react';
 import Logo from '../components/Logo';
 export default function Landing() {
   const containerVariants = {
@@ -18,6 +18,27 @@ export default function Landing() {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
   };
+
+  const [openFaqIndex, setOpenFaqIndex] = useState(null);
+  
+  const faqs = [
+    {
+      question: "Is my data used to train the AI models?",
+      answer: "Absolutely not. We operate on a strict Zero-Knowledge architecture. Your documents and chat histories are siloed, encrypted, and never used to train our foundational models or shared with third-party providers for training."
+    },
+    {
+      question: "What types of files can I upload?",
+      answer: "You can upload PDFs, DOCX files, TXT files, and even provide YouTube URLs for video analysis. We are continually expanding our parsers to support codebases and spreadsheet formats."
+    },
+    {
+      question: "How does the Founder's Edition differ from the Public Beta?",
+      answer: "The Public Beta is our robust, free tier that gives you access to core RAG capabilities. The Founder's Edition (coming soon) is an uncapped, premium tier featuring priority routing to the smartest models (like Claude 3.5 Sonnet and GPT-4o), infinite document storage, and advanced API access."
+    },
+    {
+      question: "Can I delete my data permanently?",
+      answer: "Yes. You have full control over your data footprint. You can delete individual chats, purge all your data at once, or entirely delete your account directly from the settings panel. Once deleted, it is permanently scrubbed from our vector databases."
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-zinc-100 font-sans selection:bg-primary/30 overflow-x-hidden">
@@ -335,7 +356,45 @@ export default function Landing() {
           </div>
         </section>
 
-
+        {/* FAQ Section */}
+        <section className="py-24 px-6 relative">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl font-bold text-zinc-100 mb-4">Frequently Asked Questions</h2>
+              <p className="text-zinc-400">Everything you need to know about the product and billing.</p>
+            </div>
+            
+            <div className="space-y-4">
+              {faqs.map((faq, index) => (
+                <div 
+                  key={index} 
+                  className={`border border-zinc-800 rounded-2xl overflow-hidden transition-colors ${openFaqIndex === index ? 'bg-zinc-900/50 border-primary/30' : 'bg-transparent hover:border-zinc-700'}`}
+                >
+                  <button 
+                    onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                    className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none focus-ring rounded-2xl"
+                  >
+                    <span className={`font-medium text-lg ${openFaqIndex === index ? 'text-zinc-100' : 'text-zinc-300'}`}>
+                      {faq.question}
+                    </span>
+                    <ChevronDown 
+                      size={20} 
+                      className={`text-zinc-500 shrink-0 transition-transform duration-300 ${openFaqIndex === index ? 'rotate-180 text-primary' : ''}`} 
+                    />
+                  </button>
+                  
+                  <div 
+                    className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${openFaqIndex === index ? 'max-h-48 pb-5 opacity-100' : 'max-h-0 opacity-0'}`}
+                  >
+                    <p className="text-zinc-400 leading-relaxed">
+                      {faq.answer}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
         {/* CTA Section */}
         <section className="py-32 px-6">
