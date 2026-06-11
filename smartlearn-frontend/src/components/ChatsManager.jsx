@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Search, Trash2, X, MessageSquare, Check, CheckSquare, Square, Download, Archive, Filter, Edit2 } from 'lucide-react';
 import { GroupedVirtuoso } from 'react-virtuoso';
 import { useDeleteChat, useArchiveChat, useRenameChat } from '../hooks/useChats';
@@ -7,6 +7,8 @@ import { Button } from './ui/button';
 export default function ChatsManager({ chatsData, onOpenChat }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("date-desc"); // "date-desc" | "date-asc" | "title-asc"
+  const [sortOpen, setSortOpen] = useState(false);
+  const sortRef = useRef(null);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const deleteChatMutation = useDeleteChat();
   const archiveChatMutation = useArchiveChat();
@@ -15,6 +17,23 @@ export default function ChatsManager({ chatsData, onOpenChat }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+
+  const sortOptions = [
+    { value: 'date-desc', label: 'Newest First' },
+    { value: 'date-asc',  label: 'Oldest First' },
+    { value: 'title-asc', label: 'Alphabetical' },
+  ];
+
+  // Close sort dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (sortRef.current && !sortRef.current.contains(e.target)) {
+        setSortOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
   
   const [editingId, setEditingId] = useState(null);
   const [editTitle, setEditTitle] = useState("");
@@ -244,17 +263,33 @@ export default function ChatsManager({ chatsData, onOpenChat }) {
                   />
                 </div>
                 
-                <div className="relative hidden md:block">
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="h-10 pl-3 pr-8 bg-muted/30 border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer text-muted-foreground"
+                {/* Custom Sort Dropdown */}
+                <div className="relative hidden md:block" ref={sortRef}>
+                  <button
+                    onClick={() => setSortOpen(o => !o)}
+                    className="h-10 pl-3 pr-8 bg-muted/30 border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer text-muted-foreground hover:bg-muted/50 flex items-center gap-1 whitespace-nowrap"
                   >
-                    <option value="date-desc">Newest First</option>
-                    <option value="date-asc">Oldest First</option>
-                    <option value="title-asc">Alphabetical</option>
-                  </select>
-                  <Filter className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                    {sortOptions.find(o => o.value === sortBy)?.label}
+                    <Filter className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                  </button>
+
+                  {sortOpen && (
+                    <div className="absolute right-0 top-[calc(100%+6px)] z-50 min-w-[160px] rounded-lg border border-border bg-card shadow-xl overflow-hidden">
+                      {sortOptions.map(opt => (
+                        <button
+                          key={opt.value}
+                          onClick={() => { setSortBy(opt.value); setSortOpen(false); }}
+                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                            sortBy === opt.value
+                              ? 'bg-primary/15 text-primary font-medium'
+                              : 'text-foreground hover:bg-muted/60'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
