@@ -22,6 +22,8 @@ const SharedChat = lazy(() => import("./pages/SharedChat"));
 const ReleaseNotes = lazy(() => import("./pages/ReleaseNotes"));
 const Landing = lazy(() => import("./pages/Landing"));
 const ChatsManager = lazy(() => import("./components/ChatsManager"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
 
 const API = import.meta.env.DEV
   ? "http://localhost:8000"
@@ -500,6 +502,8 @@ export default function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/releases" element={<ReleaseNotes />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
           <Route path="/app" element={
             <ProtectedRoute>
               <ChatDashboard />
