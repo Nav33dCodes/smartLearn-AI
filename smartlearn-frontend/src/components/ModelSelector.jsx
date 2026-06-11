@@ -23,27 +23,6 @@ export const MODELS = [
     provider: "Groq",
     icon: Sparkles,
     description: "Lightning fast responses for general queries."
-  },
-  {
-    id: "anthropic/claude-3.5-sonnet",
-    name: "Claude 3.5 Sonnet (Research)",
-    provider: "Anthropic",
-    icon: Brain,
-    description: "Unmatched depth and reasoning for heavy research."
-  },
-  {
-    id: "deepseek/deepseek-coder",
-    name: "DeepSeek Coder (Coding)",
-    provider: "DeepSeek",
-    icon: Rocket,
-    description: "Specialized powerhouse for software development."
-  },
-  {
-    id: "google/gemini-2.5-flash",
-    name: "Gemini 2.5 Flash (Study)",
-    provider: "Google",
-    icon: Sparkles,
-    description: "Highly capable multimodal study assistant."
   }
 ];
 
