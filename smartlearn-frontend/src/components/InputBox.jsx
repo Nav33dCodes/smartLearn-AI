@@ -97,8 +97,17 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
       mediaRecorderRef.current?.stop();
       setIsRecording(false);
     }
-    sendMessage(null, searchWeb);
+    
+    const fileListStr = attachedFiles.length > 0 
+      ? attachedFiles.map(f => `📎 **${f.name}**`).join('\n') + '\n\n'
+      : "";
+      
+    const baseInput = input.trim() ? input.trim() : "Please analyze the attached document(s).";
+    const messageToSend = fileListStr + baseInput;
+    
+    sendMessage(messageToSend, searchWeb);
     setAttachedFiles([]);
+    setInput("");
   };
 
   const uploadFile = (file) => {
