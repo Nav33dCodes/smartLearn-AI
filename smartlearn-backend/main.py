@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import text
 import asyncio
 
-from services.llm import stream_llm_response, search_tavily, needs_web_search, generate_chat_title
+from services.llm import stream_llm_response, search_tavily, get_optimal_search_query, generate_chat_title
 from services.pdf import extract_text, get_pdf_metadata
 from services.rag import store_pdf, search, clear_session, get_stats
 from services.voice import transcribe_audio, generate_speech
@@ -220,19 +220,21 @@ async def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_use
         full_response = []
         try:
             # 3. Evaluate web search
-            should_search = False
+            search_query = "NO_SEARCH"
             if data.search_web == "on":
-                should_search = True
+                yield f"data: {json.dumps({'status': 'evaluating'})}\n\n"
+                logger.info(f"🤖 Generating optimal search query for: {message}")
+                search_query = get_optimal_search_query(message, conversation_history, force=True)
             elif data.search_web == "auto":
                 yield f"data: {json.dumps({'status': 'evaluating'})}\n\n"
                 logger.info(f"🤖 Auto-evaluating web search for: {message}")
-                should_search = needs_web_search(message)
+                search_query = get_optimal_search_query(message, conversation_history, force=False)
 
             # 4. Perform Web Search
-            if should_search:
+            if search_query != "NO_SEARCH":
                 yield f"data: {json.dumps({'status': 'searching_web'})}\n\n"
-                logger.info(f"🌐 Web Search via Tavily for: {message}")
-                web_context, urls = search_tavily(message)
+                logger.info(f"🌐 Web Search via Tavily for Query: {search_query}")
+                web_context, urls = search_tavily(search_query)
                 if web_context:
                     context = (context + "\n\n### 🌐 Web Search Results:\n" + web_context) if context else ("### 🌐 Web Search Results:\n" + web_context)
                     yield f"data: {json.dumps({'status': 'search_complete', 'urls': urls})}\n\n"

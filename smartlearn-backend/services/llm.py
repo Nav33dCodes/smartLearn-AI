@@ -3,21 +3,26 @@ from typing import Generator, List, Dict
 from openai import OpenAI
 from groq import Groq
 from dotenv import load_dotenv
-from typing import Generator
 from tavily import TavilyClient
 
 load_dotenv()
 
-# OpenRouter is 100% compatible with the official OpenAI SDK
-openrouter_client = OpenAI(
-    api_key=os.getenv("OPENROUTER_API_KEY", os.getenv("GROQ_API_KEY")),
-    base_url="https://openrouter.ai/api/v1"
-)
+# OpenRouter Client (with timeout)
+openrouter_client = None
+if os.getenv("OPENROUTER_API_KEY") or os.getenv("GROQ_API_KEY"):
+    openrouter_client = OpenAI(
+        api_key=os.getenv("OPENROUTER_API_KEY", os.getenv("GROQ_API_KEY")),
+        base_url="https://openrouter.ai/api/v1",
+        timeout=45.0
+    )
 
-# Groq Official Client (for instant, native speeds)
-groq_client = Groq(
-    api_key=os.getenv("GROQ_API_KEY")
-)
+# Groq Official Client (with timeout)
+groq_client = None
+if os.getenv("GROQ_API_KEY"):
+    groq_client = Groq(
+        api_key=os.getenv("GROQ_API_KEY"),
+        timeout=45.0
+    )
 
 tavily_client = None
 if os.getenv("TAVILY_API_KEY"):
@@ -28,20 +33,20 @@ DEFAULT_MODEL = "groq:llama-3.1-8b-instant"
 # Advanced Fallback Architecture
 FALLBACK_ROUTER = {
     # 0. OpenRouter Auto Route
-    "openrouter/auto": ["groq:llama-3.3-70b-versatile", "anthropic/claude-3-haiku"],
+    "openrouter/auto": ["groq:llama-3.3-70b-versatile", "groq:llama-3.1-8b-instant"],
     # 1. Groq Fast Route
     "groq:llama-3.1-8b-instant": ["meta-llama/llama-3.1-8b-instruct"],
     # 2. Groq Heavy Route
     "groq:llama-3.3-70b-versatile": ["groq:llama-3.1-8b-instant", "meta-llama/llama-3.3-70b-instruct"],
     # 3. Anthropic Research Route
-    "anthropic/claude-3.5-sonnet": ["anthropic/claude-3-haiku", "openai/gpt-4o-mini"],
+    "anthropic/claude-3.5-sonnet": ["anthropic/claude-3-haiku", "groq:llama-3.1-8b-instant"],
     # 4. DeepSeek Coding Route
-    "deepseek/deepseek-coder": ["meta-llama/llama-3.1-8b-instruct", "openai/gpt-4o-mini"],
+    "deepseek/deepseek-coder": ["meta-llama/llama-3.1-8b-instruct", "groq:llama-3.1-8b-instant"],
     # 5. Gemini Study Route
-    "google/gemini-2.5-flash": ["google/gemini-flash-1.5", "openai/gpt-4o-mini"],
+    "google/gemini-2.5-flash": ["google/gemini-flash-1.5", "groq:llama-3.1-8b-instant"],
     
     # Kept for backward compatibility if old chats use this model
-    "openai/gpt-4o": ["openai/gpt-4o-mini", "anthropic/claude-3-haiku"]
+    "openai/gpt-4o": ["openai/gpt-4o-mini", "groq:llama-3.1-8b-instant"]
 }
 
 SYSTEM_PROMPT = """You are SmartLearn AI — an advanced, highly intelligent learning assistant and professional tutor.
@@ -122,23 +127,39 @@ def search_tavily(query: str):
         print(f"Tavily search failed: {e}")
         return "", []
 
-def needs_web_search(query: str) -> bool:
-    """Uses a fast LLM to determine if the query requires live web search."""
+def get_optimal_search_query(message: str, history: List[Dict] = None, force: bool = False) -> str:
+    """
+    Determines if a web search is needed. If YES (or forced), generates the optimal Google search query.
+    If NO, returns 'NO_SEARCH'.
+    """
+    import datetime
+    current_year = datetime.datetime.now().year
+    
+    if force:
+        sys_prompt = "You are an expert Google Search Query generator. Based on the user's latest message and conversation history, output ONLY the optimal 2-6 word search query to find the answer. Do not include quotes."
+    else:
+        sys_prompt = f"""You are a Web Search Routing Agent. Current year: {current_year}.
+Determine if the user's latest message requires a live web search.
+You MUST search the web if the prompt:
+1. Asks about recent news, current events, weather, sports, or stock prices.
+2. Asks about years {current_year} or later (e.g., '2026', '{current_year}').
+3. Uses phrases like 'search', 'latest', 'today', 'current'.
+4. Asks for highly specific technical documentation or obscure facts.
+
+If a search IS needed, output ONLY the optimal 2-6 word Google search query. Do not use quotes.
+If NO search is needed, output EXACTLY 'NO_SEARCH'."""
+
     try:
-        response = groq_client.chat.completions.create(
-            model="llama-3.1-8b-instant",
-            messages=[
-                {"role": "system", "content": "You are a classifier. Does the user's query require up-to-date, real-time, recent news, or live web knowledge to answer accurately? Respond with exactly 'YES' or 'NO'."},
-                {"role": "user", "content": query}
-            ],
-            temperature=0,
-            max_tokens=10,
-        )
-        answer = response.choices[0].message.content.strip().upper()
-        return "YES" in answer
+        query = get_llm_response(message, model_id="groq:llama-3.1-8b-instant", system_prompt=sys_prompt, history=history)
+        query = query.strip().strip('"').strip("'")
+        
+        if not force and ("NO_SEARCH" in query.upper() or len(query) > 50):
+            return "NO_SEARCH"
+            
+        return query
     except Exception as e:
-        print(f"Classification failed: {e}")
-        return False
+        print(f"Query generation failed: {e}")
+        return message if force else "NO_SEARCH"
 
 # ────────────────────────────────────────────────────
 # STREAMING  (primary — used by /chat endpoint)
@@ -152,17 +173,28 @@ def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: Lis
     # Build multi-turn conversation
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     if history:
-        messages.extend(history)
+        messages.extend(history[-10:])  # Bound history to last 10 messages to prevent token overflow
     messages.append({"role": "user", "content": prompt})
 
     for current_model in model_chain:
         try:
             if current_model.startswith("groq:"):
+                if not groq_client:
+                    raise Exception("Groq API key not configured")
                 active_client = groq_client
                 actual_model = current_model.replace("groq:", "")
+                extra_args = {}
             else:
+                if not openrouter_client:
+                    raise Exception("OpenRouter API key not configured")
                 active_client = openrouter_client
                 actual_model = current_model
+                extra_args = {
+                    "extra_body": {
+                        "route": "fallback",
+                        "provider": {"sort": "throughput"}
+                    }
+                }
 
             stream = active_client.chat.completions.create(
                 model=actual_model,
@@ -171,6 +203,7 @@ def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: Lis
                 max_tokens=4096,
                 top_p=0.9,
                 stream=True,
+                **extra_args
             )
 
             # If we've fallen back to a backup model, let the user know gracefully
@@ -205,22 +238,33 @@ def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: Lis
 # ────────────────────────────────────────────────────
 # NON-STREAMING  (fallback, kept for compatibility)
 # ────────────────────────────────────────────────────
-def get_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: List[Dict] = None) -> str:
+def get_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: List[Dict] = None, system_prompt: str = SYSTEM_PROMPT) -> str:
     model_chain = [model_id] + FALLBACK_ROUTER.get(model_id, [])
 
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    messages = [{"role": "system", "content": system_prompt}] if system_prompt else []
     if history:
-        messages.extend(history)
+        messages.extend(history[-10:])  # Bound history to prevent token overflow
     messages.append({"role": "user", "content": prompt})
 
     for current_model in model_chain:
         try:
             if current_model.startswith("groq:"):
+                if not groq_client:
+                    raise Exception("Groq API key not configured")
                 active_client = groq_client
                 actual_model = current_model.replace("groq:", "")
+                extra_args = {}
             else:
+                if not openrouter_client:
+                    raise Exception("OpenRouter API key not configured")
                 active_client = openrouter_client
                 actual_model = current_model
+                extra_args = {
+                    "extra_body": {
+                        "route": "fallback",
+                        "provider": {"sort": "throughput"}
+                    }
+                }
 
             response = active_client.chat.completions.create(
                 model=actual_model,
@@ -228,6 +272,7 @@ def get_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: List[D
                 temperature=0.7,
                 max_tokens=4096,
                 top_p=0.9,
+                **extra_args
             )
             return response.choices[0].message.content
         except Exception as e:
@@ -241,20 +286,12 @@ def get_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: List[D
 # TITLE GENERATION
 # ────────────────────────────────────────────────────
 def generate_chat_title(message: str) -> str:
-    """Generates a short 3-5 word title for the chat based on the first message."""
+    """Generates a short 3-5 word title using the fallback system."""
     prompt = f"Generate a short, concise, 3 to 5 word title for the following message. Return ONLY the title text, nothing else, no quotes, no explanation:\n\n{message}"
     
     try:
-        response = groq_client.chat.completions.create(
-            model="llama-3.1-8b-instant",
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.5,
-            max_tokens=15,
-            top_p=0.9,
-        )
-        title = response.choices[0].message.content.strip().strip('"').strip("'")
+        title = get_llm_response(prompt, model_id="groq:llama-3.1-8b-instant", system_prompt="")
+        title = title.strip().strip('"').strip("'")
         return title if title else message[:30]
     except Exception:
         return message[:30]
