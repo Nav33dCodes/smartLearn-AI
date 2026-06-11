@@ -418,67 +418,66 @@ export default function Landing() {
              </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
             {/* Public Beta Plan */}
-            <div className="bg-zinc-900/40 border border-zinc-800 hover:border-zinc-700 transition-all rounded-[2rem] p-8 sm:p-10 flex flex-col relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-10 transition-opacity">
-                <Globe size={120} />
+            <div className="bg-[#0a0a0a] border border-zinc-800/80 rounded-3xl p-8 sm:p-10 flex flex-col hover:border-zinc-700 transition-colors">
+              <h3 className="text-xl font-medium text-zinc-300 mb-2">Public Beta</h3>
+              <div className="flex items-baseline gap-1 mb-6">
+                <span className="text-4xl font-bold text-white">$0</span>
+                <span className="text-zinc-500 text-sm font-medium">/ forever</span>
               </div>
-              <h3 className="text-2xl font-bold text-zinc-100 mb-2 relative z-10">Public Beta</h3>
-              <div className="flex items-baseline gap-1 mb-6 relative z-10">
-                <span className="text-5xl font-extrabold text-zinc-100">$0</span>
-                <span className="text-zinc-500 font-medium">/ forever</span>
-              </div>
-              <p className="text-zinc-400 text-sm mb-8 flex-1 leading-relaxed relative z-10">Our way of saying thank you. Secure your pioneer account now and get foundational access forever.</p>
-              <ul className="space-y-4 mb-10 relative z-10">
+              <p className="text-zinc-400 text-sm mb-8 leading-relaxed">
+                Our way of saying thank you. Secure your pioneer account now and get foundational access forever.
+              </p>
+              
+              <div className="h-px w-full bg-gradient-to-r from-zinc-800/80 to-transparent mb-8" />
+              
+              <ul className="space-y-4 mb-10 flex-1">
                 {['Unlimited foundational document analysis', 'Access to high-speed Llama 3 models', 'Generous daily message quotas', 'Interactive knowledge mapping', 'Secure global edge caching'].map((item, i) => (
                   <li key={i} className="flex items-start gap-3 text-sm text-zinc-300">
-                    <CheckCircle2 size={18} className="text-zinc-500 shrink-0 mt-0.5" /> 
-                    <span className="leading-snug">{item}</span>
+                    <CheckCircle2 size={18} className="text-zinc-600 shrink-0 mt-0.5" /> 
+                    <span className="leading-relaxed">{item}</span>
                   </li>
                 ))}
               </ul>
-              <Link to="/signup" className="relative z-10 w-full py-4 px-6 rounded-2xl bg-zinc-100 text-zinc-900 text-center font-bold hover:bg-white hover:scale-[1.02] transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+              
+              <Link to="/signup" className="w-full py-3.5 px-6 rounded-xl bg-white text-black text-center font-medium hover:bg-zinc-200 transition-colors shadow-sm">
                 Claim Free Account
               </Link>
             </div>
 
             {/* Founder's Edition Plan */}
-            <div className="bg-zinc-950 border border-zinc-800 rounded-[2rem] p-8 sm:p-10 flex flex-col relative overflow-hidden group">
-              {/* Blur Overlay for Hype */}
-              <div className="absolute inset-0 bg-black/60 backdrop-blur-md z-10 flex flex-col items-center justify-center p-8 text-center border-2 border-primary/30 rounded-[2rem] shadow-[0_0_50px_rgba(var(--color-primary),0.1)]">
-                <div className="w-16 h-16 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(var(--color-primary),0.4)] relative">
-                  <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
-                  <Cpu size={28} className="text-primary relative z-10" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-3 tracking-tight">Founder's Edition</h3>
-                <p className="text-zinc-300 text-sm mb-8 max-w-[240px] leading-relaxed">
-                  We are forging the ultimate research tier. The most powerful frontier models, uncapped.
-                </p>
-                <button className="relative overflow-hidden w-full py-4 px-6 rounded-2xl border border-primary/50 bg-primary/10 text-primary font-bold hover:bg-primary/20 transition-all group/btn shadow-[0_0_20px_rgba(var(--color-primary),0.15)]">
-                  <span className="relative z-10">Join Waitlist</span>
-                  <div className="absolute inset-0 h-full w-[20px] bg-white/20 skew-x-[30deg] -translate-x-[150px] group-hover/btn:translate-x-[400px] transition-transform duration-1000" />
-                </button>
+            <div className="relative bg-[#0a0a0a] rounded-3xl p-8 sm:p-10 flex flex-col border border-zinc-800/80">
+              {/* Subtle top gradient accent */}
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-primary/60 via-primary/30 to-transparent rounded-t-3xl" />
+              
+              <div className="flex items-center justify-between mb-2 mt-1">
+                <h3 className="text-xl font-medium text-white">Founder's Edition</h3>
+                <span className="text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">Waitlist</span>
               </div>
-
-              {/* Underlying Blurred Content (barely visible for effect) */}
-              <div className="opacity-20 select-none blur-[3px]">
-                <h3 className="text-2xl font-bold text-zinc-100 mb-2">Founder's Edition</h3>
-                <div className="flex items-baseline gap-1 mb-6">
-                  <span className="text-5xl font-extrabold text-zinc-100">$??</span>
-                </div>
-                <p className="text-zinc-400 text-sm mb-8 flex-1">The ultimate research powerhouse.</p>
-                <ul className="space-y-4 mb-10">
-                  {['Unlimited Claude 3.5 & GPT-4o', 'Infinite document storage', 'Deep YouTube Video Analysis', 'Advanced API Access', 'Priority AGI routing'].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3 text-sm text-zinc-300">
-                      <CheckCircle2 size={18} className="text-primary shrink-0" /> {item}
-                    </li>
-                  ))}
-                </ul>
-                <div className="w-full py-4 px-6 rounded-2xl bg-zinc-800 text-center font-bold">
-                  Unlocking Soon
-                </div>
+              
+              <div className="flex items-baseline gap-1 mb-6">
+                <span className="text-4xl font-bold text-white">TBA</span>
               </div>
+              
+              <p className="text-zinc-400 text-sm mb-8 leading-relaxed">
+                We are forging the ultimate research tier. The most powerful frontier models, uncapped.
+              </p>
+              
+              <div className="h-px w-full bg-gradient-to-r from-zinc-800/80 to-transparent mb-8" />
+              
+              <ul className="space-y-4 mb-10 flex-1">
+                {['Unlimited Claude 3.5 & GPT-4o', 'Infinite document storage', 'Deep YouTube Video Analysis', 'Advanced API Access', 'Priority AGI routing'].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-zinc-300">
+                    <CheckCircle2 size={18} className="text-primary shrink-0 mt-0.5" /> 
+                    <span className="leading-relaxed">{item}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              <button className="w-full py-3.5 px-6 rounded-xl bg-zinc-900 text-zinc-300 text-center font-medium border border-zinc-800 hover:text-white hover:bg-zinc-800 hover:border-zinc-700 transition-colors">
+                Join Waitlist
+              </button>
             </div>
           </div>
         </section>
