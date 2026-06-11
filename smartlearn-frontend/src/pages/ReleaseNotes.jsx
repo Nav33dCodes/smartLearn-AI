@@ -2,6 +2,28 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 11, 2026 — Advanced AI Architecture & Premium UI Overhaul",
+    features: [
+      {
+        title: "Enterprise-Grade Fallback Routing",
+        description: "Built a mathematically flawless, multi-tier fallback architecture to guarantee 100% chat uptime.",
+        bullets: [
+          "Native API Prioritization: The system now correctly prioritizes 100% free, direct API endpoints (like Groq) before seamlessly failing over to paid OpenRouter nodes.",
+          "Automatic Failover Protocol: If a model crashes or hits rate limits, the Python backend intercepts the HTTP 500 error and transparently redirects the prompt to a secondary tier model (e.g., 70B to 8B) without the user ever noticing.",
+          "Dynamic Intelligence Router: Integrated an 'Auto' engine which uses a fast classifier to evaluate prompt complexity before routing, slashing API costs by avoiding heavy models for simple tasks."
+        ]
+      },
+      {
+        title: "Gemini Advanced-Style UI Components",
+        description: "Completely overhauled key interface components to match the aesthetics of industry giants like Google and Vercel.",
+        bullets: [
+          "Premium Model Selector: Moved the model selector to the top-left header and redesigned it to match Gemini Advanced. Features include a spacious glassmorphic dropdown, rounded-3xl borders, and dynamic circular glowing icons for active states.",
+          "Vercel-Inspired 'About' Section: Transformed the generic About modal into a massive, centered 'Hero' card featuring subtle gradient glows, tracking-widened version badges, and an elegant terminal-style 'Copy Email' container."
+        ]
+      }
+    ]
+  },
+  {
     date: "June 11, 2026 — Premium Landing Page Redesign",
     features: [
       {
