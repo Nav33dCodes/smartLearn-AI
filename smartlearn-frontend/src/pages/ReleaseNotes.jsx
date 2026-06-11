@@ -2,6 +2,35 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 11, 2026 — Premium Landing Page Redesign",
+    features: [
+      {
+        title: "✨ Premium Minimalist Aesthetic",
+        description: "Completely reimagined the landing page to deliver a sleeker, high-end, and uncluttered Vercel-like experience.",
+        bullets: [
+          "Pricing Architecture: Stripped out the messy blur overlays and ping animations on the Founder's Edition card, replacing them with a crisp, ultra-premium layout featuring razor-thin gradients and clean Waitlist badges.",
+          "Leadership Cards: Removed the visually overwhelming background Sparkles and Code icons from the team cards, achieving a much cleaner and professional look."
+        ]
+      },
+      {
+        title: "⚡ 60fps Scroll Optimization",
+        description: "Drastically improved rendering performance for low-end devices and laptops.",
+        bullets: [
+          "GPU Offloading: Removed the heavy, GPU-intensive blur-[120px] gradient blobs from the background, resulting in buttery smooth scrolling and zero frame drops."
+        ]
+      },
+      {
+        title: "🔗 Unified Web Navigation",
+        description: "Ensured seamless access to important updates and pages directly from the main website.",
+        bullets: [
+          "Added the Release Notes link to the main top navigation header for immediate visibility.",
+          "Fixed all broken routing links across the Hero section and Footer.",
+          "Integrated a seamless 'Back to Home' navigation button directly within the Release Notes page."
+        ]
+      }
+    ]
+  },
+  {
     date: "June 11, 2026 — Upstash Redis Performance & UX Update",
     features: [
       {
