@@ -335,6 +335,7 @@ function ChatDashboard() {
         setDarkMode={setDarkMode}
         themeColor={themeColor}
         setThemeColor={setThemeColor}
+        isChatsLoading={isChatsLoading}
       />
 
       <main className="flex-1 flex flex-col relative w-full h-full overflow-hidden transition-all duration-300">
@@ -392,7 +393,7 @@ function ChatDashboard() {
                }} 
             />
           </Suspense>
-        ) : activeMessages.length === 0 && !isChatsLoading && (!isHistoryLoading || isNewChat) ? (
+        ) : activeMessages.length === 0 && (!isHistoryLoading || isNewChat) ? (
           <div className="flex-1 flex flex-col items-center justify-center px-4 w-full h-full relative z-10 pb-20">
             <h1 className="text-4xl md:text-[44px] font-semibold tracking-tight text-foreground mb-8 text-center">
               How can I help you today, {user?.name ? user.name.split(" ")[0] : "there"}?

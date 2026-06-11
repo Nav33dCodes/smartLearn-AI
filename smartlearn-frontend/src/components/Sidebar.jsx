@@ -10,7 +10,7 @@ import SettingsModal from "./SettingsModal";
 import { Link } from "react-router-dom";
 
 function Sidebar({
-  activeChatId, setActiveChatId, sidebarOpen, setSidebarOpen, createNewChat, currentView, setCurrentView, isMobile, darkMode, setDarkMode, themeColor, setThemeColor
+  activeChatId, setActiveChatId, sidebarOpen, setSidebarOpen, createNewChat, currentView, setCurrentView, isMobile, darkMode, setDarkMode, themeColor, setThemeColor, isChatsLoading
 }) {
   const { data: chatsData = [] } = useChats();
   const deleteChatMutation = useDeleteChat();
@@ -279,14 +279,24 @@ function Sidebar({
         </div>
 
         <div className="flex-1 overflow-y-auto px-2 pb-4 scrollbar-thin">
-          {filteredChats.length === 0 && (
-            <div className="text-sm text-muted-foreground text-center p-4 mt-2">
-              {searchQuery ? "No chats matched." : "No chats yet."}
+          {isChatsLoading ? (
+            <div className="flex flex-col gap-2 p-2 mt-2">
+              {[1, 2, 3, 4, 5, 6, 7].map(i => (
+                <div key={i} className="w-full h-8 bg-muted/60 rounded-md animate-pulse"></div>
+              ))}
             </div>
-          )}
+          ) : (
+            <>
+              {filteredChats.length === 0 && (
+                <div className="text-sm text-muted-foreground text-center p-4 mt-2">
+                  {searchQuery ? "No chats matched." : "No chats yet."}
+                </div>
+              )}
 
-          {renderChatList(pinnedChats, "Pinned")}
-          {renderChatList(unpinnedChats, searchQuery ? `Results (${unpinnedChats.length})` : "Recent")}
+              {renderChatList(pinnedChats, "Pinned")}
+              {renderChatList(unpinnedChats, searchQuery ? `Results (${unpinnedChats.length})` : "Recent")}
+            </>
+          )}
         </div>
 
         <div className="mt-auto flex flex-col">
