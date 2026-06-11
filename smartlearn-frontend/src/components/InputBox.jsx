@@ -5,8 +5,9 @@ import { Button } from "./ui/button";
 import { useUploadPdf } from "../hooks/useChats";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import ModelSelector from "./ModelSelector";
 
-export default function InputBox({ input, setInput, sendMessage, loading, stopGeneration, textareaRef, activeChatId, isEmpty }) {
+export default function InputBox({ input, setInput, sendMessage, loading, stopGeneration, textareaRef, activeChatId, isEmpty, selectedModelId, setSelectedModelId }) {
   const fileInputRef = useRef(null);
   const uploadPdfMutation = useUploadPdf();
   const [attachedFiles, setAttachedFiles] = useState([]);
@@ -247,17 +248,18 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
               className="hidden"
             />
             
-            <div className="relative" ref={plusMenuRef}>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-10 w-10 sm:h-8 sm:w-8 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-all focus-ring hover:-translate-y-[1px]"
-                onClick={() => setShowPlusMenu(!showPlusMenu)}
-                title="Attachments and Options"
-              >
-                <Plus size={20} className={showPlusMenu ? "rotate-45 transition-transform duration-300" : "transition-transform duration-300"} />
-              </Button>
+            <div className="flex items-center gap-2">
+              <div className="relative" ref={plusMenuRef}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 sm:h-8 sm:w-8 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-all focus-ring hover:-translate-y-[1px]"
+                  onClick={() => setShowPlusMenu(!showPlusMenu)}
+                  title="Attachments and Options"
+                >
+                  <Plus size={20} className={showPlusMenu ? "rotate-45 transition-transform duration-300" : "transition-transform duration-300"} />
+                </Button>
 
               <AnimatePresence>
                 {showPlusMenu && (
@@ -324,6 +326,7 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
                   </motion.div>
                 )}
               </AnimatePresence>
+            </div>
             </div>
             
             <div className="flex items-center gap-1.5">

@@ -11,8 +11,9 @@ import InputBox from "./components/InputBox";
 import { useChats, useChatHistory, useShareChat } from "./hooks/useChats";
 import { useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import ModelSelector from "./components/ModelSelector";
 import ErrorBoundary from "./components/ErrorBoundary";
+import ModelSelector from "./components/ModelSelector";
+import { MessageSquare, LayoutDashboard, Settings, LogOut, PanelLeftClose, Search, Menu, Send } from "lucide-react";
 
 // Lazy Loaded Routes & Heavy Components
 const Login = lazy(() => import("./pages/Login"));
@@ -411,6 +412,8 @@ function ChatDashboard() {
                 textareaRef={textareaRef}
                 activeChatId={activeChatId}
                 isEmpty={true}
+                selectedModelId={selectedModelId}
+                setSelectedModelId={setSelectedModelId}
               />
 
               <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
@@ -476,6 +479,8 @@ function ChatDashboard() {
               textareaRef={textareaRef}
               activeChatId={activeChatId}
               isEmpty={false}
+              selectedModelId={selectedModelId}
+              setSelectedModelId={setSelectedModelId}
             />
           </ErrorBoundary>
         )}
