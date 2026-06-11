@@ -302,10 +302,17 @@ const releases = [
   }
 ];
 
+import { Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
+
 export default function ReleaseNotes() {
   return (
     <div className="dark min-h-screen bg-[#0a0a0a] text-zinc-100 font-sans selection:bg-primary/30 overflow-x-hidden pb-20">
       <div className="max-w-3xl mx-auto px-6 py-24 md:py-32">
+        <Link to="/" className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-12">
+          <ArrowLeft size={16} />
+          <span>Back to Home</span>
+        </Link>
         <h1 className="text-[40px] md:text-[56px] font-bold tracking-tight mb-20 leading-tight">
           Release notes
         </h1>

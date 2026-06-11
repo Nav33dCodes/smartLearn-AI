@@ -92,6 +92,7 @@ export default function Landing() {
           <a href="#features" className="hover:text-zinc-100 transition-colors">Features</a>
           <a href="#pricing" className="hover:text-zinc-100 transition-colors">Pricing</a>
           <a href="#about" className="hover:text-zinc-100 transition-colors">About</a>
+          <Link to="/releases" className="hover:text-zinc-100 transition-colors">Release Notes</Link>
         </div>
         <div className="flex items-center gap-4">
           <Link to="/login" className="text-sm font-medium text-zinc-300 hover:text-white transition-colors">Sign In</Link>
@@ -586,7 +587,7 @@ export default function Landing() {
             <ul className="space-y-3 text-sm text-zinc-500">
               <li><a href="#features" className="hover:text-zinc-300 transition-colors">Features</a></li>
               <li><a href="#pricing" className="hover:text-zinc-300 transition-colors">Pricing</a></li>
-              <li><Link to="/release-notes" className="hover:text-zinc-300 transition-colors">Release Notes</Link></li>
+              <li><Link to="/releases" className="hover:text-zinc-300 transition-colors">Release Notes</Link></li>
               <li><Link to="/signup" className="hover:text-zinc-300 transition-colors">Sign Up</Link></li>
               <li><Link to="/login" className="hover:text-zinc-300 transition-colors">Log In</Link></li>
             </ul>
