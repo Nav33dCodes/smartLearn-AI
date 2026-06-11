@@ -91,26 +91,53 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
               transition={{ duration: 0.4 }}
               className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              {msg.role === 'user' ? (
-                <div className="flex flex-col items-end max-w-[85%] sm:max-w-[75%] group">
-                  <div className="bg-muted/80 backdrop-blur-sm text-foreground px-6 py-4 rounded-3xl rounded-tr-sm leading-relaxed whitespace-pre-wrap text-base border border-border/50">
-                    {msg.content}
+              {msg.role === 'user' ? (() => {
+                const fileRegex = /\[FILE:(.+?)\]/g;
+                const files = [];
+                let match;
+                while ((match = fileRegex.exec(msg.content)) !== null) {
+                  files.push(match[1]);
+                }
+                const textContent = msg.content.replace(/\[FILE:(.+?)\]/g, '').trim();
+                
+                return (
+                  <div className="flex flex-col items-end max-w-[85%] sm:max-w-[75%] group">
+                    {files.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-2 justify-end w-full">
+                        {files.map((filename, i) => (
+                          <div key={i} className="flex items-center gap-3 bg-muted/80 backdrop-blur-sm border border-border/50 rounded-2xl p-2 pr-4 shadow-sm">
+                            <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center shrink-0 border border-red-500/20">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-500"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            </div>
+                            <div className="flex flex-col min-w-0 text-left">
+                              <span className="text-[13px] font-semibold text-foreground max-w-[160px] truncate">{filename}</span>
+                              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Document</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {textContent && (
+                      <div className="bg-muted/80 backdrop-blur-sm text-foreground px-6 py-4 rounded-3xl rounded-tr-sm leading-relaxed whitespace-pre-wrap text-base border border-border/50">
+                        {textContent}
+                      </div>
+                    )}
+                    <div className="flex items-center mt-2 opacity-0 group-hover:opacity-100 transition-opacity pr-2">
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(textContent || msg.content);
+                          import("sonner").then(m => m.toast.success("Copied to clipboard"));
+                        }}
+                        className="p-1 text-muted-foreground hover:text-primary border border-transparent hover:border-primary transition-all duration-300 flex items-center gap-1.5 text-xs font-medium rounded-md"
+                        title="Copy your message"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                        Copy
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center mt-2 opacity-0 group-hover:opacity-100 transition-opacity pr-2">
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(msg.content);
-                        import("sonner").then(m => m.toast.success("Copied to clipboard"));
-                      }}
-                      className="p-1 text-muted-foreground hover:text-primary border border-transparent hover:border-primary transition-all duration-300 flex items-center gap-1.5 text-xs font-medium rounded-md"
-                      title="Copy your message"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                      Copy
-                    </button>
-                  </div>
-                </div>
-              ) : (
+                );
+              })() : (
                 <div className="flex w-full group">
                   <div className="flex w-full justify-start gap-4">
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20 mt-1">
