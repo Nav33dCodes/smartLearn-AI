@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, BrainCircuit, Zap, Shield, FileText, Sparkles, Code2, Database, PlaySquare, Image as ImageIcon, CheckCircle2, Cpu, Network, Globe, Mail, ChevronDown } from 'lucide-react';
 import Logo from '../components/Logo';
 export default function Landing() {
@@ -365,33 +365,49 @@ export default function Landing() {
             </div>
             
             <div className="space-y-4">
-              {faqs.map((faq, index) => (
-                <div 
-                  key={index} 
-                  className={`border border-zinc-800 rounded-2xl overflow-hidden transition-colors ${openFaqIndex === index ? 'bg-zinc-900/50 border-primary/30' : 'bg-transparent hover:border-zinc-700'}`}
-                >
-                  <button 
-                    onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
-                    className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none focus-ring rounded-2xl"
+              {faqs.map((faq, index) => {
+                const isOpen = openFaqIndex === index;
+                return (
+                  <motion.div 
+                    layout
+                    key={index} 
+                    className={`border rounded-2xl overflow-hidden transition-all duration-300 ${isOpen ? 'bg-zinc-900/80 border-primary/40 shadow-[0_0_20px_rgba(255,49,49,0.1)]' : 'bg-zinc-950/50 border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-900/30'}`}
                   >
-                    <span className={`font-medium text-lg ${openFaqIndex === index ? 'text-zinc-100' : 'text-zinc-300'}`}>
-                      {faq.question}
-                    </span>
-                    <ChevronDown 
-                      size={20} 
-                      className={`text-zinc-500 shrink-0 transition-transform duration-300 ${openFaqIndex === index ? 'rotate-180 text-primary' : ''}`} 
-                    />
-                  </button>
-                  
-                  <div 
-                    className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${openFaqIndex === index ? 'max-h-48 pb-5 opacity-100' : 'max-h-0 opacity-0'}`}
-                  >
-                    <p className="text-zinc-400 leading-relaxed">
-                      {faq.answer}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                    <button 
+                      onClick={() => setOpenFaqIndex(isOpen ? null : index)}
+                      className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none rounded-2xl group"
+                    >
+                      <span className={`font-medium text-lg transition-colors ${isOpen ? 'text-zinc-100' : 'text-zinc-300 group-hover:text-zinc-200'}`}>
+                        {faq.question}
+                      </span>
+                      <motion.div
+                        animate={{ rotate: isOpen ? 180 : 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className={`flex items-center justify-center w-8 h-8 rounded-full shrink-0 transition-colors ${isOpen ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-400 group-hover:bg-zinc-700 group-hover:text-zinc-300'}`}
+                      >
+                        <ChevronDown size={18} />
+                      </motion.div>
+                    </button>
+                    
+                    <AnimatePresence>
+                      {isOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                        >
+                          <div className="px-6 pb-6 pt-1">
+                            <p className="text-zinc-400 leading-relaxed text-[15px] border-l-2 border-primary/30 pl-4 ml-1">
+                              {faq.answer}
+                            </p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         </section>
