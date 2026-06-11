@@ -85,7 +85,7 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
   }, [input, textareaRef]);
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }

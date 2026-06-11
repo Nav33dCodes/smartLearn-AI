@@ -12,6 +12,7 @@ import { useChats, useChatHistory, useShareChat } from "./hooks/useChats";
 import { useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ModelSelector from "./components/ModelSelector";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 // Lazy Loaded Routes & Heavy Components
 const Login = lazy(() => import("./pages/Login"));
@@ -60,6 +61,9 @@ function ChatDashboard() {
   const [isMobile, setIsMobile] = useState(false);
 
   const textareaRef = useRef(null);
+  const isStreamingRef = useRef(false);
+  const tokenQueueRef = useRef([]);
+  const rafIdRef = useRef(null);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -108,9 +112,10 @@ function ChatDashboard() {
   }, [isChatsLoading, hasInitialized, createNewChat]);
 
   // When activeChatId changes, load its dynamic history ONLY ONCE
+  // CRITICAL: Never overwrite during active streaming
   useEffect(() => {
     if (activeChatId && historyData?.messages) {
-      if (loadedChatIdRef.current !== activeChatId) {
+      if (loadedChatIdRef.current !== activeChatId && !isStreamingRef.current) {
         setActiveMessages(historyData.messages);
         loadedChatIdRef.current = activeChatId;
       }
@@ -142,6 +147,8 @@ function ChatDashboard() {
     if (!overrideText) setInput("");
     setLoading(true);
     setStreamStatus(null);
+    isStreamingRef.current = true;
+    tokenQueueRef.current = [];
 
     try {
       const res = await fetch(`${API}/chat`, {
@@ -210,23 +217,36 @@ function ChatDashboard() {
             if (parsed.token) {
               setStreamStatus(null);
               accumulated += parsed.token;
-              // Update local state for smooth typing
-              setActiveMessages(prev => {
-                const updated = [...prev];
-                const now = Date.now();
-                if (updated.length === 0) {
-                  updated.push({ role: "assistant", content: accumulated, timestamp: now });
-                  return updated;
-                }
-                const lastIdx = updated.length - 1;
-                if (updated[lastIdx].role === "user") {
-                  updated.push({ role: "assistant", content: accumulated, timestamp: now });
-                } else {
-                  const existingMsg = updated[lastIdx];
-                  updated[lastIdx] = { ...existingMsg, role: "assistant", content: accumulated, timestamp: existingMsg.timestamp || now };
-                }
-                return updated;
-              });
+              // Smooth frontend token reveal via requestAnimationFrame
+              tokenQueueRef.current.push(accumulated);
+              if (!rafIdRef.current) {
+                const processQueue = () => {
+                  if (tokenQueueRef.current.length > 0) {
+                    const latest = tokenQueueRef.current[tokenQueueRef.current.length - 1];
+                    tokenQueueRef.current = [];
+                    setActiveMessages(prev => {
+                      const updated = [...prev];
+                      const now = Date.now();
+                      if (updated.length === 0) {
+                        updated.push({ role: "assistant", content: latest, timestamp: now });
+                        return updated;
+                      }
+                      const lastIdx = updated.length - 1;
+                      if (updated[lastIdx].role === "user") {
+                        updated.push({ role: "assistant", content: latest, timestamp: now });
+                      } else {
+                        const existingMsg = updated[lastIdx];
+                        updated[lastIdx] = { ...existingMsg, role: "assistant", content: latest, timestamp: existingMsg.timestamp || now };
+                      }
+                      return updated;
+                    });
+                    rafIdRef.current = requestAnimationFrame(processQueue);
+                  } else {
+                    rafIdRef.current = null;
+                  }
+                };
+                rafIdRef.current = requestAnimationFrame(processQueue);
+              }
             }
           } catch {}
         }
@@ -252,6 +272,23 @@ function ChatDashboard() {
 
     setLoading(false);
     setAbortController(null);
+    isStreamingRef.current = false;
+    // Flush remaining tokens
+    if (rafIdRef.current) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+    if (accumulated) {
+      setActiveMessages(prev => {
+        const updated = [...prev];
+        if (updated.length === 0) return updated;
+        const lastIdx = updated.length - 1;
+        if (updated[lastIdx].role === "assistant") {
+          updated[lastIdx] = { ...updated[lastIdx], content: accumulated };
+        }
+        return updated;
+      });
+    }
     if (!isMobile) setTimeout(() => textareaRef.current?.focus(), 100);
   };
 
@@ -414,7 +451,7 @@ function ChatDashboard() {
             </div>
           </div>
         ) : (
-          <>
+          <ErrorBoundary>
             <ChatWindow 
               messages={activeMessages} 
               loading={loading}
@@ -437,7 +474,7 @@ function ChatDashboard() {
               activeChatId={activeChatId}
               isEmpty={false}
             />
-          </>
+          </ErrorBoundary>
         )}
       </main>
     </div>

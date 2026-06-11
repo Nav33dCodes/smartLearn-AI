@@ -1,22 +1,38 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mermaid from 'mermaid';
-import { Network, Maximize2, Download } from 'lucide-react';
+import { Network, Download } from 'lucide-react';
 
-mermaid.initialize({
-  startOnLoad: false,
-  suppressErrorRendering: true,
-  theme: 'base',
-  themeVariables: {
-    fontFamily: 'Inter, sans-serif',
-    primaryColor: '#10b981', // Emerald
-    primaryTextColor: '#fff',
-    primaryBorderColor: '#059669',
-    lineColor: '#6b7280',
-    secondaryColor: '#f3f4f6',
-    tertiaryColor: '#fff',
-  },
-  securityLevel: 'loose',
-});
+function initMermaid() {
+  const isDark = document.documentElement.classList.contains('dark');
+  mermaid.initialize({
+    startOnLoad: false,
+    suppressErrorRendering: true,
+    theme: 'base',
+    themeVariables: isDark ? {
+      fontFamily: 'Inter, sans-serif',
+      primaryColor: '#6366f1',
+      primaryTextColor: '#f8fafc',
+      primaryBorderColor: '#4f46e5',
+      lineColor: '#94a3b8',
+      secondaryColor: '#1e293b',
+      tertiaryColor: '#0f172a',
+      mainBkg: '#1e293b',
+      textColor: '#f8fafc',
+      nodeBorder: '#4f46e5',
+    } : {
+      fontFamily: 'Inter, sans-serif',
+      primaryColor: '#10b981',
+      primaryTextColor: '#fff',
+      primaryBorderColor: '#059669',
+      lineColor: '#6b7280',
+      secondaryColor: '#f3f4f6',
+      tertiaryColor: '#fff',
+    },
+    securityLevel: 'loose',
+  });
+}
+
+initMermaid();
 
 export default function MermaidBlock({ data }) {
   const containerRef = useRef(null);
@@ -25,6 +41,9 @@ export default function MermaidBlock({ data }) {
 
   useEffect(() => {
     let isMounted = true;
+    
+    // Re-init mermaid to pick up current theme
+    initMermaid();
     
     const timer = setTimeout(async () => {
       try {

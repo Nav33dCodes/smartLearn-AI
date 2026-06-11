@@ -2,20 +2,23 @@ import logging
 import io
 import json
 import gc
+import os
+import uuid
 import time
 from datetime import datetime, timezone
 from typing import Optional
-from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks, Depends
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks, Depends, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import text
 import asyncio
 
 from services.llm import stream_llm_response, search_tavily, needs_web_search, generate_chat_title
 from services.pdf import extract_text, get_pdf_metadata
 from services.rag import store_pdf, search, clear_session, get_stats
-from services.voice import transcribe_audio
+from services.voice import transcribe_audio, generate_speech
 from services.youtube import get_youtube_recommendations
 from database import SessionLocal, Chat, get_db, get_async_db, User, ChatMetadata
 from routers import auth
@@ -51,11 +54,34 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # ────────────────────────────────────────────────────
-# APP
+# APP — Modern Lifespan
 # ────────────────────────────────────────────────────
-app = FastAPI(title="SmartLearn AI", version="13.7.4")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("=== SmartLearn AI starting up ===")
+    try:
+        db = SessionLocal()
+        db.execute(text("SELECT 1"))
+        try:
+            db.execute(text("ALTER TABLE chat_metadata ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT FALSE"))
+        except Exception:
+            pass
+        db.commit()
+        db.close()
+        logger.info("✅ Database connected OK")
+    except Exception as e:
+        logger.error(f"❌ DATABASE FAILED: {e}")
+    try:
+        from services.rag import get_model
+        get_model()
+        logger.info("✅ Sentence transformer model loaded OK")
+    except Exception as e:
+        logger.error(f"❌ MODEL LOAD FAILED: {e}")
+    logger.info("=== Startup complete ===")
+    yield
+    logger.info("=== SmartLearn AI shutting down ===")
 
-import os
+app = FastAPI(title="SmartLearn AI", version="14.0.0", lifespan=lifespan)
 
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "https://smart-learn-ai-gules.vercel.app,http://localhost:5173,http://localhost:3000").split(",")
 app.add_middleware(
@@ -70,48 +96,13 @@ app.include_router(auth.router)
 
 
 # ────────────────────────────────────────────────────
-# STARTUP — logs exact crash reason to Railway
-# ────────────────────────────────────────────────────
-@app.on_event("startup")
-async def startup_event():
-    logger.info("=== SmartLearn AI starting up ===")
-
-    # 1. Test DB connection
-    try:
-        db = SessionLocal()
-        db.execute(text("SELECT 1"))
-        # Seamlessly upgrade DB for new features without losing data
-        try:
-            db.execute(text("ALTER TABLE chat_metadata ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT FALSE"))
-        except Exception:
-            pass # Ignore if sqlite or already exists
-        db.commit()
-        db.close()
-        logger.info("✅ Database connected OK")
-    except Exception as e:
-        logger.error(f"❌ DATABASE FAILED: {e}")
-        # Don't raise — let server start anyway, DB errors show per-request
-
-    # 2. Pre-load sentence transformer model
-    # This prevents timeout on first /chat or /upload request
-    try:
-        from services.rag import get_model
-        get_model()
-        logger.info("✅ Sentence transformer model loaded OK")
-    except Exception as e:
-        logger.error(f"❌ MODEL LOAD FAILED: {e}")
-
-    logger.info("=== Startup complete ===")
-
-
-# ────────────────────────────────────────────────────
 # SCHEMA
 # ────────────────────────────────────────────────────
 class ChatRequest(BaseModel):
-    message: str
+    message: str = Field(..., max_length=10000)
     chat_id: Optional[str] = None
-    search_web: Optional[str] = "off"
-    model: Optional[str] = "meta-llama/llama-3-8b-instruct:free"
+    search_web: Optional[str] = "auto"
+    model: Optional[str] = "groq:llama-3.1-8b-instant"
 
 class RenameRequest(BaseModel):
     title: str
@@ -125,7 +116,7 @@ class PinRequest(BaseModel):
 # ────────────────────────────────────────────────────
 @app.get("/")
 def root():
-    return {"status": "SmartLearn AI Running 🚀", "version": "13.7.4"}
+    return {"status": "SmartLearn AI Running 🚀", "version": "14.0.0"}
 
 @app.get("/health")
 def health():
@@ -138,15 +129,11 @@ def health():
 def save_to_db(user_id: int, chat_id: str, message: str, response: str):
     db = SessionLocal()
     try:
-        from sqlalchemy import func
         count = db.query(func.count(Chat.id)).filter(Chat.chat_id == chat_id).scalar()
-
         db.add(Chat(user_id=user_id, chat_id=chat_id, message=message, response=response))
         db.commit()
         logger.info(f"💾 Saved message for chat_id={chat_id}")
-
         if count == 0:
-            from services.llm import generate_chat_title
             title = generate_chat_title(message)
             meta = db.query(ChatMetadata).filter(ChatMetadata.chat_id == chat_id, ChatMetadata.user_id == user_id).first()
             if not meta:
@@ -156,7 +143,6 @@ def save_to_db(user_id: int, chat_id: str, message: str, response: str):
                 meta.title = title
             db.commit()
             logger.info(f"✨ Auto-generated title for {chat_id}: {title}")
-
     except Exception as e:
         db.rollback()
         logger.error(f"❌ DB save error: {e}")
@@ -168,7 +154,7 @@ def save_to_db(user_id: int, chat_id: str, message: str, response: str):
 # CHAT — SSE streaming
 # ────────────────────────────────────────────────────
 @app.post("/chat")
-async def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_user: User = Depends(get_current_user)):
+async def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     message = data.message.strip()
     chat_id = get_full_chat_id(current_user.id, data.chat_id)
 
@@ -177,7 +163,23 @@ async def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_use
 
     logger.info(f"💬 Chat request: chat_id={chat_id} msg_len={len(message)}")
 
-    # RAG context
+    # ── 1. Fetch conversation history for multi-turn memory ──
+    conversation_history = []
+    try:
+        past_chats = db.query(Chat).filter(
+            Chat.chat_id == chat_id, Chat.user_id == current_user.id
+        ).order_by(Chat.id.asc()).all()
+        recent = past_chats[-10:] if len(past_chats) > 10 else past_chats
+        for c in recent:
+            conversation_history.append({"role": "user", "content": c.message})
+            resp = c.response[:2000] if len(c.response) > 2000 else c.response
+            conversation_history.append({"role": "assistant", "content": resp})
+        if conversation_history:
+            logger.info(f"📚 Loaded {len(recent)} past turns for conversation memory")
+    except Exception as e:
+        logger.error(f"❌ History fetch error: {e}")
+
+    # ── 2. RAG context ──
     try:
         context = search(message, chat_id=chat_id)
         if context and len(context) > 10000:
@@ -190,19 +192,19 @@ async def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_use
         nonlocal context
         full_response = []
         try:
-            # 1. Yield evaluating status if auto
+            # 3. Evaluate web search
             should_search = False
             if data.search_web == "on":
                 should_search = True
             elif data.search_web == "auto":
                 yield f"data: {json.dumps({'status': 'evaluating'})}\n\n"
-                print(f"🤖 Auto-evaluating if Web Search is needed for: {message}")
+                logger.info(f"🤖 Auto-evaluating web search for: {message}")
                 should_search = needs_web_search(message)
 
-            # 2. Perform Web Search if needed
+            # 4. Perform Web Search
             if should_search:
                 yield f"data: {json.dumps({'status': 'searching_web'})}\n\n"
-                print(f"🌐 Performing Web Search via Tavily for: {message}")
+                logger.info(f"🌐 Web Search via Tavily for: {message}")
                 web_context, urls = search_tavily(message)
                 if web_context:
                     context = (context + "\n\n### 🌐 Web Search Results:\n" + web_context) if context else ("### 🌐 Web Search Results:\n" + web_context)
@@ -212,17 +214,15 @@ async def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_use
             else:
                 yield f"data: {json.dumps({'status': 'search_complete'})}\n\n"
 
-            # 3. Inject Current Date/Time
-            from datetime import datetime
+            # 5. Build prompt
             current_time = datetime.now().strftime("%Y-%m-%d %I:%M %p")
-            
             if context:
-                prompt = f"Document & Web Context:\n{context}\n\nCurrent Date and Time: {current_time}\n\nStudent question: {message}\n\nYou are SmartLearn AI, an advanced, professional tutor. Please answer the student's question comprehensively using the provided Context.\nYour response MUST be detailed, highly structured, and utilize rich Markdown formatting such as:\n- **Headings (##, ###)** to organize different sections\n- **Tables** to compare data or present statistics if applicable\n- **Bullet points** and **bold text** for key information\n\nCRITICAL INSTRUCTION: You must heavily synthesize and rely on the provided Context. If you pull facts from the Web Search Results, you MUST cite the source URL provided in the context (e.g. `[Source](URL)`). If the answer is absolutely not found in the context, you may use your internal knowledge, but explicitly state that you are doing so."
+                user_prompt = f"Document & Web Context:\n{context}\n\nCurrent Date and Time: {current_time}\n\nStudent question: {message}\n\nYou are SmartLearn AI, an advanced, professional tutor. Please answer the student's question comprehensively using the provided Context.\nYour response MUST be detailed, highly structured, and utilize rich Markdown formatting such as:\n- **Headings (##, ###)** to organize different sections\n- **Tables** to compare data or present statistics if applicable\n- **Bullet points** and **bold text** for key information\n\nCRITICAL INSTRUCTION: You must heavily synthesize and rely on the provided Context. If you pull facts from the Web Search Results, you MUST cite the source URL provided in the context (e.g. `[Source](URL)`). If the answer is absolutely not found in the context, you may use your internal knowledge, but explicitly state that you are doing so."
             else:
-                prompt = f"Current Date and Time: {current_time}\n\nQuestion: {message}\n\nYou are SmartLearn AI, an advanced, professional tutor. Please answer the student's question comprehensively. Your response MUST be detailed, highly structured, and utilize rich Markdown formatting."
+                user_prompt = f"Current Date and Time: {current_time}\n\nQuestion: {message}\n\nYou are SmartLearn AI, an advanced, professional tutor. Please answer the student's question comprehensively. Your response MUST be detailed, highly structured, and utilize rich Markdown formatting."
 
-            # 4. Stream actual LLM response
-            for token in stream_llm_response(prompt, model_id=data.model):
+            # 6. Stream LLM with conversation history
+            for token in stream_llm_response(user_prompt, model_id=data.model, history=conversation_history):
                 full_response.append(token)
                 yield f"data: {json.dumps({'token': token})}\n\n"
 
@@ -366,7 +366,6 @@ def archive_all_chats(current_user: User = Depends(get_current_user), db: Sessio
     ).update({"is_archived": True})
     
     # Also find all chats that don't even have metadata yet and create metadata for them
-    from sqlalchemy import func
     subquery = db.query(Chat.chat_id, func.min(Chat.id).label("min_id")).filter(Chat.user_id == current_user.id).group_by(Chat.chat_id).subquery()
     first_messages = db.query(Chat).join(subquery, Chat.id == subquery.c.min_id).all()
     
@@ -394,7 +393,7 @@ def unarchive_chat(chat_id: str, current_user: User = Depends(get_current_user),
 # ────────────────────────────────────────────────────
 # SHARE CHAT
 # ────────────────────────────────────────────────────
-import uuid
+# ────────────────────────────────────────────────────
 
 @app.post("/chat/{chat_id}/share")
 def share_chat(chat_id: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -530,8 +529,7 @@ class TTSRequest(BaseModel):
     text: str
     voice: Optional[str] = "en-US-JennyNeural"
 
-from fastapi import Response
-from services.voice import generate_speech
+# generate_speech imported at top
 
 @app.post("/api/tts")
 async def text_to_speech(req: TTSRequest):

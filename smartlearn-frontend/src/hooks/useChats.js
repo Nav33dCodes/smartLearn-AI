@@ -12,7 +12,6 @@ export function useChats() {
   return useQuery({
     // Isolate cache per user. If user logs out, user.id is undefined, cache resets.
     queryKey: ['chats', user?.id],
-    staleTime: 5 * 60 * 1000, // 5 minutes cache to prevent unnecessary network requests
     queryFn: async () => {
       if (!user) return [];
       

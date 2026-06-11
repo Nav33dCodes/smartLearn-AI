@@ -2,6 +2,57 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 11, 2026 — v14.0.0",
+    features: [
+      {
+        title: "🧠 Conversation Memory — The AI Finally Remembers",
+        description: "The single most requested feature is here. SmartLearn AI now maintains full multi-turn conversation context, allowing it to follow up, reference past answers, and engage in genuine back-and-forth dialogue.",
+        bullets: [
+          "Multi-Turn History: The backend now fetches the last 10 conversation turns from the database and injects them into every LLM request as a proper multi-message conversation.",
+          "Intelligent Truncation: Past responses are smartly truncated to 2,000 characters to maximize context window efficiency while preserving meaning.",
+          "Seamless Integration: Works across all models — Groq, Claude, GPT, DeepSeek, and Gemini all receive full conversation context automatically."
+        ]
+      },
+      {
+        title: "⚡ 60fps Smooth Typing Engine",
+        description: "Completely re-engineered how tokens are rendered on screen. Replaced the server-side thread-blocking delay with a sophisticated frontend animation pipeline.",
+        bullets: [
+          "requestAnimationFrame Token Buffer: Incoming tokens are queued and rendered at native 60fps using the browser's animation frame scheduler — identical to how ChatGPT renders its responses.",
+          "Zero Server Blocking: Removed the dangerous time.sleep(0.015) that was blocking entire server threads. The backend now streams at full speed, and the frontend controls the visual pacing.",
+          "4096 Max Tokens: Doubled the response length limit from 2,048 to 4,096 tokens. Long essays, code scripts, and detailed explanations are no longer silently truncated."
+        ]
+      },
+      {
+        title: "🛡️ Crash-Proof Architecture",
+        description: "Implemented multiple layers of defense to ensure the UI never goes blank, no matter what happens.",
+        bullets: [
+          "React Error Boundary: Wrapped the entire chat interface in a graceful error boundary. If any component crashes (quiz, flashcard, mind map), you see a friendly 'Try Again' button instead of a white screen.",
+          "Streaming State Guard: Added an isStreamingRef lock that prevents background database refetches from overwriting the live streaming content — the root cause of the infamous 'disappearing messages' bug.",
+          "Final Token Flush: When streaming completes, a final synchronization pass ensures every last token is rendered, even if the animation buffer hasn't caught up yet."
+        ]
+      },
+      {
+        title: "🎨 Premium UX Polish",
+        description: "Small but impactful refinements that make SmartLearn feel like a $20/month product.",
+        bullets: [
+          "Enter to Send: Changed from Ctrl+Enter to plain Enter (ChatGPT-style). Use Shift+Enter for newlines.",
+          "Dark Mode Mind Maps: Mermaid diagrams now dynamically detect your theme and render with matching Indigo (dark) or Emerald (light) color palettes.",
+          "Web Search Auto-Detection: Fixed the backend default from 'off' to 'auto', so the AI automatically decides when to search the web — matching the frontend's intended behavior."
+        ]
+      }
+    ],
+    fixes: [
+      "Fixed a critical race condition where switching chats during active streaming would cause the chat window to go completely blank.",
+      "Fixed conversation memory — the AI previously had zero context of past messages and could not follow up or reference earlier discussion.",
+      "Fixed server deadlock under concurrent load caused by synchronous time.sleep() blocking the thread pool (just 4 users could freeze the entire server).",
+      "Fixed silent response truncation at 2,048 tokens that cut off long answers mid-sentence.",
+      "Removed dangerous hardcoded JWT secret key fallback that could allow token forgery if JWT_SECRET env var was missing in production.",
+      "Removed 5 inline imports scattered inside functions (datetime, func, uuid) and consolidated all imports at the top of main.py.",
+      "Fixed duplicate staleTime configuration in useChats.js where the first value was silently overridden by the second.",
+      "Migrated deprecated @app.on_event('startup') to modern FastAPI lifespan context manager."
+    ]
+  },
+  {
     date: "June 10, 2026 (Part 6)",
     features: [
       {

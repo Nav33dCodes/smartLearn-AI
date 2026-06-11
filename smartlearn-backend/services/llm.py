@@ -1,5 +1,5 @@
 import os
-import time
+from typing import Generator, List, Dict
 from openai import OpenAI
 from groq import Groq
 from dotenv import load_dotenv
@@ -124,9 +124,9 @@ def needs_web_search(query: str) -> bool:
 # ────────────────────────────────────────────────────
 # STREAMING  (primary — used by /chat endpoint)
 # ────────────────────────────────────────────────────
-def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL) -> Generator[str, None, None]:
+def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: List[Dict] = None) -> Generator[str, None, None]:
     """
-    Yields tokens one by one. Routes to Groq or OpenRouter dynamically.
+    Yields tokens one by one with multi-turn conversation memory.
     """
     try:
         if model_id.startswith("groq:"):
@@ -136,14 +136,17 @@ def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL) -> Generator
             active_client = openrouter_client
             actual_model = model_id
 
+        # Build multi-turn conversation
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+        if history:
+            messages.extend(history)
+        messages.append({"role": "user", "content": prompt})
+
         stream = active_client.chat.completions.create(
             model=actual_model,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user",   "content": prompt}
-            ],
+            messages=messages,
             temperature=0.7,
-            max_tokens=2048,
+            max_tokens=4096,
             top_p=0.9,
             stream=True,
         )
@@ -153,22 +156,21 @@ def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL) -> Generator
                 token = chunk.choices[0].delta.content
                 if token:
                     yield token
-                    time.sleep(0.015) # Artificial delay for smooth ChatGPT typing feel
-        return  # success
+        return
 
     except Exception as e:
         err_str = str(e).lower()
         if "rate_limit" in err_str or "429" in err_str:
             yield "\n\n⚠️ Rate limit hit on this model. Please wait a moment and try again."
         elif "insufficient" in err_str or "credits" in err_str:
-            yield "\n\n⚠️ Your OpenRouter account ran out of credits for this premium model. Please switch to a free model or add credits."
+            yield "\n\n⚠️ Your OpenRouter account ran out of credits for this premium model."
         else:
             yield f"\n\n⚠️ Model '{model_id}' unavailable. (Error: {e})"
 
 # ────────────────────────────────────────────────────
 # NON-STREAMING  (fallback, kept for compatibility)
 # ────────────────────────────────────────────────────
-def get_llm_response(prompt: str, model_id: str = DEFAULT_MODEL) -> str:
+def get_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: List[Dict] = None) -> str:
     try:
         if model_id.startswith("groq:"):
             active_client = groq_client
@@ -177,14 +179,16 @@ def get_llm_response(prompt: str, model_id: str = DEFAULT_MODEL) -> str:
             active_client = openrouter_client
             actual_model = model_id
 
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+        if history:
+            messages.extend(history)
+        messages.append({"role": "user", "content": prompt})
+
         response = active_client.chat.completions.create(
             model=actual_model,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user",   "content": prompt}
-            ],
+            messages=messages,
             temperature=0.7,
-            max_tokens=2048,
+            max_tokens=4096,
             top_p=0.9,
         )
         return response.choices[0].message.content
