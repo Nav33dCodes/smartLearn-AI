@@ -114,7 +114,7 @@ export default function Landing() {
             <Sparkles size={14} className="text-primary" />
             <span>SmartLearn v2.0 is now live</span>
             <span className="w-px h-3 bg-zinc-700 mx-1" />
-            <Link to="/release-notes" className="text-primary hover:text-primary/80 flex items-center gap-1 font-medium transition-colors">
+            <Link to="/releases" className="text-primary hover:text-primary/80 flex items-center gap-1 font-medium transition-colors">
               Read more <ArrowRight size={12} />
             </Link>
           </motion.div>

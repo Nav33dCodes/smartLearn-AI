@@ -5,7 +5,7 @@ const releases = [
     date: "June 11, 2026 — Upstash Redis Performance & UX Update",
     features: [
       {
-        title: "⚡ Lightning-Fast Redis Global Caching",
+        title: "Lightning-Fast Redis Global Caching",
         description: "Completely overhauled the backend architecture with Upstash Redis, achieving sub-millisecond response times and bypassing PostgreSQL for the vast majority of operations.",
         bullets: [
           "Zero-DB Authentication: The core get_current_user logic now fetches your profile directly from Redis, eliminating synchronous database queries on every API request.",
@@ -14,7 +14,7 @@ const releases = [
         ]
       },
       {
-        title: "🎨 ChatGPT-Grade Seamless UI/UX",
+        title: "ChatGPT-Grade Seamless UI/UX",
         description: "Polished the frontend application to behave exactly like industry-leading AI platforms.",
         bullets: [
           "Optimistic Chat Deletion: Deleting a chat is now completely instant. We removed the clunky confirmation modal and implemented an onMutate optimistic update that clears the chat from your screen milliseconds before the server even processes the request.",
@@ -23,7 +23,7 @@ const releases = [
         ]
       },
       {
-        title: "🚦 Enterprise Rate Limiting",
+        title: " Enterprise Rate Limiting",
         description: "Protected the AI generation endpoints to prevent API abuse and control costs.",
         bullets: [
           "Redis-Backed Rate Limiting: The /chat endpoint is now fortified with a strict 15-request-per-minute rate limit, enforced flawlessly across all edge nodes via Upstash Redis."
@@ -39,7 +39,7 @@ const releases = [
     date: "June 11, 2026 — v14.0.0",
     features: [
       {
-        title: "🧠 Conversation Memory — The AI Finally Remembers",
+        title: "Conversation Memory — The AI Finally Remembers",
         description: "The single most requested feature is here. SmartLearn AI now maintains full multi-turn conversation context, allowing it to follow up, reference past answers, and engage in genuine back-and-forth dialogue.",
         bullets: [
           "Multi-Turn History: The backend now fetches the last 10 conversation turns from the database and injects them into every LLM request as a proper multi-message conversation.",
@@ -48,7 +48,7 @@ const releases = [
         ]
       },
       {
-        title: "⚡ 60fps Smooth Typing Engine",
+        title: "60fps Smooth Typing Engine",
         description: "Completely re-engineered how tokens are rendered on screen. Replaced the server-side thread-blocking delay with a sophisticated frontend animation pipeline.",
         bullets: [
           "requestAnimationFrame Token Buffer: Incoming tokens are queued and rendered at native 60fps using the browser's animation frame scheduler — identical to how ChatGPT renders its responses.",
@@ -57,7 +57,7 @@ const releases = [
         ]
       },
       {
-        title: "🛡️ Crash-Proof Architecture",
+        title: "Crash-Proof Architecture",
         description: "Implemented multiple layers of defense to ensure the UI never goes blank, no matter what happens.",
         bullets: [
           "React Error Boundary: Wrapped the entire chat interface in a graceful error boundary. If any component crashes (quiz, flashcard, mind map), you see a friendly 'Try Again' button instead of a white screen.",
@@ -66,7 +66,7 @@ const releases = [
         ]
       },
       {
-        title: "🎨 Premium UX Polish",
+        title: "Premium UX Polish",
         description: "Small but impactful refinements that make SmartLearn feel like a $20/month product.",
         bullets: [
           "Enter to Send: Changed from Ctrl+Enter to plain Enter (ChatGPT-style). Use Shift+Enter for newlines.",
@@ -90,7 +90,7 @@ const releases = [
     date: "June 10, 2026 (Part 6)",
     features: [
       {
-        title: "⚡ Asynchronous Scaling & DOM Virtualization",
+        title: "Asynchronous Scaling & DOM Virtualization",
         description: "A colossal performance overhaul of both the frontend rendering engine and backend database connections to handle immense traffic and massive chat histories.",
         bullets: [
           "True Async Database Queries: Integrated asyncpg into the FastAPI backend. Fetching chats and histories is now completely non-blocking, allowing thousands of simultaneous requests without locking up threads.",
@@ -109,7 +109,7 @@ const releases = [
     date: "June 10, 2026 (Part 5)",
     features: [
       {
-        title: "✨ Premium Architecture & Shimmering UX",
+        title: "Premium Architecture & Shimmering UX",
         description: "Implemented high-end UX transitions and robust layout fixes to ensure a flawless experience.",
         bullets: [
           "Chat History Skeleton Loaders: Replaced the jarring layout shift when loading old chats with a beautiful, shimmering skeleton loader effect that perfectly traces the shape of your messages while data is fetched.",
@@ -118,7 +118,7 @@ const releases = [
         ]
       },
       {
-        title: "📚 Inline Sources Carousel",
+        title: "Inline Sources Carousel",
         description: "Dramatically improved how educational video sources are presented.",
         bullets: [
           "Inline Architecture: Abandoned the intrusive right-hand slide-over panel. Sources now expand smoothly directly beneath the AI's message, keeping your eyes perfectly focused on the chat stream.",
@@ -136,7 +136,7 @@ const releases = [
     date: "June 10, 2026 (Part 4)",
     features: [
       {
-        title: "🎨 SmartLearn Premium UI Redesign",
+        title: "SmartLearn Premium UI Redesign",
         description: "We completely abandoned the standard 'ChatGPT Clone' aesthetic in favor of a sleek, modern, and engaging premium design.",
         bullets: [
           "Chat Bubble Aesthetics: Replaced full-width message bands with dynamic chat bubbles. Your messages now feature a vibrant, modern color gradient, and AI messages sit inside beautiful elevated glass cards.",
@@ -146,7 +146,7 @@ const releases = [
         ]
       },
       {
-        title: "🎙️ Premium AI Voice Engine (STT & TTS)",
+        title: "Premium AI Voice Engine (STT & TTS)",
         description: "Ripped out the buggy native browser speech tools and replaced them with a state-of-the-art backend AI audio pipeline.",
         bullets: [
           "Groq Whisper Speech-to-Text: Native microphone recording now routes directly through Groq's Whisper API, delivering flawless, near-instantaneous transcription regardless of your browser or device.",
@@ -164,7 +164,7 @@ const releases = [
     date: "June 10, 2026 (Part 3)",
     features: [
       {
-        title: "🎓 Next-Gen Interactive Educational Tools",
+        title: "Next-Gen Interactive Educational Tools",
         description: "Completely transformed the chatbot from a standard text generator into a highly interactive, dynamic learning platform using a custom 'Artifact' architecture.",
         bullets: [
           "Dynamic Component Interception: Re-engineered the Markdown engine to seamlessly intercept specific AI code block formats and instantly render premium, interactive React components in the chat stream.",
@@ -174,7 +174,7 @@ const releases = [
         ]
       },
       {
-        title: "✨ ChatGPT-Style Dashboard Redesign",
+        title: "ChatGPT-Style Dashboard Redesign",
         description: "Overhauled the empty-state layout to deliver a flawless, deeply focused aesthetic mirroring industry-leading AI platforms.",
         bullets: [
           "Centric Greeting Architecture: The welcome message ('How can I help you today, Name?') is now perfectly centered in a massive, premium font size.",
@@ -188,7 +188,7 @@ const releases = [
     date: "June 10, 2026 (Part 2)",
     features: [
       {
-        title: "⚡ Dual-Provider Architecture & The 5 Pillars",
+        title: "Dual-Provider Architecture & The 5 Pillars",
         description: "Re-engineered the backend routing logic to support multiple API providers simultaneously, delivering unmatched speed and reasoning.",
         bullets: [
           "Native Groq Integration: Restored the official Groq client. Requests routed to 'Groq Instant' bypass OpenRouter entirely for blistering, near-zero-latency LPU inference.",
@@ -197,7 +197,7 @@ const releases = [
         ]
       },
       {
-        title: "🎨 Premium UI Overhaul & UX Polish",
+        title: "Premium UI Overhaul & UX Polish",
         description: "Implemented several highly requested quality-of-life interface upgrades to make the platform feel truly state-of-the-art.",
         bullets: [
           "Code Export Engine: Completely redesigned the syntax highlighter UI with darker, premium aesthetics and added a native 'Download' button that automatically detects file extensions (e.g. .py, .js).",
@@ -215,7 +215,7 @@ const releases = [
     date: "June 10, 2026",
     features: [
       {
-        title: "🚀 OpenRouter Multi-Model Mastery (Most Advanced Update Yet)",
+        title: "OpenRouter Multi-Model Mastery (Most Advanced Update Yet)",
         description: "Completely overhauled the core AI engine, granting you access to the world's most powerful frontier models within a single unified interface.",
         bullets: [
           "ChatGPT-Style Model Selector: A gorgeous new dropdown menu allowing instant, mid-conversation switching between leading AI models.",
@@ -303,23 +303,8 @@ const releases = [
 ];
 
 export default function ReleaseNotes() {
-  // Force light mode on this specific page by removing "dark" from document
-  useEffect(() => {
-    const wasDark = document.documentElement.classList.contains("dark");
-    document.documentElement.classList.remove("dark");
-    document.body.style.backgroundColor = "white";
-    
-    return () => {
-      // Revert when unmounting if it was dark
-      if (wasDark) {
-        document.documentElement.classList.add("dark");
-      }
-      document.body.style.backgroundColor = "";
-    };
-  }, []);
-
   return (
-    <div className="min-h-screen bg-white text-[#0d0d0d] font-sans selection:bg-black selection:text-white pb-20">
+    <div className="dark min-h-screen bg-[#0a0a0a] text-zinc-100 font-sans selection:bg-primary/30 overflow-x-hidden pb-20">
       <div className="max-w-3xl mx-auto px-6 py-24 md:py-32">
         <h1 className="text-[40px] md:text-[56px] font-bold tracking-tight mb-20 leading-tight">
           Release notes
@@ -346,10 +331,10 @@ export default function ReleaseNotes() {
                     <h3 className="text-[20px] font-semibold tracking-tight">
                       {feature.title}
                     </h3>
-                    <p className="text-[16px] leading-relaxed text-[#333333]">
+                    <p className="text-[16px] leading-relaxed text-zinc-400">
                       {feature.description}
                     </p>
-                    <ul className="list-disc pl-5 space-y-2 mt-4 text-[16px] leading-relaxed text-[#333333] marker:text-[#888888]">
+                    <ul className="list-disc pl-5 space-y-2 mt-4 text-[16px] leading-relaxed text-zinc-400 marker:text-zinc-600">
                       {feature.bullets.map((bullet, bIdx) => (
                         <li key={bIdx} className="pl-2">{bullet}</li>
                       ))}
@@ -363,7 +348,7 @@ export default function ReleaseNotes() {
                     <h3 className="text-[20px] font-semibold tracking-tight">
                       Bug Fixes
                     </h3>
-                    <ul className="list-disc pl-5 space-y-2 mt-4 text-[16px] leading-relaxed text-[#333333] marker:text-[#888888]">
+                    <ul className="list-disc pl-5 space-y-2 mt-4 text-[16px] leading-relaxed text-zinc-400 marker:text-zinc-600">
                       {release.fixes.map((fix, fixIdx) => (
                         <li key={fixIdx} className="pl-2">{fix}</li>
                       ))}
@@ -373,7 +358,7 @@ export default function ReleaseNotes() {
               </div>
               
               {index < releases.length - 1 && (
-                <hr className="mt-24 border-[#e5e5e5]" />
+                <hr className="mt-24 border-zinc-800" />
               )}
             </motion.div>
           ))}
