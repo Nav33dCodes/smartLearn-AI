@@ -572,31 +572,43 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode, 
               {activeTab === 'about' && (
                 <motion.div key="about" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="max-w-md">
                   <h3 className="text-lg font-medium mb-6 pb-2 border-b border-zinc-200 dark:border-zinc-800">About SmartLearn AI</h3>
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-4">
-                      <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-sm">
-                        <CheckCircle2 size={24} />
+                  <div className="space-y-8">
+                    
+                    {/* Hero Branding */}
+                    <div className="flex flex-col items-center justify-center py-8 bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-900/50 dark:to-transparent border border-zinc-200 dark:border-zinc-800 rounded-2xl relative overflow-hidden">
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
+                      <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 mb-4 ring-4 ring-primary/10">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                       </div>
-                      <div>
-                        <p className="font-semibold text-foreground">SmartLearn AI</p>
-                        <p className="text-sm text-muted-foreground">Version 13.7.4 (BETA)</p>
+                      <h4 className="text-xl font-bold tracking-tight text-foreground">SmartLearn AI</h4>
+                      <div className="flex items-center gap-2 mt-3">
+                        <span className="px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                          Version 13.7.4 (BETA)
+                        </span>
                       </div>
                     </div>
-                    <div className="bg-zinc-50 dark:bg-zinc-900/40 p-5 rounded-xl border border-zinc-200 dark:border-zinc-800">
-                      <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                        SmartLearn AI is an advanced, industry-level cognitive assistant designed for peak productivity, rapid learning, and seamless AI interactions.
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-4 font-medium">
-                        &copy; {new Date().getFullYear()} SmartLearn AI. All rights reserved.
+
+                    {/* Description */}
+                    <div className="px-1 text-center">
+                      <p className="text-[14px] leading-relaxed text-muted-foreground font-medium">
+                        SmartLearn is a high-performance, industry-grade cognitive engine designed to accelerate productivity and facilitate seamless AI interactions through advanced conversational models.
                       </p>
                     </div>
-                    <div className="pt-2">
-                      <h4 className="text-sm font-semibold mb-2">Need Help?</h4>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Our premium support team is available 24/7 to assist you. You can reach us directly at the email below.
-                      </p>
-                      <div className="flex items-center gap-3">
-                        <div className="flex-1 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-4 py-2.5 text-sm font-medium text-foreground select-all">
+
+                    {/* Support & Contact */}
+                    <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800">
+                      <div className="flex items-center gap-3 mb-4 px-1">
+                        <div className="p-2 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
+                          <Info size={16} className="text-foreground" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-semibold text-foreground tracking-tight">Dedicated Support</h4>
+                          <p className="text-xs text-muted-foreground mt-0.5">Available 24/7 for premium assistance.</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-900/50 p-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all hover:border-zinc-300 dark:hover:border-zinc-700">
+                        <div className="flex-1 px-3 text-sm font-semibold text-foreground truncate select-all">
                           iamnaveed.cs@gmail.com
                         </div>
                         <button 
@@ -604,12 +616,20 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode, 
                             navigator.clipboard.writeText("iamnaveed.cs@gmail.com");
                             toast.success("Email copied to clipboard!");
                           }}
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm"
+                          className="bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-foreground px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all shadow-sm border border-zinc-200 dark:border-zinc-700 active:scale-95"
                         >
                           Copy
                         </button>
                       </div>
                     </div>
+
+                    {/* Footer / Copyright */}
+                    <div className="flex items-center justify-center pt-2">
+                      <p className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
+                        &copy; {new Date().getFullYear()} SmartLearn AI. All rights reserved.
+                      </p>
+                    </div>
+
                   </div>
                 </motion.div>
               )}
