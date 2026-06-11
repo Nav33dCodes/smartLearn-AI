@@ -368,6 +368,56 @@ export default function Landing() {
           </div>
         </section>
 
+        {/* About Section */}
+        <section id="about" className="py-32 px-6 bg-[#0a0a0a] border-t border-zinc-900 relative">
+          <div className="max-w-6xl mx-auto relative z-10">
+            {/* The Mission Statement */}
+            <div className="text-center mb-24 max-w-4xl mx-auto">
+              <h2 className="text-sm font-medium text-primary tracking-widest uppercase mb-6">The Mission</h2>
+              <p className="text-3xl sm:text-5xl font-bold tracking-tight text-zinc-100 leading-[1.2]">
+                We are engineering the cognitive architecture of tomorrow. SmartLearn AI is built for pioneers who demand uncompromising speed and intelligence.
+              </p>
+            </div>
+
+            {/* Leadership Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              {/* Sanan Malik */}
+              <div className="bg-[#09090b] border border-zinc-800 rounded-3xl p-8 sm:p-10 flex flex-col justify-between group hover:border-zinc-700 transition-colors relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-8 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity">
+                  <Sparkles size={120} />
+                </div>
+                <div className="relative z-10">
+                  <div className="w-14 h-14 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center mb-6 shadow-xl">
+                    <Sparkles size={22} className="text-zinc-400 group-hover:text-primary transition-colors" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-zinc-100 mb-1">Sanan Malik</h3>
+                  <p className="text-primary font-medium mb-6 text-sm tracking-wide">CEO & VISIONARY</p>
+                  <p className="text-zinc-400 text-base leading-relaxed">
+                    Driving the strategic vision to make SmartLearn AI the absolute pinnacle of educational and research technology globally.
+                  </p>
+                </div>
+              </div>
+
+              {/* Naveed Ahmed */}
+              <div className="bg-[#09090b] border border-zinc-800 rounded-3xl p-8 sm:p-10 flex flex-col justify-between group hover:border-zinc-700 transition-colors relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-8 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity">
+                  <Code2 size={120} />
+                </div>
+                <div className="relative z-10">
+                  <div className="w-14 h-14 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center mb-6 shadow-xl">
+                    <Code2 size={22} className="text-zinc-400 group-hover:text-primary transition-colors" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-zinc-100 mb-1">Naveed Ahmed</h3>
+                  <p className="text-primary font-medium mb-6 text-sm tracking-wide">LEAD ARCHITECT & DEVELOPER</p>
+                  <p className="text-zinc-400 text-base leading-relaxed">
+                    Engineering the core infrastructure, RAG pipelines, and hyper-optimized UI/UX to deliver a 60fps, zero-latency experience.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Pricing Section */}
         <section id="pricing" className="py-24 px-6 max-w-7xl mx-auto">
           <div className="text-center mb-20 relative">
