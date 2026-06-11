@@ -27,11 +27,19 @@ DEFAULT_MODEL = "groq:llama-3.1-8b-instant"
 
 # Advanced Fallback Architecture
 FALLBACK_ROUTER = {
-    "groq:llama-3.3-70b-versatile": ["groq:llama-3.1-8b-instant", "meta-llama/llama-3.3-70b-instruct"],
-    "anthropic/claude-3.5-sonnet": ["anthropic/claude-3-haiku", "openai/gpt-4o-mini"],
-    "openai/gpt-4o": ["openai/gpt-4o-mini", "anthropic/claude-3-haiku"],
+    # 1. Groq Fast Route
     "groq:llama-3.1-8b-instant": ["meta-llama/llama-3.1-8b-instruct"],
-    "deepseek/deepseek-coder": ["meta-llama/llama-3.1-8b-instruct"]
+    # 2. Groq Heavy Route
+    "groq:llama-3.3-70b-versatile": ["groq:llama-3.1-8b-instant", "meta-llama/llama-3.3-70b-instruct"],
+    # 3. Anthropic Research Route
+    "anthropic/claude-3.5-sonnet": ["anthropic/claude-3-haiku", "openai/gpt-4o-mini"],
+    # 4. DeepSeek Coding Route
+    "deepseek/deepseek-coder": ["meta-llama/llama-3.1-8b-instruct", "openai/gpt-4o-mini"],
+    # 5. Gemini Study Route
+    "google/gemini-2.5-flash": ["google/gemini-flash-1.5", "openai/gpt-4o-mini"],
+    
+    # Kept for backward compatibility if old chats use this model
+    "openai/gpt-4o": ["openai/gpt-4o-mini", "anthropic/claude-3-haiku"]
 }
 
 SYSTEM_PROMPT = """You are SmartLearn AI — an advanced, highly intelligent learning assistant and professional tutor.
