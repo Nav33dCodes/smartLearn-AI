@@ -203,12 +203,16 @@ def reset_password(req: ResetPasswordRequest, background_tasks: BackgroundTasks,
 def update_name(req: UpdateNameRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user_auth)):
     current_user.name = req.name.strip()
     db.commit()
+    from services.redis_client import delete_cache
+    delete_cache(f"user_profile:{current_user.id}")
     return {"message": "Name updated successfully", "name": current_user.name}
 
 @router.put("/user/avatar")
 def update_avatar(req: UpdateAvatarRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user_auth)):
     current_user.avatar = req.avatar
     db.commit()
+    from services.redis_client import delete_cache
+    delete_cache(f"user_profile:{current_user.id}")
     return {"message": "Avatar updated successfully", "avatar": current_user.avatar}
 
 @router.put("/user/password")
@@ -221,6 +225,8 @@ def update_password(req: UpdatePasswordRequest, db: Session = Depends(get_db), c
         
     current_user.password_hash = get_password_hash(req.new_password)
     db.commit()
+    from services.redis_client import delete_cache
+    delete_cache(f"user_profile:{current_user.id}")
     return {"message": "Password updated successfully"}
 
 @router.get("/user/export")
@@ -265,5 +271,7 @@ def delete_account(req: DeleteAccountRequest, db: Session = Depends(get_db), cur
     db.query(ChatMetadata).filter(ChatMetadata.user_id == current_user.id).delete()
     db.delete(current_user)
     db.commit()
+    from services.redis_client import delete_cache
+    delete_cache(f"user_profile:{current_user.id}")
     
     return {"message": "Account deleted successfully"}

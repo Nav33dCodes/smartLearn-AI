@@ -31,14 +31,30 @@ from sqlalchemy import select, func
 
 security = HTTPBearer()
 
+class CachedUser:
+    def __init__(self, id, name, email, avatar):
+        self.id = id
+        self.name = name
+        self.email = email
+        self.avatar = avatar
+
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)):
     payload = verify_token(credentials.credentials, token_type="access")
     if not payload:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     user_id = payload.get("sub")
+    
+    from services.redis_client import get_cache, set_cache
+    cache_key = f"user_profile:{user_id}"
+    cached_user = get_cache(cache_key)
+    if cached_user:
+        return CachedUser(**cached_user)
+        
     user = db.query(User).filter(User.id == int(user_id)).first()
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
+        
+    set_cache(cache_key, {"id": user.id, "name": user.name, "email": user.email, "avatar": user.avatar}, expire_seconds=3600)
     return user
 
 def get_full_chat_id(user_id: int, chat_id: str) -> str:
