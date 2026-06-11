@@ -27,6 +27,8 @@ DEFAULT_MODEL = "groq:llama-3.1-8b-instant"
 
 # Advanced Fallback Architecture
 FALLBACK_ROUTER = {
+    # 0. OpenRouter Auto Route
+    "openrouter/auto": ["groq:llama-3.3-70b-versatile", "anthropic/claude-3-haiku"],
     # 1. Groq Fast Route
     "groq:llama-3.1-8b-instant": ["meta-llama/llama-3.1-8b-instruct"],
     # 2. Groq Heavy Route

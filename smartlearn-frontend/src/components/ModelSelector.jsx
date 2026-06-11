@@ -1,8 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Check, Sparkles, Zap, Brain, Rocket } from 'lucide-react';
+import { ChevronDown, Check, Sparkles, Zap, Brain, Rocket, Wand2 } from 'lucide-react';
 
 export const MODELS = [
+  {
+    id: "openrouter/auto",
+    name: "Auto (Dynamic)",
+    provider: "OpenRouter",
+    icon: Wand2,
+    description: "Intelligently routes prompts to balance cost and capability."
+  },
   {
     id: "groq:llama-3.1-8b-instant",
     name: "Groq Llama 3.1 8B (Instant)",
