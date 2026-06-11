@@ -99,7 +99,7 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
     }
     
     const fileListStr = attachedFiles.length > 0 
-      ? attachedFiles.map(f => `📎 **${f.name}**`).join('\n') + '\n\n'
+      ? attachedFiles.map(f => `[FILE:${f.name}]`).join('\n') + '\n\n'
       : "";
       
     const baseInput = input.trim() ? input.trim() : "Please analyze the attached document(s).";
