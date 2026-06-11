@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from typing import Optional
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks, Depends, Response
+from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
@@ -176,7 +177,7 @@ def save_to_db(user_id: int, chat_id: str, message: str, response: str):
 # CHAT — SSE streaming
 # ────────────────────────────────────────────────────
 @app.post("/chat")
-async def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     # ── 0. Rate Limiting ──
     # Max 15 messages per 60 seconds per user
     if not check_rate_limit(f"ratelimit:chat:{current_user.id}", max_requests=15, window_seconds=60):
@@ -532,7 +533,7 @@ async def upload(file: UploadFile = File(...), chat_id: str = "default", current
 
         logger.info(f"📄 File size: {len(file_bytes)} bytes")
 
-        text = extract_text(io.BytesIO(file_bytes))
+        text = await run_in_threadpool(extract_text, io.BytesIO(file_bytes))
         if not text or not text.strip():
             raise HTTPException(status_code=422, detail="No readable text found in this file")
         if text.startswith("PDF extraction error:"):
@@ -540,11 +541,11 @@ async def upload(file: UploadFile = File(...), chat_id: str = "default", current
 
         logger.info(f"📄 Extracted {len(text)} chars — now storing in RAG...")
 
-        chunk_count = store_pdf(text, chat_id=full_chat_id)
+        chunk_count = await run_in_threadpool(store_pdf, text, chat_id=full_chat_id)
         logger.info(f"✅ Stored {chunk_count} chunks for chat_id={full_chat_id}")
 
         try:
-            meta = get_pdf_metadata(io.BytesIO(file_bytes))
+            meta = await run_in_threadpool(get_pdf_metadata, io.BytesIO(file_bytes))
         except Exception:
             meta = {"pages": "?", "title": "", "author": ""}
 

@@ -2,6 +2,8 @@ import faiss
 import numpy as np
 import re
 import gc
+import os
+import json
 
 # ── FIXED: Model was loading at import time = 400MB RAM used immediately
 # Now loads lazily on first use
@@ -15,8 +17,15 @@ def get_model():
     return _model
 
 
-# ── Per-session storage ──
-_sessions: dict = {}
+# ── Disk Storage ──
+RAG_DIR = "rag_data"
+os.makedirs(RAG_DIR, exist_ok=True)
+
+def _get_index_path(chat_id: str) -> str:
+    return os.path.join(RAG_DIR, f"{chat_id}_index.bin")
+
+def _get_chunks_path(chat_id: str) -> str:
+    return os.path.join(RAG_DIR, f"{chat_id}_chunks.json")
 
 # ── Global fallback ──
 _global_index = None
@@ -25,9 +34,6 @@ _global_chunks = []
 # ── FIXED: Max chunks per session to prevent RAM overflow
 # 1 chunk ≈ 500 chars. 300 chunks ≈ 150KB text = enough for a 50-page PDF
 MAX_CHUNKS = 300
-
-# ── FIXED: Max sessions in memory at once
-MAX_SESSIONS = 5
 
 
 # ────────────────────────────────────────────────────
@@ -73,12 +79,6 @@ def create_chunks(text: str, size: int = 1500, overlap: int = 200) -> list:
 def store_pdf(text: str, chat_id: str = None) -> int:
     global _global_index, _global_chunks
 
-    # FIXED: Evict oldest session if we're over the limit
-    if chat_id and len(_sessions) >= MAX_SESSIONS:
-        oldest = next(iter(_sessions))
-        del _sessions[oldest]
-        gc.collect()  # free RAM immediately
-
     chunks = create_chunks(text)
     if not chunks:
         return 0
@@ -98,11 +98,17 @@ def store_pdf(text: str, chat_id: str = None) -> int:
     idx.add(embeddings)
 
     if chat_id:
-        # Clear old session for this chat_id before storing new one
-        if chat_id in _sessions:
-            del _sessions[chat_id]
-            gc.collect()
-        _sessions[chat_id] = {"index": idx, "chunks": chunks}
+        # Save to disk instantly to prevent memory leaks
+        index_path = _get_index_path(chat_id)
+        chunks_path = _get_chunks_path(chat_id)
+        
+        faiss.write_index(idx, index_path)
+        with open(chunks_path, "w", encoding="utf-8") as f:
+            json.dump(chunks, f)
+            
+        # Free FAISS from RAM immediately
+        del idx
+        gc.collect()
     else:
         _global_index = idx
         _global_chunks = chunks
@@ -115,10 +121,22 @@ def store_pdf(text: str, chat_id: str = None) -> int:
 # ────────────────────────────────────────────────────
 def search(query: str, chat_id: str = None, k: int = 6) -> str:
     # FIXED: k=6 and chunk size 1500 provides much richer context for detailed answers
-
-    if chat_id and chat_id in _sessions:
-        idx = _sessions[chat_id]["index"]
-        chunks = _sessions[chat_id]["chunks"]
+    idx = None
+    chunks = []
+    
+    if chat_id:
+        index_path = _get_index_path(chat_id)
+        chunks_path = _get_chunks_path(chat_id)
+        
+        if os.path.exists(index_path) and os.path.exists(chunks_path):
+            try:
+                # Load from disk
+                idx = faiss.read_index(index_path)
+                with open(chunks_path, "r", encoding="utf-8") as f:
+                    chunks = json.load(f)
+            except Exception as e:
+                print(f"Failed to load RAG disk storage: {e}")
+                return ""
     else:
         idx = _global_index
         chunks = _global_chunks
@@ -138,6 +156,12 @@ def search(query: str, chat_id: str = None, k: int = 6) -> str:
         for dist, i in zip(distances[0], indices[0]):
             if i < len(chunks) and dist < 1.8:
                 results.append(chunks[i])
+                
+        # Free memory immediately after search
+        if chat_id:
+            del idx
+            del chunks
+            gc.collect()
 
         return "\n\n".join(results)
 
@@ -151,21 +175,29 @@ def search(query: str, chat_id: str = None, k: int = 6) -> str:
 # ────────────────────────────────────────────────────
 def clear_session(chat_id: str) -> None:
     """Free memory for a deleted chat."""
-    if chat_id in _sessions:
-        del _sessions[chat_id]
-        gc.collect()
+    index_path = _get_index_path(chat_id)
+    chunks_path = _get_chunks_path(chat_id)
+    
+    if os.path.exists(index_path):
+        os.remove(index_path)
+    if os.path.exists(chunks_path):
+        os.remove(chunks_path)
 
 
 def has_context(chat_id: str = None) -> bool:
-    if chat_id and chat_id in _sessions:
-        return True
+    if chat_id:
+        return os.path.exists(_get_index_path(chat_id))
     return _global_index is not None
 
 
 def get_stats(chat_id: str = None) -> dict:
-    if chat_id and chat_id in _sessions:
-        chunks = _sessions[chat_id]["chunks"]
-        return {"session": chat_id, "chunks": len(chunks), "source": "session"}
+    if chat_id and os.path.exists(_get_chunks_path(chat_id)):
+        try:
+            with open(_get_chunks_path(chat_id), "r", encoding="utf-8") as f:
+                chunks = json.load(f)
+            return {"session": chat_id, "chunks": len(chunks), "source": "disk"}
+        except:
+            pass
     if _global_chunks:
         return {"session": "global", "chunks": len(_global_chunks), "source": "global"}
     return {"session": None, "chunks": 0, "source": "none"}

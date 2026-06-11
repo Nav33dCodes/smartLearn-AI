@@ -46,8 +46,9 @@ export function useChats() {
     },
     // Prevent fetching if no user is logged in
     enabled: !!user,
-    staleTime: 1000 * 60 * 5, // 5 minutes cache
+    staleTime: 1000 * 15, // 15 seconds cache to fix stale UI
     cacheTime: 1000 * 60 * 30, // 30 minutes garbage collection
+    refetchOnWindowFocus: true, // Instantly sync when switching tabs
   });
 }
 
