@@ -259,53 +259,78 @@ export default function Landing() {
 
         {/* Pricing Section */}
         <section id="pricing" className="py-24 px-6 max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-             <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-zinc-100 mb-4">Simple, transparent pricing</h2>
-             <p className="text-zinc-400 text-lg">Choose the plan that fits your study needs.</p>
+          <div className="text-center mb-20 relative">
+             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary mb-6">
+                <Sparkles size={14} />
+                <span className="font-medium tracking-wide">Early Access Phase</span>
+             </div>
+             <h2 className="text-4xl sm:text-6xl font-bold tracking-tight text-zinc-100 mb-6">Built for the future. <br className="hidden sm:block" /> Free for the pioneers.</h2>
+             <p className="text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+               During our exclusive Public Beta, all users get unprecedented access to SmartLearn's core engine for free. Our ultimate research tier is currently being forged.
+             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Starter Plan */}
-            <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 flex flex-col">
-              <h3 className="text-xl font-bold text-zinc-100 mb-2">Starter</h3>
-              <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-4xl font-bold text-zinc-100">$0</span>
-                <span className="text-zinc-500">/month</span>
+            {/* Public Beta Plan */}
+            <div className="bg-zinc-900/40 border border-zinc-800 hover:border-zinc-700 transition-all rounded-[2rem] p-8 sm:p-10 flex flex-col relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-10 transition-opacity">
+                <Globe size={120} />
               </div>
-              <p className="text-zinc-400 text-sm mb-8 flex-1">Perfect for students starting out with AI document analysis.</p>
-              <ul className="space-y-4 mb-8">
-                {['5 documents per month', 'Access to base models (Llama 3)', '50 messages per day', 'Basic Web Search', 'Standard support'].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-zinc-300">
-                    <CheckCircle2 size={16} className="text-zinc-600" /> {item}
+              <h3 className="text-2xl font-bold text-zinc-100 mb-2 relative z-10">Public Beta</h3>
+              <div className="flex items-baseline gap-1 mb-6 relative z-10">
+                <span className="text-5xl font-extrabold text-zinc-100">$0</span>
+                <span className="text-zinc-500 font-medium">/ forever</span>
+              </div>
+              <p className="text-zinc-400 text-sm mb-8 flex-1 leading-relaxed relative z-10">Our way of saying thank you. Secure your pioneer account now and get foundational access forever.</p>
+              <ul className="space-y-4 mb-10 relative z-10">
+                {['Unlimited foundational document analysis', 'Access to high-speed Llama 3 models', 'Generous daily message quotas', 'Interactive knowledge mapping', 'Secure global edge caching'].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-zinc-300">
+                    <CheckCircle2 size={18} className="text-zinc-500 shrink-0 mt-0.5" /> 
+                    <span className="leading-snug">{item}</span>
                   </li>
                 ))}
               </ul>
-              <Link to="/signup" className="w-full py-3 px-4 rounded-xl border border-zinc-700 text-center text-sm font-medium hover:bg-zinc-800 transition-colors">
-                Get Started
+              <Link to="/signup" className="relative z-10 w-full py-4 px-6 rounded-2xl bg-zinc-100 text-zinc-900 text-center font-bold hover:bg-white hover:scale-[1.02] transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                Claim Free Account
               </Link>
             </div>
 
-            {/* Pro Plan */}
-            <div className="bg-zinc-900 border-2 border-primary rounded-3xl p-8 flex flex-col relative transform md:-translate-y-4 shadow-[0_0_40px_rgba(var(--color-primary),0.15)]">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                Unlimited Power
+            {/* Founder's Edition Plan */}
+            <div className="bg-zinc-950 border border-zinc-800 rounded-[2rem] p-8 sm:p-10 flex flex-col relative overflow-hidden group">
+              {/* Blur Overlay for Hype */}
+              <div className="absolute inset-0 bg-black/60 backdrop-blur-md z-10 flex flex-col items-center justify-center p-8 text-center border-2 border-primary/30 rounded-[2rem] shadow-[0_0_50px_rgba(var(--color-primary),0.1)]">
+                <div className="w-16 h-16 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(var(--color-primary),0.4)] relative">
+                  <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
+                  <Cpu size={28} className="text-primary relative z-10" />
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-3 tracking-tight">Founder's Edition</h3>
+                <p className="text-zinc-300 text-sm mb-8 max-w-[240px] leading-relaxed">
+                  We are forging the ultimate research tier. The most powerful frontier models, uncapped.
+                </p>
+                <button className="relative overflow-hidden w-full py-4 px-6 rounded-2xl border border-primary/50 bg-primary/10 text-primary font-bold hover:bg-primary/20 transition-all group/btn shadow-[0_0_20px_rgba(var(--color-primary),0.15)]">
+                  <span className="relative z-10">Join Waitlist</span>
+                  <div className="absolute inset-0 h-full w-[20px] bg-white/20 skew-x-[30deg] -translate-x-[150px] group-hover/btn:translate-x-[400px] transition-transform duration-1000" />
+                </button>
               </div>
-              <h3 className="text-xl font-bold text-zinc-100 mb-2">Professional</h3>
-              <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-4xl font-bold text-zinc-100">$15</span>
-                <span className="text-zinc-500">/month</span>
+
+              {/* Underlying Blurred Content (barely visible for effect) */}
+              <div className="opacity-20 select-none blur-[3px]">
+                <h3 className="text-2xl font-bold text-zinc-100 mb-2">Founder's Edition</h3>
+                <div className="flex items-baseline gap-1 mb-6">
+                  <span className="text-5xl font-extrabold text-zinc-100">$??</span>
+                </div>
+                <p className="text-zinc-400 text-sm mb-8 flex-1">The ultimate research powerhouse.</p>
+                <ul className="space-y-4 mb-10">
+                  {['Unlimited Claude 3.5 & GPT-4o', 'Infinite document storage', 'Deep YouTube Video Analysis', 'Advanced API Access', 'Priority AGI routing'].map((item, i) => (
+                    <li key={i} className="flex items-center gap-3 text-sm text-zinc-300">
+                      <CheckCircle2 size={18} className="text-primary shrink-0" /> {item}
+                    </li>
+                  ))}
+                </ul>
+                <div className="w-full py-4 px-6 rounded-2xl bg-zinc-800 text-center font-bold">
+                  Unlocking Soon
+                </div>
               </div>
-              <p className="text-zinc-400 text-sm mb-8 flex-1">For researchers and professionals who need unlimited capabilities.</p>
-              <ul className="space-y-4 mb-8">
-                {['Unlimited documents & storage', 'Access to all premium models (Claude 3.5, GPT-4o, Gemini 1.5, DeepSeek)', 'Unlimited messages', 'Unlimited YouTube Video Analysis', 'Advanced Deep Web Search', 'Priority 24/7 support'].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-zinc-300">
-                    <CheckCircle2 size={16} className="text-primary" /> {item}
-                  </li>
-                ))}
-              </ul>
-              <Link to="/signup" className="w-full py-3 px-4 rounded-xl bg-primary text-primary-foreground text-center text-sm font-medium hover:opacity-90 transition-opacity">
-                Start 7-Day Trial
-              </Link>
             </div>
           </div>
         </section>
