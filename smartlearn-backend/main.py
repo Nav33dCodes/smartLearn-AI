@@ -20,7 +20,7 @@ from services.pdf import extract_text, get_pdf_metadata
 from services.rag import store_pdf, search, clear_session, get_stats
 from services.voice import transcribe_audio, generate_speech
 from services.youtube import get_youtube_recommendations
-from services.redis_client import get_cache, set_cache, delete_cache_pattern, check_rate_limit
+from services.redis_client import get_cache, set_cache, delete_cache, check_rate_limit
 from database import SessionLocal, Chat, get_db, get_async_db, User, ChatMetadata
 from routers import auth
 from services.jwt_handler import verify_token
@@ -162,8 +162,8 @@ def save_to_db(user_id: int, chat_id: str, message: str, response: str):
             logger.info(f"✨ Auto-generated title for {chat_id}: {title}")
         
         # 🚀 Invalidate caches since there is a new message
-        delete_cache_pattern(f"chat_messages:{chat_id}")
-        delete_cache_pattern(f"user_chats:{user_id}")
+        delete_cache(f"chat_messages:{chat_id}")
+        delete_cache(f"user_chats:{user_id}")
         
     except Exception as e:
         db.rollback()
@@ -359,7 +359,7 @@ def rename_chat(chat_id: str, data: RenameRequest, current_user: User = Depends(
         db.add(new_metadata)
     
     db.commit()
-    delete_cache_pattern(f"user_chats:{current_user.id}")
+    delete_cache(f"user_chats:{current_user.id}")
     return {"status": "success", "title": data.title}
 
 
@@ -380,7 +380,7 @@ def pin_chat(chat_id: str, data: PinRequest, current_user: User = Depends(get_cu
         db.add(new_metadata)
     
     db.commit()
-    delete_cache_pattern(f"user_chats:{current_user.id}")
+    delete_cache(f"user_chats:{current_user.id}")
     return {"status": "success", "is_pinned": data.is_pinned}
 
 
@@ -399,7 +399,7 @@ def archive_chat(chat_id: str, current_user: User = Depends(get_current_user), d
         new_metadata = ChatMetadata(user_id=current_user.id, chat_id=full_chat_id, title=title, is_archived=True)
         db.add(new_metadata)
     db.commit()
-    delete_cache_pattern(f"user_chats:{current_user.id}")
+    delete_cache(f"user_chats:{current_user.id}")
     return {"status": "archived"}
 
 @app.put("/chats/archive_all")
@@ -423,7 +423,7 @@ def archive_all_chats(current_user: User = Depends(get_current_user), db: Sessio
             db.add(new_metadata)
             
     db.commit()
-    delete_cache_pattern(f"user_chats:{current_user.id}")
+    delete_cache(f"user_chats:{current_user.id}")
     return {"status": "success"}
 
 @app.put("/chat/{chat_id}/unarchive")
@@ -433,7 +433,7 @@ def unarchive_chat(chat_id: str, current_user: User = Depends(get_current_user),
     if metadata:
         metadata.is_archived = False
         db.commit()
-        delete_cache_pattern(f"user_chats:{current_user.id}")
+        delete_cache(f"user_chats:{current_user.id}")
     return {"status": "unarchived"}
 
 
@@ -499,8 +499,8 @@ def delete_chat(chat_id: str, current_user: User = Depends(get_current_user), db
         db.commit()
         clear_session(full_chat_id)
         gc.collect()
-        delete_cache_pattern(f"chat_messages:{full_chat_id}")
-        delete_cache_pattern(f"user_chats:{current_user.id}")
+        delete_cache(f"chat_messages:{full_chat_id}")
+        delete_cache(f"user_chats:{current_user.id}")
         logger.info(f"🗑️ Deleted chat_id={chat_id} rows={deleted}")
         return {"status": "deleted", "rows": deleted}
     except Exception as e:

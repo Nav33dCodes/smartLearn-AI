@@ -60,11 +60,19 @@ export function useDeleteChat() {
       await api.delete(`${API}/chat/${id}`);
       return id;
     },
-    onSuccess: (id) => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries(['chats', user?.id]);
+      const previousChats = queryClient.getQueryData(['chats', user?.id]);
       queryClient.setQueryData(['chats', user?.id], (oldChats) => {
         if (!oldChats) return [];
         return oldChats.filter(chat => chat.id !== id);
       });
+      return { previousChats };
+    },
+    onError: (err, id, context) => {
+      if (context?.previousChats) {
+        queryClient.setQueryData(['chats', user?.id], context.previousChats);
+      }
     }
   });
 }

@@ -2,6 +2,40 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 11, 2026 — Upstash Redis Performance & UX Update",
+    features: [
+      {
+        title: "⚡ Lightning-Fast Redis Global Caching",
+        description: "Completely overhauled the backend architecture with Upstash Redis, achieving sub-millisecond response times and bypassing PostgreSQL for the vast majority of operations.",
+        bullets: [
+          "Zero-DB Authentication: The core get_current_user logic now fetches your profile directly from Redis, eliminating synchronous database queries on every API request.",
+          "Ephemeral OTP Management: Password reset and signup verification codes are now stored safely in Redis with automatic 15-minute expiration, keeping the primary database perfectly clean.",
+          "Secure JWT Blacklisting: Clicking 'Logout' now immediately blacklists your active session token in Redis, preventing token reuse even if stolen."
+        ]
+      },
+      {
+        title: "🎨 ChatGPT-Grade Seamless UI/UX",
+        description: "Polished the frontend application to behave exactly like industry-leading AI platforms.",
+        bullets: [
+          "Optimistic Chat Deletion: Deleting a chat is now completely instant. We removed the clunky confirmation modal and implemented an onMutate optimistic update that clears the chat from your screen milliseconds before the server even processes the request.",
+          "Instant Welcome Screen: The centered 'How can I help you today?' interface now renders the very second you open the app, rather than blocking the UI while your historical chats load.",
+          "Sidebar Skeletons: While fetching your past conversations from Redis, the sidebar now displays beautiful, pulsing skeleton loaders instead of remaining blank."
+        ]
+      },
+      {
+        title: "🚦 Enterprise Rate Limiting",
+        description: "Protected the AI generation endpoints to prevent API abuse and control costs.",
+        bullets: [
+          "Redis-Backed Rate Limiting: The /chat endpoint is now fortified with a strict 15-request-per-minute rate limit, enforced flawlessly across all edge nodes via Upstash Redis."
+        ]
+      }
+    ],
+    fixes: [
+      "Fixed a critical bug where wildcard SCAN commands (delete_cache_pattern) were silently failing in Upstash Redis, causing deleted or renamed chats to magically reappear after refreshing the page.",
+      "Fixed a UI glitch where the chat window would briefly render a skeleton loader on a completely new session."
+    ]
+  },
+  {
     date: "June 11, 2026 — v14.0.0",
     features: [
       {
