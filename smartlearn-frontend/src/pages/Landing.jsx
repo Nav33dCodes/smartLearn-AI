@@ -160,58 +160,65 @@ export default function Landing() {
 
 
 
-        {/* Visual Dashboard Bento Box */}
-        <section id="features" className="py-24 px-6 max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-zinc-100 mb-4">Industry-Leading Interface</h2>
-            <p className="text-zinc-400 text-lg">A beautiful, minimalistic workspace designed for maximum focus.</p>
-          </div>
-
+        {/* Features Section */}
+        <section id="features" className="py-24 px-6 max-w-7xl mx-auto space-y-32">
+          
+          {/* Feature 1: Hero Dashboard (Centered) */}
           <motion.div 
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={itemVariants}
+            className="flex flex-col items-center text-center max-w-5xl mx-auto"
           >
-            {/* Main Chat Interface (Large, spans 2 columns) */}
-            <motion.div variants={itemVariants} className="md:col-span-2 group relative rounded-3xl border border-zinc-800/50 bg-zinc-900/20 overflow-hidden backdrop-blur-sm p-2 hover:border-zinc-700/50 transition-colors">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-zinc-100 mb-6">Industry-Leading Interface</h2>
+            <p className="text-zinc-400 text-lg md:text-xl max-w-3xl mb-12 leading-relaxed">
+              Experience a beautiful, minimalistic workspace designed for maximum focus. Our context-aware chat environment ensures you interact with your documents without distractions, allowing for deep, meaningful analysis.
+            </p>
+            <div className="w-full relative rounded-3xl border border-zinc-800/50 bg-zinc-900/20 overflow-hidden shadow-2xl p-2">
               <div className="relative rounded-2xl overflow-hidden border border-zinc-800/50 bg-zinc-950 aspect-[16/10]">
-                <img src="/images/mockup1.png" alt="Dashboard AI Chat" className="w-full h-full object-cover object-left-top opacity-90 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-700" />
+                <img src="/images/mockup1.png" alt="Dashboard AI Chat" className="w-full h-full object-cover object-left-top opacity-90 hover:opacity-100 transition-opacity duration-500" />
               </div>
-              <div className="mt-6 px-4 pb-4">
-                <h3 className="text-xl font-bold text-zinc-100 mb-2 flex items-center gap-2"><BrainCircuit size={20} className="text-primary" /> Context-Aware Chat</h3>
-                <p className="text-zinc-400">Interact with your documents in a sleek, distraction-free environment.</p>
-              </div>
-            </motion.div>
-
-            <div className="md:col-span-1 flex flex-col gap-6">
-              {/* Graph View (Small, top right) */}
-              <motion.div variants={itemVariants} className="flex-1 group relative rounded-3xl border border-zinc-800/50 bg-zinc-900/20 overflow-hidden backdrop-blur-sm p-2 hover:border-zinc-700/50 transition-colors">
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative rounded-2xl overflow-hidden border border-zinc-800/50 bg-zinc-950 aspect-video">
-                  <img src="/images/mockup2.png" alt="Knowledge Graph" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-700" />
-                </div>
-                <div className="mt-4 px-3 pb-2">
-                  <h3 className="text-lg font-bold text-zinc-100 mb-1 flex items-center gap-2"><Network size={18} className="text-emerald-400" /> Knowledge Graph</h3>
-                  <p className="text-sm text-zinc-400">Visualize connections across all data.</p>
-                </div>
-              </motion.div>
-
-              {/* Video Analysis (Small, bottom right) */}
-              <motion.div variants={itemVariants} className="flex-1 group relative rounded-3xl border border-zinc-800/50 bg-zinc-900/20 overflow-hidden backdrop-blur-sm p-2 hover:border-zinc-700/50 transition-colors">
-                <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative rounded-2xl overflow-hidden border border-zinc-800/50 bg-zinc-950 aspect-video">
-                  <img src="/images/mockup3.png" alt="Video Analysis" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-700" />
-                </div>
-                <div className="mt-4 px-3 pb-2">
-                  <h3 className="text-lg font-bold text-zinc-100 mb-1 flex items-center gap-2"><PlaySquare size={18} className="text-red-400" /> Video Insights</h3>
-                  <p className="text-sm text-zinc-400">Analyze YouTube lectures instantly.</p>
-                </div>
-              </motion.div>
             </div>
           </motion.div>
+
+          {/* Feature 2: Knowledge Graph (Image Left, Text Right) */}
+          <motion.div 
+            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={itemVariants}
+            className="flex flex-col md:flex-row items-center gap-12 lg:gap-20"
+          >
+            <div className="w-full md:w-1/2">
+              <div className="relative rounded-3xl border border-zinc-800/50 bg-zinc-900/20 p-2 shadow-2xl">
+                <div className="relative rounded-2xl overflow-hidden border border-zinc-800/50 bg-zinc-950 aspect-[4/3] sm:aspect-video md:aspect-[4/3]">
+                  <img src="/images/mockup2.png" alt="Knowledge Graph" className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-500" />
+                </div>
+              </div>
+            </div>
+            <div className="w-full md:w-1/2 space-y-6">
+              <h3 className="text-3xl sm:text-4xl font-bold text-zinc-100">Visualize Connections</h3>
+              <p className="text-zinc-400 text-lg leading-relaxed">
+                Our dynamic knowledge graph transforms static documents into a web of interactive insights. By mapping relationships across all your uploaded data, you can visually navigate complex topics and discover hidden connections that traditional reading would miss.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Feature 3: Video Analysis (Text Left, Image Right) */}
+          <motion.div 
+            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={itemVariants}
+            className="flex flex-col md:flex-row-reverse items-center gap-12 lg:gap-20"
+          >
+            <div className="w-full md:w-1/2">
+              <div className="relative rounded-3xl border border-zinc-800/50 bg-zinc-900/20 p-2 shadow-2xl">
+                <div className="relative rounded-2xl overflow-hidden border border-zinc-800/50 bg-zinc-950 aspect-[4/3] sm:aspect-video md:aspect-[4/3]">
+                  <img src="/images/mockup3.png" alt="Video Analysis" className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-500" />
+                </div>
+              </div>
+            </div>
+            <div className="w-full md:w-1/2 space-y-6">
+              <h3 className="text-3xl sm:text-4xl font-bold text-zinc-100">Instant Video Insights</h3>
+              <p className="text-zinc-400 text-lg leading-relaxed">
+                Bypass hours of lecture watching. Simply integrate your video links and let the system automatically extract, transcribe, and analyze the content. You can instantly query timestamped answers and summarize massive lectures in seconds.
+              </p>
+            </div>
+          </motion.div>
+
         </section>
 
         {/* Pricing Section */}
