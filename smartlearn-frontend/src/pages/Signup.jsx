@@ -81,7 +81,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#0a0a0a] font-sans text-zinc-100">
+    <div className="dark min-h-screen flex bg-[#0a0a0a] font-sans text-zinc-100">
       {/* Left Side: Professional Quote Section */}
       <div className="hidden lg:flex w-1/2 relative flex-col justify-between p-16 overflow-hidden bg-zinc-900/30 border-r border-zinc-800/50">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-zinc-800/20 via-zinc-950 to-zinc-950 pointer-events-none" />

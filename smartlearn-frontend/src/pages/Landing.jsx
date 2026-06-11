@@ -72,7 +72,7 @@ export default function Landing() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-zinc-100 font-sans selection:bg-primary/30 overflow-x-hidden">
+    <div className="dark min-h-screen bg-[#0a0a0a] text-zinc-100 font-sans selection:bg-primary/30 overflow-x-hidden">
       
       {/* Background Gradients */}
       <div className="fixed inset-0 z-0 pointer-events-none">

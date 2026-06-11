@@ -4,7 +4,7 @@ import Logo from '../components/Logo';
 
 export default function Privacy() {
   return (
-    <div className="min-h-screen bg-black text-zinc-300 selection:bg-primary/30 selection:text-white font-sans">
+    <div className="dark min-h-screen bg-black text-zinc-300 selection:bg-primary/30 selection:text-white font-sans">
       <div className="max-w-4xl mx-auto px-6 py-20 sm:py-32">
         
         {/* Header */}
