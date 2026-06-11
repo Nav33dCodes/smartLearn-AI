@@ -23,7 +23,13 @@ def create_refresh_token(data: dict):
     to_encode.update({"exp": expire, "type": "refresh"})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+from services.redis_client import get_cache
+
 def verify_token(token: str, token_type: str = "access"):
+    # 🚨 Check if token is blacklisted (logged out)
+    if get_cache(f"blacklist:{token}"):
+        return None
+        
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         if payload.get("type") != token_type:

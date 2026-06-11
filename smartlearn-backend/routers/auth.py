@@ -5,7 +5,7 @@ from database import get_db, User, OTP
 from datetime import datetime
 from services.auth_logic import get_password_hash, verify_password
 from services.jwt_handler import create_access_token, create_refresh_token
-from services.otp_manager import store_otp, verify_otp_hash
+from services.otp_manager import store_otp, verify_and_clear_otp, verify_otp_only
 from services.email_service import send_welcome_email, send_otp_email, send_password_reset_success_email, send_verification_email, send_delete_account_otp_email
 from database import get_db, User, OTP, Chat, ChatMetadata
 
@@ -89,13 +89,7 @@ def signup(req: SignupRequest, background_tasks: BackgroundTasks, db: Session = 
 
 @router.post("/verify-account")
 def verify_account(req: VerifyOTPRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
-    otp_record = db.query(OTP).filter(
-        OTP.email == req.email, 
-        OTP.is_used == False,
-        OTP.expires_at > datetime.utcnow()
-    ).order_by(OTP.id.desc()).first()
-    
-    if not otp_record or not verify_otp_hash(req.otp, otp_record.otp_hash):
+    if not verify_and_clear_otp(req.email, req.otp):
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
         
     user = db.query(User).filter(User.email == req.email).first()
@@ -103,7 +97,6 @@ def verify_account(req: VerifyOTPRequest, background_tasks: BackgroundTasks, db:
         raise HTTPException(status_code=404, detail="User not found")
         
     user.is_verified = True
-    otp_record.is_used = True
     db.commit()
     
     background_tasks.add_task(send_welcome_email, user.email, user.name)
@@ -141,6 +134,26 @@ def login(req: LoginRequest, background_tasks: BackgroundTasks, db: Session = De
     refresh_token = create_refresh_token({"sub": str(user.id)})
     return {"access_token": access_token, "refresh_token": refresh_token, "user": {"id": user.id, "name": user.name, "email": user.email, "avatar": user.avatar}}
 
+@router.post("/logout")
+def logout(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    try:
+        from services.jwt_handler import SECRET_KEY, ALGORITHM
+        import jwt
+        import time
+        from services.redis_client import set_cache
+        
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        exp = payload.get("exp")
+        if exp:
+            ttl = int(exp - time.time())
+            if ttl > 0:
+                # Blacklist the token until it naturally expires
+                set_cache(f"blacklist:{token}", "logged_out", expire_seconds=ttl)
+    except Exception:
+        pass
+    return {"message": "Logged out securely"}
+
 @router.post("/refresh")
 def refresh_token(req: RefreshRequest):
     from services.jwt_handler import verify_token
@@ -165,26 +178,14 @@ def forgot_password(req: ForgotPasswordRequest, background_tasks: BackgroundTask
 
 @router.post("/verify-otp")
 def verify_otp(req: VerifyOTPRequest, db: Session = Depends(get_db)):
-    otp_record = db.query(OTP).filter(
-        OTP.email == req.email, 
-        OTP.is_used == False,
-        OTP.expires_at > datetime.utcnow()
-    ).order_by(OTP.id.desc()).first()
-    
-    if not otp_record or not verify_otp_hash(req.otp, otp_record.otp_hash):
+    if not verify_otp_only(req.email, req.otp):
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
         
     return {"message": "OTP verified successfully"}
 
 @router.post("/reset-password")
 def reset_password(req: ResetPasswordRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
-    otp_record = db.query(OTP).filter(
-        OTP.email == req.email, 
-        OTP.is_used == False,
-        OTP.expires_at > datetime.utcnow()
-    ).order_by(OTP.id.desc()).first()
-    
-    if not otp_record or not verify_otp_hash(req.otp, otp_record.otp_hash):
+    if not verify_and_clear_otp(req.email, req.otp):
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
         
     user = db.query(User).filter(User.email == req.email).first()
@@ -192,7 +193,6 @@ def reset_password(req: ResetPasswordRequest, background_tasks: BackgroundTasks,
         raise HTTPException(status_code=404, detail="User not found")
         
     user.password_hash = get_password_hash(req.new_password)
-    otp_record.is_used = True
     db.commit()
     
     background_tasks.add_task(send_password_reset_success_email, user.email)
@@ -257,21 +257,12 @@ def request_account_deletion(background_tasks: BackgroundTasks, db: Session = De
 
 @router.delete("/user/account")
 def delete_account(req: DeleteAccountRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user_auth)):
-    otp_record = db.query(OTP).filter(
-        OTP.email == current_user.email, 
-        OTP.is_used == False,
-        OTP.expires_at > datetime.utcnow()
-    ).order_by(OTP.id.desc()).first()
-    
-    if not otp_record or not verify_otp_hash(req.otp, otp_record.otp_hash):
+    if not verify_and_clear_otp(current_user.email, req.otp):
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
-        
-    otp_record.is_used = True
     
     # Delete everything
     db.query(Chat).filter(Chat.user_id == current_user.id).delete()
     db.query(ChatMetadata).filter(ChatMetadata.user_id == current_user.id).delete()
-    db.query(OTP).filter(OTP.email == current_user.email).delete()
     db.delete(current_user)
     db.commit()
     

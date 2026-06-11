@@ -20,6 +20,7 @@ from services.pdf import extract_text, get_pdf_metadata
 from services.rag import store_pdf, search, clear_session, get_stats
 from services.voice import transcribe_audio, generate_speech
 from services.youtube import get_youtube_recommendations
+from services.redis_client import get_cache, set_cache, delete_cache_pattern, check_rate_limit
 from database import SessionLocal, Chat, get_db, get_async_db, User, ChatMetadata
 from routers import auth
 from services.jwt_handler import verify_token
@@ -143,6 +144,11 @@ def save_to_db(user_id: int, chat_id: str, message: str, response: str):
                 meta.title = title
             db.commit()
             logger.info(f"✨ Auto-generated title for {chat_id}: {title}")
+        
+        # 🚀 Invalidate caches since there is a new message
+        delete_cache_pattern(f"chat_messages:{chat_id}")
+        delete_cache_pattern(f"user_chats:{user_id}")
+        
     except Exception as e:
         db.rollback()
         logger.error(f"❌ DB save error: {e}")
@@ -155,6 +161,11 @@ def save_to_db(user_id: int, chat_id: str, message: str, response: str):
 # ────────────────────────────────────────────────────
 @app.post("/chat")
 async def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    # ── 0. Rate Limiting ──
+    # Max 15 messages per 60 seconds per user
+    if not check_rate_limit(f"ratelimit:chat:{current_user.id}", max_requests=15, window_seconds=60):
+        raise HTTPException(status_code=429, detail="You are sending messages too fast. Please wait a moment.")
+
     message = data.message.strip()
     chat_id = get_full_chat_id(current_user.id, data.chat_id)
 
@@ -254,6 +265,11 @@ async def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_use
 # ────────────────────────────────────────────────────
 @app.get("/chats")
 async def get_chats(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_async_db)):
+    cache_key = f"user_chats:{current_user.id}"
+    cached_data = get_cache(cache_key)
+    if cached_data:
+        return cached_data
+
     try:
         # 1. Fetch metadata
         result = await db.execute(select(ChatMetadata).filter(ChatMetadata.user_id == current_user.id))
@@ -277,7 +293,9 @@ async def get_chats(current_user: User = Depends(get_current_user), db: AsyncSes
         for c in first_messages:
             grouped[c.chat_id] = [{"role": "user", "content": c.message[:100]}]
             
-        return {"chats": grouped, "metadata": metadata_map}
+        data = {"chats": grouped, "metadata": metadata_map}
+        set_cache(cache_key, data)
+        return data
     except Exception as e:
         logger.error(f"❌ get_chats error: {e}")
         return {"chats": {}, "metadata": {}}
@@ -289,6 +307,11 @@ async def get_chats(current_user: User = Depends(get_current_user), db: AsyncSes
 @app.get("/chat/{chat_id}/messages")
 async def get_chat_messages(chat_id: str, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_async_db)):
     full_chat_id = get_full_chat_id(current_user.id, chat_id)
+    cache_key = f"chat_messages:{full_chat_id}"
+    cached_data = get_cache(cache_key)
+    if cached_data:
+        return cached_data
+
     try:
         result = await db.execute(select(Chat).filter(Chat.chat_id == full_chat_id, Chat.user_id == current_user.id).order_by(Chat.id.asc()))
         chats = result.scalars().all()
@@ -296,7 +319,10 @@ async def get_chat_messages(chat_id: str, current_user: User = Depends(get_curre
         for c in chats:
             messages.append({"role": "user", "content": c.message})
             messages.append({"role": "assistant", "content": c.response})
-        return {"messages": messages}
+            
+        data = {"messages": messages}
+        set_cache(cache_key, data)
+        return data
     except Exception as e:
         logger.error(f"❌ get_chat_messages error: {e}")
         return {"messages": []}
@@ -317,6 +343,7 @@ def rename_chat(chat_id: str, data: RenameRequest, current_user: User = Depends(
         db.add(new_metadata)
     
     db.commit()
+    delete_cache_pattern(f"user_chats:{current_user.id}")
     return {"status": "success", "title": data.title}
 
 
@@ -337,6 +364,7 @@ def pin_chat(chat_id: str, data: PinRequest, current_user: User = Depends(get_cu
         db.add(new_metadata)
     
     db.commit()
+    delete_cache_pattern(f"user_chats:{current_user.id}")
     return {"status": "success", "is_pinned": data.is_pinned}
 
 
@@ -355,6 +383,7 @@ def archive_chat(chat_id: str, current_user: User = Depends(get_current_user), d
         new_metadata = ChatMetadata(user_id=current_user.id, chat_id=full_chat_id, title=title, is_archived=True)
         db.add(new_metadata)
     db.commit()
+    delete_cache_pattern(f"user_chats:{current_user.id}")
     return {"status": "archived"}
 
 @app.put("/chats/archive_all")
@@ -378,6 +407,7 @@ def archive_all_chats(current_user: User = Depends(get_current_user), db: Sessio
             db.add(new_metadata)
             
     db.commit()
+    delete_cache_pattern(f"user_chats:{current_user.id}")
     return {"status": "success"}
 
 @app.put("/chat/{chat_id}/unarchive")
@@ -387,6 +417,7 @@ def unarchive_chat(chat_id: str, current_user: User = Depends(get_current_user),
     if metadata:
         metadata.is_archived = False
         db.commit()
+        delete_cache_pattern(f"user_chats:{current_user.id}")
     return {"status": "unarchived"}
 
 
@@ -452,6 +483,8 @@ def delete_chat(chat_id: str, current_user: User = Depends(get_current_user), db
         db.commit()
         clear_session(full_chat_id)
         gc.collect()
+        delete_cache_pattern(f"chat_messages:{full_chat_id}")
+        delete_cache_pattern(f"user_chats:{current_user.id}")
         logger.info(f"🗑️ Deleted chat_id={chat_id} rows={deleted}")
         return {"status": "deleted", "rows": deleted}
     except Exception as e:

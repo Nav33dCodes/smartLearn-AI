@@ -1,8 +1,7 @@
 import secrets
 import string
 from passlib.context import CryptContext
-from datetime import datetime, timedelta
-from database import SessionLocal, OTP
+from services.redis_client import set_cache, get_cache, delete_cache_pattern
 
 otp_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -17,18 +16,24 @@ def verify_otp_hash(plain_otp: str, hashed_otp: str) -> bool:
 
 def store_otp(email: str) -> str:
     otp, otp_hash = generate_otp()
-    db = SessionLocal()
-    try:
-        # Expire old OTPs
-        db.query(OTP).filter(OTP.email == email).update({"is_used": True})
-        
-        new_otp = OTP(
-            email=email,
-            otp_hash=otp_hash,
-            expires_at=datetime.utcnow() + timedelta(minutes=15)
-        )
-        db.add(new_otp)
-        db.commit()
-        return otp
-    finally:
-        db.close()
+    # Store in Redis with a 15-minute expiration (900 seconds)
+    set_cache(f"otp:{email}", otp_hash, expire_seconds=900)
+    return otp
+
+def verify_and_clear_otp(email: str, plain_otp: str) -> bool:
+    """Verifies the OTP and clears it from cache to prevent reuse."""
+    otp_hash = get_cache(f"otp:{email}")
+    if not otp_hash:
+        return False
+    
+    if verify_otp_hash(plain_otp, otp_hash):
+        delete_cache_pattern(f"otp:{email}")
+        return True
+    return False
+
+def verify_otp_only(email: str, plain_otp: str) -> bool:
+    """Verifies the OTP without clearing it (useful for multi-step flows like password reset)."""
+    otp_hash = get_cache(f"otp:{email}")
+    if not otp_hash:
+        return False
+    return verify_otp_hash(plain_otp, otp_hash)

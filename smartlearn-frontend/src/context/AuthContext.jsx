@@ -33,7 +33,12 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('refresh_token', refreshToken);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch (e) {
+      console.error("Failed to call backend logout", e);
+    }
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('access_token');
