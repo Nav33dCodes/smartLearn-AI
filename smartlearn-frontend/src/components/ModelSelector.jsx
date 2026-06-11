@@ -11,22 +11,22 @@ export const MODELS = [
     description: "Blistering native Groq speeds for general queries."
   },
   {
-    id: "meta-llama/llama-3.3-70b-instruct",
+    id: "groq:llama-3.3-70b-versatile",
     name: "Llama 3.3 70B (Fast)",
-    provider: "Meta",
+    provider: "Groq",
     icon: Sparkles,
     description: "Lightning fast responses for general queries."
   },
   {
-    id: "anthropic/claude-sonnet-4",
-    name: "Claude 4 Sonnet (Research)",
+    id: "anthropic/claude-3.5-sonnet",
+    name: "Claude 3.5 Sonnet (Research)",
     provider: "Anthropic",
     icon: Brain,
     description: "Unmatched depth and reasoning for heavy research."
   },
   {
-    id: "deepseek/deepseek-chat",
-    name: "DeepSeek (Coding)",
+    id: "deepseek/deepseek-coder",
+    name: "DeepSeek Coder (Coding)",
     provider: "DeepSeek",
     icon: Rocket,
     description: "Specialized powerhouse for software development."

@@ -25,6 +25,15 @@ if os.getenv("TAVILY_API_KEY"):
 
 DEFAULT_MODEL = "groq:llama-3.1-8b-instant"
 
+# Advanced Fallback Architecture
+FALLBACK_ROUTER = {
+    "groq:llama-3.3-70b-versatile": ["groq:llama-3.1-8b-instant", "meta-llama/llama-3.3-70b-instruct"],
+    "anthropic/claude-3.5-sonnet": ["anthropic/claude-3-haiku", "openai/gpt-4o-mini"],
+    "openai/gpt-4o": ["openai/gpt-4o-mini", "anthropic/claude-3-haiku"],
+    "groq:llama-3.1-8b-instant": ["meta-llama/llama-3.1-8b-instruct"],
+    "deepseek/deepseek-coder": ["meta-llama/llama-3.1-8b-instruct"]
+}
+
 SYSTEM_PROMPT = """You are SmartLearn AI — an advanced, highly intelligent learning assistant and professional tutor.
 
 - **Provide extremely comprehensive, detailed, and profound explanations.**
@@ -126,74 +135,97 @@ def needs_web_search(query: str) -> bool:
 # ────────────────────────────────────────────────────
 def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: List[Dict] = None) -> Generator[str, None, None]:
     """
-    Yields tokens one by one with multi-turn conversation memory.
+    Yields tokens one by one with multi-turn conversation memory and advanced cascading model fallback.
     """
-    try:
-        if model_id.startswith("groq:"):
-            active_client = groq_client
-            actual_model = model_id.replace("groq:", "")
-        else:
-            active_client = openrouter_client
-            actual_model = model_id
+    model_chain = [model_id] + FALLBACK_ROUTER.get(model_id, [])
 
-        # Build multi-turn conversation
-        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-        if history:
-            messages.extend(history)
-        messages.append({"role": "user", "content": prompt})
+    # Build multi-turn conversation
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    if history:
+        messages.extend(history)
+    messages.append({"role": "user", "content": prompt})
 
-        stream = active_client.chat.completions.create(
-            model=actual_model,
-            messages=messages,
-            temperature=0.7,
-            max_tokens=4096,
-            top_p=0.9,
-            stream=True,
-        )
+    for current_model in model_chain:
+        try:
+            if current_model.startswith("groq:"):
+                active_client = groq_client
+                actual_model = current_model.replace("groq:", "")
+            else:
+                active_client = openrouter_client
+                actual_model = current_model
 
-        for chunk in stream:
-            if chunk.choices and len(chunk.choices) > 0:
-                token = chunk.choices[0].delta.content
-                if token:
-                    yield token
-        return
+            stream = active_client.chat.completions.create(
+                model=actual_model,
+                messages=messages,
+                temperature=0.7,
+                max_tokens=4096,
+                top_p=0.9,
+                stream=True,
+            )
 
-    except Exception as e:
-        err_str = str(e).lower()
-        if "rate_limit" in err_str or "429" in err_str:
-            yield "\n\n⚠️ Rate limit hit on this model. Please wait a moment and try again."
-        elif "insufficient" in err_str or "credits" in err_str:
-            yield "\n\n⚠️ Your OpenRouter account ran out of credits for this premium model."
-        else:
-            yield f"\n\n⚠️ Model '{model_id}' unavailable. (Error: {e})"
+            # If we've fallen back to a backup model, let the user know gracefully
+            if current_model != model_id:
+                yield f"> ⚠️ **Notice:** Switched to fallback model `{current_model}` due to high traffic or API limits on the primary model.\n\n"
+
+            for chunk in stream:
+                if chunk.choices and len(chunk.choices) > 0:
+                    token = chunk.choices[0].delta.content
+                    if token:
+                        yield token
+            
+            # Successfully finished streaming, break out of fallback loop
+            return
+
+        except Exception as e:
+            err_str = str(e).lower()
+            # If this is the LAST model in our fallback chain, we must yield the error to the user
+            if current_model == model_chain[-1]:
+                if "rate_limit" in err_str or "429" in err_str:
+                    yield "\n\n⚠️ Rate limit hit on all fallback models. Please wait a moment and try again."
+                elif "insufficient" in err_str or "credits" in err_str:
+                    yield "\n\n⚠️ Your OpenRouter account ran out of credits, and no free fallbacks were available."
+                else:
+                    yield f"\n\n⚠️ Models unavailable. (Final Error: {e})"
+                return
+            else:
+                # Log the error and continue to the next fallback model in the loop
+                print(f"Model {current_model} failed: {e}. Cascading to fallback...")
+                continue
 
 # ────────────────────────────────────────────────────
 # NON-STREAMING  (fallback, kept for compatibility)
 # ────────────────────────────────────────────────────
 def get_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: List[Dict] = None) -> str:
-    try:
-        if model_id.startswith("groq:"):
-            active_client = groq_client
-            actual_model = model_id.replace("groq:", "")
-        else:
-            active_client = openrouter_client
-            actual_model = model_id
+    model_chain = [model_id] + FALLBACK_ROUTER.get(model_id, [])
 
-        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-        if history:
-            messages.extend(history)
-        messages.append({"role": "user", "content": prompt})
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    if history:
+        messages.extend(history)
+    messages.append({"role": "user", "content": prompt})
 
-        response = active_client.chat.completions.create(
-            model=actual_model,
-            messages=messages,
-            temperature=0.7,
-            max_tokens=4096,
-            top_p=0.9,
-        )
-        return response.choices[0].message.content
-    except Exception as e:
-        return f"⚠️ SmartLearn AI is temporarily unavailable. (Error: {e})"
+    for current_model in model_chain:
+        try:
+            if current_model.startswith("groq:"):
+                active_client = groq_client
+                actual_model = current_model.replace("groq:", "")
+            else:
+                active_client = openrouter_client
+                actual_model = current_model
+
+            response = active_client.chat.completions.create(
+                model=actual_model,
+                messages=messages,
+                temperature=0.7,
+                max_tokens=4096,
+                top_p=0.9,
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            if current_model == model_chain[-1]:
+                return f"⚠️ SmartLearn AI and its fallbacks are temporarily unavailable. (Error: {e})"
+            else:
+                print(f"Model {current_model} failed: {e}. Cascading to fallback...")
+                continue
 
 # ────────────────────────────────────────────────────
 # TITLE GENERATION
