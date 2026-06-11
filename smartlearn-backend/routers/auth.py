@@ -110,7 +110,7 @@ def verify_account(req: VerifyOTPRequest, background_tasks: BackgroundTasks, db:
     
     access_token = create_access_token({"sub": str(user.id)})
     refresh_token = create_refresh_token({"sub": str(user.id)})
-    return {"access_token": access_token, "refresh_token": refresh_token, "user": {"id": user.id, "name": user.name, "email": user.email}}
+    return {"access_token": access_token, "refresh_token": refresh_token, "user": {"id": user.id, "name": user.name, "email": user.email, "avatar": user.avatar}}
 
 @router.post("/resend-verification")
 def resend_verification(req: ResendVerificationRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
@@ -139,7 +139,7 @@ def login(req: LoginRequest, background_tasks: BackgroundTasks, db: Session = De
         
     access_token = create_access_token({"sub": str(user.id)})
     refresh_token = create_refresh_token({"sub": str(user.id)})
-    return {"access_token": access_token, "refresh_token": refresh_token, "user": {"id": user.id, "name": user.name, "email": user.email}}
+    return {"access_token": access_token, "refresh_token": refresh_token, "user": {"id": user.id, "name": user.name, "email": user.email, "avatar": user.avatar}}
 
 @router.post("/refresh")
 def refresh_token(req: RefreshRequest):
