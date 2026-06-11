@@ -18,9 +18,40 @@ export default function Landing() {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
   };
+  const [activeHeroTab, setActiveHeroTab] = useState(0);
+  
+  const heroTabs = [
+    {
+      id: 'learning',
+      icon: <BrainCircuit size={18} />,
+      title: "Interactive Learning",
+      description: "Next-Gen Educational Tools",
+      bullets: ["3D Physics Flashcards for memorization", "Vector-Rendered Mind Maps (Mermaid.js)", "Interactive Quizzes with step-by-step logic"]
+    },
+    {
+      id: 'speed',
+      icon: <Zap size={18} />,
+      title: "Premium Speed",
+      description: "60fps Smooth Typing Engine",
+      bullets: ["Native 60fps token rendering (requestAnimationFrame)", "Zero server-thread blocking for instant streams", "Gorgeous shimmering skeleton loaders"]
+    },
+    {
+      id: 'models',
+      icon: <Network size={18} />,
+      title: "Multi-Model Intelligence",
+      description: "The 5 Pillar Architecture",
+      bullets: ["Claude 3.5 Sonnet for deep research", "GPT-4o & DeepSeek for logic & coding", "Groq Instant for blistering LPU inference"]
+    },
+    {
+      id: 'scale',
+      icon: <Database size={18} />,
+      title: "Enterprise Scale",
+      description: "Crash-Proof & Asynchronous",
+      bullets: ["Upstash Redis for sub-millisecond global caching", "Neon Serverless Postgres for immense scale", "True Async queries preventing thread locks"]
+    }
+  ];
 
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
-  
   const faqs = [
     {
       question: "Is my data used to train the AI models?",
@@ -119,6 +150,65 @@ export default function Landing() {
               Explore Features
             </a>
           </motion.div>
+
+          {/* Dynamic "Use-Case" Release Note Tabs */}
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="w-full max-w-4xl mt-24 mb-8"
+          >
+            {/* Tab Navigation */}
+            <div className="flex flex-wrap justify-center gap-2 mb-8 relative z-10">
+              {heroTabs.map((tab, idx) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveHeroTab(idx)}
+                  className={`relative flex items-center gap-2 px-5 py-3 rounded-full text-sm font-medium transition-colors ${activeHeroTab === idx ? 'text-zinc-100' : 'text-zinc-400 hover:text-zinc-300'}`}
+                >
+                  {activeHeroTab === idx && (
+                    <motion.div
+                      layoutId="heroTabBubble"
+                      className="absolute inset-0 bg-zinc-800 border border-zinc-700 rounded-full -z-10 shadow-[0_0_15px_rgba(255,255,255,0.05)]"
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                  {tab.icon}
+                  {tab.title}
+                </button>
+              ))}
+            </div>
+
+            {/* Tab Content Crossfade */}
+            <div className="relative min-h-[220px] bg-zinc-900/40 border border-zinc-800/60 rounded-[2rem] p-8 sm:p-12 text-left backdrop-blur-md overflow-hidden">
+              {/* Subtle background glow based on active tab */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -z-10" />
+              
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeHeroTab}
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex flex-col h-full justify-center"
+                >
+                  <h3 className="text-2xl sm:text-3xl font-bold text-zinc-100 mb-3 tracking-tight">
+                    {heroTabs[activeHeroTab].description}
+                  </h3>
+                  <div className="space-y-4 mt-6">
+                    {heroTabs[activeHeroTab].bullets.map((bullet, i) => (
+                      <div key={i} className="flex items-start gap-3 text-zinc-400">
+                        <CheckCircle2 size={20} className="text-primary shrink-0 mt-0.5" />
+                        <p className="text-base leading-relaxed">{bullet}</p>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </motion.div>
+          
         </section>
 
 
