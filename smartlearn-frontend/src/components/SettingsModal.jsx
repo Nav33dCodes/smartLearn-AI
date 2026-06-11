@@ -313,6 +313,7 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode, 
                     </div>
                     <div className="flex flex-wrap gap-4">
                       {[
+                        { id: 'smartlearn', hex: '#ff3131', label: 'SmartLearn Red' },
                         { id: 'emerald', hex: '#10b981', label: 'Emerald' },
                         { id: 'blue', hex: '#3b82f6', label: 'Blue' },
                         { id: 'violet', hex: '#8b5cf6', label: 'Violet' },

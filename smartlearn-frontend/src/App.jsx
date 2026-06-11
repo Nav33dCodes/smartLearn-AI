@@ -55,7 +55,7 @@ function ChatDashboard() {
     return savedTheme !== null ? savedTheme === "true" : true;
   });
   const [themeColor, setThemeColor] = useState(() => {
-    return localStorage.getItem("sl_theme_color") || "#10b981"; // default Emerald
+    return localStorage.getItem("sl_theme_color") || "#ff3131"; // default Red
   });
   const [selectedModelId, setSelectedModelId] = useState(() => {
     return localStorage.getItem("sl_model") || "groq:llama-3.1-8b-instant";

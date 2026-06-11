@@ -63,26 +63,26 @@
 }
 
 .dark {
-  --background: #09090b;
-  --foreground: #f8fafc;
-  --card: rgba(15, 23, 42, 0.5);
-  --card-foreground: #f8fafc;
-  --popover: rgba(15, 23, 42, 0.8);
-  --popover-foreground: #f8fafc;
-  --primary: #818cf8;
+  --background: #000000;
+  --foreground: #fafafa;
+  --card: #09090b;
+  --card-foreground: #fafafa;
+  --popover: rgba(9, 9, 11, 0.95);
+  --popover-foreground: #fafafa;
+  --primary: #ff3131;
   --primary-foreground: #ffffff;
-  --secondary: #1e293b;
-  --secondary-foreground: #f8fafc;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #312e81;
-  --accent-foreground: #e0e7ff;
-  --destructive: #7f1d1d;
+  --secondary: #18181b;
+  --secondary-foreground: #fafafa;
+  --muted: #18181b;
+  --muted-foreground: #a1a1aa;
+  --accent: #27272a;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
   --destructive-foreground: #fafafa;
-  --border: #1e293b;
-  --input: #1e293b;
-  --ring: #818cf8;
-  --sidebar: #020617;
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #ff3131;
+  --sidebar: #000000;
 }
 
 .glass {
