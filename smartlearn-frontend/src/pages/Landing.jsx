@@ -132,17 +132,29 @@ export default function Landing() {
             
             <div className="flex animate-marquee gap-16 sm:gap-24 px-6 transition-all duration-700 items-center">
               {[
-                { name: 'Groq', file: 'groq' },
                 { name: 'Claude', file: 'claude' },
                 { name: 'DeepSeek', file: 'deepseek' },
                 { name: 'Gemini', file: 'gemini' },
+                { name: 'Gmail', file: 'gmail' },
+                { name: 'Groq', file: 'groq' },
+                { name: 'Llama', file: 'llama' },
                 { name: 'Neon DB', file: 'neon' },
+                { name: 'OpenRouter', file: 'openrouter' },
+                { name: 'Redis', file: 'redis' },
+                { name: 'Tavily', file: 'tavily' },
+                { name: 'YouTube', file: 'youtube' },
                 // Duplicate the array exactly to create the seamless loop
-                { name: 'Groq', file: 'groq' },
                 { name: 'Claude', file: 'claude' },
                 { name: 'DeepSeek', file: 'deepseek' },
                 { name: 'Gemini', file: 'gemini' },
+                { name: 'Gmail', file: 'gmail' },
+                { name: 'Groq', file: 'groq' },
+                { name: 'Llama', file: 'llama' },
                 { name: 'Neon DB', file: 'neon' },
+                { name: 'OpenRouter', file: 'openrouter' },
+                { name: 'Redis', file: 'redis' },
+                { name: 'Tavily', file: 'tavily' },
+                { name: 'YouTube', file: 'youtube' },
               ].map((tech, i) => (
                 <div key={i} className="flex flex-col items-center gap-4 group/icon min-w-[120px]">
                   <div className="w-20 h-20 rounded-2xl bg-zinc-900/40 backdrop-blur-md flex flex-col items-center justify-center overflow-hidden border border-zinc-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.3)] group-hover/icon:-translate-y-1 group-hover/icon:border-zinc-700 group-hover/icon:shadow-[0_8px_30px_rgba(255,255,255,0.08)] transition-all duration-300 p-4 relative">
@@ -192,14 +204,14 @@ export default function Landing() {
               </div>
             </div>
             <div className="w-full md:w-1/2 space-y-6">
-              <h3 className="text-3xl sm:text-4xl font-bold text-zinc-100">Visualize Connections</h3>
+              <h3 className="text-3xl sm:text-4xl font-bold text-zinc-100">Dynamic Knowledge Mapping</h3>
               <p className="text-zinc-400 text-lg leading-relaxed">
-                Our dynamic knowledge graph transforms static documents into a web of interactive insights. By mapping relationships across all your uploaded data, you can visually navigate complex topics and discover hidden connections that traditional reading would miss.
+                Transform static documents into a living, interactive web of insights. Our intelligent extraction engine automatically maps relationships across your entire knowledge base, allowing you to visually explore complex concepts and instantly uncover non-obvious connections.
               </p>
             </div>
           </motion.div>
 
-          {/* Feature 3: Video Analysis (Text Left, Image Right) */}
+          {/* Feature 3: Multi-Model Intelligence (Text Left, Image Right) */}
           <motion.div 
             initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={itemVariants}
             className="flex flex-col md:flex-row-reverse items-center gap-12 lg:gap-20"
@@ -207,18 +219,42 @@ export default function Landing() {
             <div className="w-full md:w-1/2">
               <div className="relative rounded-3xl border border-zinc-800/50 bg-zinc-900/20 p-2 shadow-2xl">
                 <div className="relative rounded-2xl overflow-hidden border border-zinc-800/50 bg-zinc-950 aspect-[4/3] sm:aspect-video md:aspect-[4/3]">
-                  <img src="/images/mockup3.png" alt="Video Analysis" className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-500" />
+                  <img src="/images/mockup3.png" alt="Multi-Model Intelligence" className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-500" />
                 </div>
               </div>
             </div>
             <div className="w-full md:w-1/2 space-y-6">
-              <h3 className="text-3xl sm:text-4xl font-bold text-zinc-100">Instant Video Insights</h3>
+              <h3 className="text-3xl sm:text-4xl font-bold text-zinc-100">Multi-Model Intelligence</h3>
               <p className="text-zinc-400 text-lg leading-relaxed">
-                Bypass hours of lecture watching. Simply integrate your video links and let the system automatically extract, transcribe, and analyze the content. You can instantly query timestamped answers and summarize massive lectures in seconds.
+                Never lock yourself into a single ecosystem again. SmartLearn allows you to query your documents using the world's most advanced frontier models—from Claude 3.5 to GPT-4o and DeepSeek. Effortlessly switch models based on your specific reasoning, coding, or analysis tasks, just like the best industry tools.
               </p>
             </div>
           </motion.div>
 
+        </section>
+
+        {/* Advanced Capabilities List */}
+        <section className="py-24 px-6 border-t border-zinc-800/50 bg-zinc-950/30">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-16">
+              <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-zinc-100 mb-4">Enterprise-Grade Architecture</h2>
+              <p className="text-zinc-400 text-lg">Built from the ground up for speed, reliability, and security.</p>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[
+                { title: 'Optimistic UI', desc: 'Interfaces update instantly before the server even responds, creating a seamless, zero-latency experience.' },
+                { title: 'Global Edge Caching', desc: 'Powered by Upstash Redis, your sessions and frequent queries are cached globally for sub-millisecond retrieval.' },
+                { title: 'Format Agnostic', desc: 'Upload PDFs, Word documents, Markdown, or raw text files. Our pipeline processes them flawlessly.' },
+                { title: 'Strict Privacy', desc: 'Your documents are fully encrypted at rest and never used to train public foundational AI models.' }
+              ].map((feat, i) => (
+                <div key={i} className="flex flex-col border-l border-zinc-800 pl-6">
+                  <h4 className="text-lg font-bold text-zinc-100 mb-2">{feat.title}</h4>
+                  <p className="text-sm text-zinc-400 leading-relaxed">{feat.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
 
         {/* Pricing Section */}
@@ -293,19 +329,39 @@ export default function Landing() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-800/50 bg-zinc-950/50 relative z-10">
-        <div className="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2">
-            <Logo size={20} />
-            <span className="font-semibold text-zinc-100">SmartLearn AI</span>
-            <span className="text-zinc-600 ml-2">© {new Date().getFullYear()}</span>
+      <footer className="border-t border-zinc-800/50 bg-zinc-950 pt-16 pb-8 relative z-10">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+          <div className="col-span-1 md:col-span-2">
+            <div className="flex items-center gap-2 mb-4">
+              <Logo size={24} />
+              <span className="font-bold text-lg text-zinc-100">SmartLearn AI</span>
+            </div>
+            <p className="text-zinc-400 text-sm max-w-sm leading-relaxed mb-6">
+              The ultimate contextual AI platform. Analyze massive documents, videos, and codebases at the speed of thought.
+            </p>
           </div>
-          <div className="flex gap-6 text-sm font-medium text-zinc-500">
-            <Link to="/login" className="hover:text-zinc-300 transition-colors">Sign In</Link>
-            <Link to="/signup" className="hover:text-zinc-300 transition-colors">Sign Up</Link>
-            <a href="#" className="hover:text-zinc-300 transition-colors">Privacy</a>
-            <a href="#" className="hover:text-zinc-300 transition-colors">Terms</a>
+          
+          <div>
+            <h4 className="text-zinc-100 font-semibold mb-4">Product</h4>
+            <ul className="space-y-3 text-sm text-zinc-500">
+              <li><a href="#features" className="hover:text-zinc-300 transition-colors">Features</a></li>
+              <li><a href="#pricing" className="hover:text-zinc-300 transition-colors">Pricing</a></li>
+              <li><Link to="/signup" className="hover:text-zinc-300 transition-colors">Sign Up</Link></li>
+              <li><Link to="/login" className="hover:text-zinc-300 transition-colors">Log In</Link></li>
+            </ul>
           </div>
+          
+          <div>
+            <h4 className="text-zinc-100 font-semibold mb-4">Legal</h4>
+            <ul className="space-y-3 text-sm text-zinc-500">
+              <li><a href="/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-300 transition-colors">Privacy Policy</a></li>
+              <li><a href="/terms" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-300 transition-colors">Terms of Service</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-6 pt-8 border-t border-zinc-800/50 flex flex-col md:flex-row justify-between items-center gap-4">
+          <span className="text-zinc-600 text-sm">© {new Date().getFullYear()} SmartLearn AI. All rights reserved.</span>
         </div>
       </footer>
     </div>
