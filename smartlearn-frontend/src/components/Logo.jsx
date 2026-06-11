@@ -1,64 +1,32 @@
 import React from "react";
 
-export default function Logo({ size = 32 }) {
+export default function Logo({ size = 32, className = "" }) {
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 32 32"
+      viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
       style={{ flexShrink: 0 }}
     >
-      {/* 🔷 Glow Effect */}
-      <defs>
-        <filter id="glow">
-          <feGaussianBlur stdDeviation="2" result="coloredBlur" />
-          <feMerge>
-            <feMergeNode in="coloredBlur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-
-        {/* Gradient */}
-        <linearGradient id="sl_pro_grad" x1="4" y1="3" x2="28" y2="29">
-          <stop stopColor="#10b981" />
-          <stop offset="1" stopColor="#2563eb" />
-        </linearGradient>
-      </defs>
-
-      {/* 🔷 Main Hexagon */}
+      {/* Sleek, professional "Cursor / Arrow" geometry for SmartLearn */}
       <path
-        d="M16 3 L27.26 9.5 L27.26 22.5 L16 29 L4.74 22.5 L4.74 9.5 Z"
-        fill="url(#sl_pro_grad)"
-        filter="url(#glow)"
-      />
-
-      {/* 🔷 Inner Lines (AI structure) */}
-      <path
-        d="M16 16 V30 M16 16 L28.5 8.5 M16 16 L3.5 8.5"
-        stroke="var(--background)"
-        strokeWidth="2.2"
+        d="M5 3L19 10L12 12L10 19L5 3Z"
+        stroke="currentColor"
+        strokeWidth="2"
         strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="currentColor"
+        fillOpacity="0.1"
       />
-
-      {/* 🔷 Core AI Node (Animated) */}
-      <circle cx="16" cy="16" r="5" fill="var(--background)" />
-
-      <circle cx="16" cy="16" r="2.2" fill="var(--foreground)">
-        <animate
-          attributeName="r"
-          values="2;2.8;2"
-          dur="1.2s"
-          repeatCount="indefinite"
-        />
-      </circle>
-
-      {/* 🔷 Highlight (3D feel) */}
       <path
-        d="M16 3 L27.26 9.5 L16 16 Z"
-        fill="white"
-        opacity="0.08"
+        d="M12 12L19 19"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
