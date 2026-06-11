@@ -74,11 +74,9 @@ export default function Landing() {
   return (
     <div className="dark min-h-screen bg-[#0a0a0a] text-zinc-100 font-sans selection:bg-primary/30 overflow-x-hidden">
       
-      {/* Background Gradients */}
+      {/* Background Gradients (Optimized for performance) */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/10 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/10 blur-[120px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#0a0a0a_100%)] opacity-80" />
+        <div className="absolute inset-0 bg-[#0a0a0a]" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
       </div>
 
@@ -384,13 +382,7 @@ export default function Landing() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {/* Sanan Malik */}
               <div className="bg-[#09090b] border border-zinc-800 rounded-3xl p-8 sm:p-10 flex flex-col justify-between group hover:border-zinc-700 transition-colors relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-8 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity">
-                  <Sparkles size={120} />
-                </div>
                 <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center mb-6 shadow-xl">
-                    <Sparkles size={22} className="text-zinc-400 group-hover:text-primary transition-colors" />
-                  </div>
                   <h3 className="text-2xl font-bold text-zinc-100 mb-1">Sanan Malik</h3>
                   <p className="text-primary font-medium mb-6 text-sm tracking-wide">CEO & VISIONARY</p>
                   <p className="text-zinc-400 text-base leading-relaxed">
@@ -401,13 +393,7 @@ export default function Landing() {
 
               {/* Naveed Ahmed */}
               <div className="bg-[#09090b] border border-zinc-800 rounded-3xl p-8 sm:p-10 flex flex-col justify-between group hover:border-zinc-700 transition-colors relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-8 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity">
-                  <Code2 size={120} />
-                </div>
                 <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center mb-6 shadow-xl">
-                    <Code2 size={22} className="text-zinc-400 group-hover:text-primary transition-colors" />
-                  </div>
                   <h3 className="text-2xl font-bold text-zinc-100 mb-1">Naveed Ahmed</h3>
                   <p className="text-primary font-medium mb-6 text-sm tracking-wide">LEAD ARCHITECT & DEVELOPER</p>
                   <p className="text-zinc-400 text-base leading-relaxed">
@@ -587,7 +573,6 @@ export default function Landing() {
             <ul className="space-y-3 text-sm text-zinc-500">
               <li><a href="#features" className="hover:text-zinc-300 transition-colors">Features</a></li>
               <li><a href="#pricing" className="hover:text-zinc-300 transition-colors">Pricing</a></li>
-              <li><Link to="/releases" className="hover:text-zinc-300 transition-colors">Release Notes</Link></li>
               <li><Link to="/signup" className="hover:text-zinc-300 transition-colors">Sign Up</Link></li>
               <li><Link to="/login" className="hover:text-zinc-300 transition-colors">Log In</Link></li>
             </ul>
