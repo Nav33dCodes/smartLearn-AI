@@ -121,11 +121,14 @@ function ChatDashboard() {
     }
   }, [isChatsLoading, hasInitialized, createNewChat]);
 
-  // When activeChatId changes, load its dynamic history ONLY ONCE
+  // When activeChatId changes, or when historyData refetches (e.g. tab focus),
+  // sync the local messages with the server.
   // CRITICAL: Never overwrite during active streaming
   useEffect(() => {
     if (activeChatId && historyData?.messages) {
-      if (loadedChatIdRef.current !== activeChatId && !isStreamingRef.current) {
+      if (!isStreamingRef.current) {
+        // Compare lengths or last message to avoid unnecessary state updates if possible, 
+        // but simply setting it works and ensures cross-tab synchronization.
         setActiveMessages(historyData.messages);
         loadedChatIdRef.current = activeChatId;
       }
@@ -188,8 +191,9 @@ function ChatDashboard() {
         const { done, value } = await reader.read();
 
         if (done) {
-          // Streaming finished, trigger background refetch to grab the LLM auto-generated title!
+          // Streaming finished, trigger background refetch to grab the LLM auto-generated title and finalize chat history!
           queryClient.invalidateQueries(['chats', user?.id]);
+          queryClient.invalidateQueries(['chat', currentChatId]);
           break;
         }
 
@@ -266,17 +270,19 @@ function ChatDashboard() {
         setActiveMessages(prev => {
           const updated = [...prev];
           if (updated.length === 0) {
-            updated.push({ role: "assistant", content: "⚠️ An error occurred. Please try again." });
+            updated.push({ role: "assistant", content: "⚠️ An error occurred or stream disconnected. Syncing..." });
             return updated;
           }
           if (updated[updated.length - 1].role === "user") {
-            updated.push({ role: "assistant", content: "⚠️ An error occurred. Please try again." });
+            updated.push({ role: "assistant", content: "⚠️ An error occurred or stream disconnected. Syncing..." });
           } else {
-            updated[updated.length - 1] = { role: "assistant", content: "⚠️ An error occurred. Please try again." };
+            updated[updated.length - 1] = { role: "assistant", content: "⚠️ An error occurred or stream disconnected. Syncing..." };
           }
           return updated;
         });
-        toast.error("Failed to send message");
+        toast.error("Stream interrupted. Attempting to resync with server...");
+        // If stream broke but backend finished, this will pull the complete message.
+        queryClient.invalidateQueries(['chat', currentChatId]);
       }
     }
 
