@@ -101,6 +101,29 @@ function ChatDashboard() {
     }
   }, [selectedModelId]);
 
+  // Dynamic Browser Tab Title
+  useEffect(() => {
+    if (loading) {
+      document.title = "● Generating... | SmartLearn";
+    } else {
+      const isHidden = document.hidden;
+      if (isHidden && activeMessages.length > 0 && activeMessages[activeMessages.length - 1].role === 'model') {
+        document.title = "(1) SmartLearn AI";
+      } else {
+        document.title = "SmartLearn AI";
+      }
+    }
+    
+    const handleVisibilityChange = () => {
+      if (!document.hidden && !loading) {
+        document.title = "SmartLearn AI";
+      }
+    };
+    
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [loading, activeMessages]);
+
   const createNewChat = useCallback(() => {
     const newId = Date.now().toString();
     setActiveChatId(newId);

@@ -27,6 +27,15 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
   const [openSources, setOpenSources] = useState({});
   const scrollContainerRef = useRef(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const [, setTick] = useState(0);
+
+  // Force re-render every 60 seconds to update relative timestamps
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTick(t => t + 1);
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleScroll = () => {
     if (!scrollContainerRef.current) return;
