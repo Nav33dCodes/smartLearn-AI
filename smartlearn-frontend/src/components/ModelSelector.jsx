@@ -15,14 +15,14 @@ export const MODELS = [
     name: "Gemini 2.5 Flash",
     provider: "Google",
     icon: Brain,
-    description: "Google's ultra-fast native multi-modal study model. 100% Free."
+    description: "Google's ultra-fast native multi-modal study model."
   },
   {
     id: "groq:llama-3.3-70b-versatile",
     name: "Groq Fast (Llama 3.3)",
     provider: "Groq",
     icon: Zap,
-    description: "Lightning fast responses for general queries. 100% Free."
+    description: "Lightning fast responses for general queries."
   }
 ];
 
