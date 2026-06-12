@@ -26,6 +26,14 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
   const messagesEndRef = useRef(null);
   const [openSources, setOpenSources] = useState({});
   const scrollContainerRef = useRef(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+    const isScrolledUp = scrollHeight - scrollTop - clientHeight > 200;
+    setShowScrollButton(isScrolledUp);
+  };
 
   useEffect(() => {
     if (scrollContainerRef.current) {
@@ -78,7 +86,7 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
   }
 
   return (
-    <div ref={scrollContainerRef} className="flex-1 overflow-y-auto pt-14 pb-40 px-4 sm:px-6 md:px-8">
+    <div ref={scrollContainerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto pt-14 pb-40 px-4 sm:px-6 md:px-8 relative">
       <div className="max-w-3xl mx-auto flex flex-col gap-12 py-10">
         {messages.map((msg, index) => {
           const isLast = index === messages.length - 1;
@@ -163,8 +171,8 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
                         </div>
                       )}
 
-                      <div className="text-foreground leading-relaxed text-base pt-1">
-                        <AIMessage content={msg.content} />
+                      <div className="text-foreground leading-relaxed text-base pt-1 relative">
+                        <AIMessage content={msg.content} isGenerating={isLast && loading} />
                       </div>
                       <div className="flex items-center mt-3 opacity-0 group-hover:opacity-100 transition-opacity gap-1 pl-1">
                         <button
@@ -252,8 +260,30 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
           </motion.div>
         )}
         
+        
         <div ref={messagesEndRef} />
       </div>
+
+      <AnimatePresence>
+        {showScrollButton && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-32 right-8 z-50 md:right-12"
+          >
+            <button
+              onClick={() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" })}
+              className="p-2.5 bg-[#0a0a0a] border border-white/10 rounded-full shadow-2xl text-zinc-400 hover:text-white hover:bg-white/5 transition-all relative flex items-center justify-center"
+              title="Scroll to bottom"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+              {loading && <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#0a0a0a]" />}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -245,7 +245,7 @@ const markdownRenderers = {
 };
 
 // ── Main ──
-function AIMessage({ content }) {
+function AIMessage({ content, isGenerating }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFetchingTTS, setIsFetchingTTS] = useState(false);
   const audioRef = useRef(null);
@@ -317,6 +317,8 @@ function AIMessage({ content }) {
 
   if (!content) return null;
 
+  const displayContent = isGenerating ? content + " ▋" : content;
+
   return (
     <div className="group relative">
       <div className="markdown-body">
@@ -325,7 +327,7 @@ function AIMessage({ content }) {
           rehypePlugins={[rehypeKatex]}
           components={markdownRenderers}
         >
-          {content}
+          {displayContent}
         </ReactMarkdown>
       </div>
       
