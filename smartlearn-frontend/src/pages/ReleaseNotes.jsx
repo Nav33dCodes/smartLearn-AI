@@ -2,6 +2,27 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 12, 2026 — Enterprise Fallback Architecture & Stability (Phase 4)",
+    features: [
+      {
+        title: "Bulletproof Backend Routing",
+        description: "Completely re-engineered the AI routing system to eliminate rate limit crashes and network timeouts.",
+        bullets: [
+          "Zero-Downtime Cascade: The 'SmartLearn Auto' route now dynamically bounces between 7 different elite AI models (including Llama 3.3 70B, Gemini 2.5 Flash, and DeepSeek R1). If one provider hits a rate limit or crashes, it instantly jumps to the next without interrupting your chat.",
+          "Mid-Stream Crash Protection: Fixed a critical bug where the UI would severely corrupt if a model disconnected mid-sentence. The system now meticulously tracks data packets and aborts gracefully if the network drops.",
+          "Timeout Paralysis Fix: Radically reduced the API network timeout from 45 seconds down to 15 seconds, preventing the entire app from freezing if a third-party server goes completely offline."
+        ]
+      },
+      {
+        title: "Memory Overflow Sanitization",
+        description: "Hardened the context window injection limits to protect smaller fallback models.",
+        bullets: [
+          "Historical Truncation: Both past AI responses and past user prompts are now strictly bounded to 2000 characters when passed into the AI's multi-turn memory. This ensures massive text dumps in the past won't accidentally crash the AI's limited context window today."
+        ]
+      }
+    ]
+  },
+  {
     date: "June 12, 2026 — UI Simplification & State Synchronization (Phase 3)",
     features: [
       {
