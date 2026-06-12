@@ -6,7 +6,7 @@ SECRET_KEY = os.getenv("JWT_SECRET")
 if not SECRET_KEY:
     import warnings
     warnings.warn("⚠️ JWT_SECRET not set! Using insecure default for development only.")
-    SECRET_KEY = "dev-only-insecure-key-" + str(os.getpid())
+    SECRET_KEY = "dev-only-insecure-key-12345"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 REFRESH_TOKEN_EXPIRE_DAYS = 7

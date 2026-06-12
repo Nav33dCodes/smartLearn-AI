@@ -25,7 +25,6 @@ const Landing = lazy(() => import("./pages/Landing"));
 const ChatsManager = lazy(() => import("./components/ChatsManager"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 
 const API = import.meta.env.DEV
   ? "http://localhost:8000"
@@ -510,11 +509,7 @@ export default function App() {
           <Route path="/releases" element={<ReleaseNotes />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
-          <Route path="/admin" element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } />
+
           <Route path="/app" element={
             <ProtectedRoute>
               <ChatDashboard />

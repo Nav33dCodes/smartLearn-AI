@@ -1,14 +1,16 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { ReactFlow, Controls, Background, applyNodeChanges, applyEdgeChanges, Panel } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import dagre from 'dagre';
-import { Maximize2, X } from 'lucide-react';
+import * as dagre from 'dagre';
+import { Maximize2, X, Loader2, Network } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const dagreGraph = new dagre.graphlib.Graph();
-dagreGraph.setDefaultEdgeLabel(() => ({}));
-
 const getLayoutedElements = (nodes, edges, direction = 'TB') => {
+  // Support Vite CommonJS interop safely
+  const dagreLib = dagre.default ? dagre.default : dagre;
+  const dagreGraph = new dagreLib.graphlib.Graph();
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
+
   const isHorizontal = direction === 'LR';
   dagreGraph.setGraph({ rankdir: direction, nodesep: 60, ranksep: 100 });
 
@@ -20,7 +22,7 @@ const getLayoutedElements = (nodes, edges, direction = 'TB') => {
     dagreGraph.setEdge(edge.source, edge.target);
   });
 
-  dagre.layout(dagreGraph);
+  dagreLib.layout(dagreGraph);
 
   const newNodes = nodes.map((node) => {
     const nodeWithPosition = dagreGraph.node(node.id);
@@ -51,6 +53,8 @@ export default function MindMapBlock({ data }) {
       let cleanData = data;
       if (typeof cleanData === 'string') {
         cleanData = cleanData.replace(/```json/g, '').replace(/```/g, '').trim();
+        // Remove trailing commas that LLMs sometimes generate
+        cleanData = cleanData.replace(/,\s*([\]}])/g, '$1');
         cleanData = JSON.parse(cleanData);
       }
 
@@ -89,7 +93,7 @@ export default function MindMapBlock({ data }) {
       setEdges(layoutedEdges);
     } catch (err) {
       console.error("Mind Map Parse Error:", err);
-      setError("Failed to generate mind map from AI output.");
+      setError(`Failed to generate mind map: ${err.message}. Data: ${String(data).substring(0, 100)}`);
     }
   }, [data]);
 
@@ -104,8 +108,13 @@ export default function MindMapBlock({ data }) {
 
   if (error) {
     return (
-      <div className="bg-red-500/10 border border-red-500/20 text-red-500 rounded-lg p-4 my-4 font-medium text-sm">
-        {error}
+      <div className="bg-[#0f0f0f] border border-border/50 rounded-2xl overflow-hidden shadow-lg h-[250px] w-full my-6 flex flex-col items-center justify-center gap-4 text-muted-foreground relative">
+        <div className="absolute inset-0 bg-primary/5 animate-pulse"></div>
+        <Network size={32} className="text-primary/50 animate-bounce" />
+        <div className="flex items-center gap-2">
+          <Loader2 size={16} className="animate-spin text-primary" />
+          <span className="font-semibold text-sm tracking-widest uppercase">Rendering Mind Map...</span>
+        </div>
       </div>
     );
   }
