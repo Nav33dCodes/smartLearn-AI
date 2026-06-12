@@ -60,34 +60,43 @@ Create a `.env` file using the following industry-standard template:
 
 ```env
 # ────────────────────────────────────────────────────
-# CORE INFRASTRUCTURE (Required)
+# CORE INFRASTRUCTURE & AUTHENTICATION
 # ────────────────────────────────────────────────────
+# Allowed origins for CORS (comma-separated)
+ALLOWED_ORIGINS="http://localhost:5173,http://localhost:3000"
+
+# Secret key for encrypting JWT tokens and session data
+JWT_SECRET="your_jwt_secret_here"
+
 # The public connection string to your PostgreSQL instance
 DATABASE_URL="postgresql://user:password@host:port/dbname"
 
-# Secret key for encrypting JWT tokens and session data
-SECRET_KEY="your_secure_random_string"
+# Upstash Redis for global edge caching and session state management
+REDIS_URL="rediss://default:password@host:port"
 
 # ────────────────────────────────────────────────────
-# AI MODEL PROVIDERS (At least one required)
+# EMAIL SERVER FOR OTP & ACCOUNT DELETION
+# ────────────────────────────────────────────────────
+SMTP_EMAIL="your_email@gmail.com"
+SMTP_PASSWORD="your_app_specific_password_here"
+
+# ────────────────────────────────────────────────────
+# AI MODEL PROVIDERS & EXTERNAL INTEGRATIONS
 # ────────────────────────────────────────────────────
 # Groq (Powers LLaMA 3.3 for ultra-low latency text generation)
 GROQ_API_KEY="gsk_..."
 
 # Google Gemini (Powers Gemini 2.5 Flash for multimodal vision tasks)
-GEMINI_API_KEY="AIza..."
+GEMINI_API_KEY="AQ..."
 
 # OpenRouter (The primary fallback safety net to guarantee 100% uptime)
 OPENROUTER_API_KEY="sk-or-v1-..."
 
-# ────────────────────────────────────────────────────
-# EXTERNAL INTEGRATIONS (Optional)
-# ────────────────────────────────────────────────────
 # Tavily API for enterprise-grade live web extraction and scraping
 TAVILY_API_KEY="tvly-..."
 
-# Upstash Redis for global edge caching and session state management
-REDIS_URL="rediss://default:password@host:port"
+# YouTube API for extracting transcripts and analyzing video data
+YOUTUBE_API_KEY="AIza..."
 ```
 
 Start the asynchronous server:
