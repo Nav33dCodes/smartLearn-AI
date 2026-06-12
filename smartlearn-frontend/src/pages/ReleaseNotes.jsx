@@ -21,6 +21,7 @@ const releases = [
           "Custom Instructions: A dedicated space to define strict, permanent rules for the AI (e.g., 'Always reply in French').",
           "Zero Performance Hit: Your persona is instantly stitched into the core system prompt at the backend router level, guaranteeing perfect adherence with absolutely zero added latency."
         ]
+      }
     ]
   },
   {
