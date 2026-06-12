@@ -19,6 +19,23 @@ export default function Landing() {
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
   };
   const [activeHeroTab, setActiveHeroTab] = useState(0);
+
+  const handleScroll = (e, targetId) => {
+    e.preventDefault();
+    const element = document.getElementById(targetId);
+    if (element) {
+      const offset = 100; // Account for the sticky navbar height
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = element.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
   
   const heroTabs = [
     {
@@ -81,22 +98,24 @@ export default function Landing() {
       </div>
 
       {/* Navigation Bar */}
-      <nav className="relative z-50 flex items-center justify-between px-6 py-4 max-w-7xl mx-auto backdrop-blur-md border-b border-zinc-800/50 sticky top-0 bg-[#0a0a0a]/80">
-        <Link to="/" className="flex items-center gap-3 group">
-          <Logo size={28} />
-          <span className="text-xl font-bold tracking-tight text-zinc-100 group-hover:text-white transition-colors">SmartLearn</span>
-        </Link>
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
-          <a href="#features" className="hover:text-zinc-100 transition-colors">Features</a>
-          <a href="#pricing" className="hover:text-zinc-100 transition-colors">Pricing</a>
-          <a href="#about" className="hover:text-zinc-100 transition-colors">About</a>
-          <Link to="/releases" className="hover:text-zinc-100 transition-colors">Release Notes</Link>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link to="/login" className="text-sm font-medium text-zinc-300 hover:text-white transition-colors">Sign In</Link>
-          <Link to="/signup" className="text-sm font-medium bg-zinc-100 text-zinc-900 px-4 py-2 rounded-full hover:bg-white transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-            Get Started
+      <nav className="sticky top-0 z-50 w-full border-b border-white/[0.05] bg-[#0a0a0a]/60 backdrop-blur-xl transition-all duration-300">
+        <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
+          <Link to="/" className="flex items-center gap-3 group">
+            <Logo size={28} />
+            <span className="text-xl font-bold tracking-tight text-zinc-100 group-hover:text-white transition-colors">SmartLearn</span>
           </Link>
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
+            <a href="#features" onClick={(e) => handleScroll(e, 'features')} className="hover:text-zinc-100 transition-colors cursor-pointer">Features</a>
+            <a href="#pricing" onClick={(e) => handleScroll(e, 'pricing')} className="hover:text-zinc-100 transition-colors cursor-pointer">Pricing</a>
+            <a href="#about" onClick={(e) => handleScroll(e, 'about')} className="hover:text-zinc-100 transition-colors cursor-pointer">About</a>
+            <Link to="/releases" className="hover:text-zinc-100 transition-colors">Release Notes</Link>
+          </div>
+          <div className="flex items-center gap-4">
+            <Link to="/login" className="text-sm font-medium text-zinc-300 hover:text-white transition-colors">Sign In</Link>
+            <Link to="/signup" className="text-sm font-medium bg-zinc-100 text-zinc-900 px-4 py-2 rounded-full hover:bg-white transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+              Get Started
+            </Link>
+          </div>
         </div>
       </nav>
 
@@ -145,7 +164,7 @@ export default function Landing() {
             <Link to="/signup" className="w-full sm:w-auto flex items-center justify-center gap-2 bg-zinc-100 text-zinc-900 px-8 py-3.5 rounded-full text-base font-medium hover:bg-white transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-[1.02]">
               Start for Free <ArrowRight size={18} />
             </Link>
-            <a href="#features" className="w-full sm:w-auto flex items-center justify-center gap-2 bg-zinc-900/50 border border-zinc-800 text-zinc-300 px-8 py-3.5 rounded-full text-base font-medium hover:bg-zinc-800/50 hover:text-white transition-all backdrop-blur-sm">
+            <a href="#features" onClick={(e) => handleScroll(e, 'features')} className="w-full sm:w-auto flex items-center justify-center gap-2 bg-zinc-900/50 border border-zinc-800 text-zinc-300 px-8 py-3.5 rounded-full text-base font-medium hover:bg-zinc-800/50 hover:text-white transition-all backdrop-blur-sm cursor-pointer">
               Explore Features
             </a>
           </motion.div>
