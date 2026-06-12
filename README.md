@@ -58,34 +58,36 @@ The following diagram illustrates the high-level data flow and component interac
 
 ```mermaid
 graph TD
-    %% Define Styles
+    User("User Client / Browser")
+    Vite("React Frontend UI")
+    FastAPI("FastAPI Backend Server")
+    FAISS[("FAISS Vector DB")]
+    Postgres[("PostgreSQL")]
+    Redis[("Upstash Redis Cache")]
+    Router{"AI Model Router"}
+    Groq("Groq LLaMA 3.3")
+    Gemini("Google Gemini 2.5")
+    OpenRouter("OpenRouter Fallbacks")
+
+    User <-->|"WebSocket / SSE"| Vite
+    Vite <-->|"REST API"| FastAPI
+    FastAPI <-->|"Embeddings Retrieval"| FAISS
+    FastAPI <-->|"Session / Chat History"| Postgres
+    FastAPI <-->|"Global Edge Caching"| Redis
+    FastAPI -->|"Prompt & Context"| Router
+    Router -->|"Primary Text"| Groq
+    Router -->|"Multimodal / Vision"| Gemini
+    Router -.->|"Fallback Routing"| OpenRouter
+
     classDef client fill:#0a0a0a,stroke:#38B2AC,stroke-width:2px,color:#fff
     classDef api fill:#005571,stroke:#fff,stroke-width:2px,color:#fff
     classDef db fill:#316192,stroke:#fff,stroke-width:2px,color:#fff
     classDef ai fill:#DC382D,stroke:#fff,stroke-width:2px,color:#fff
-    
-    %% Nodes
-    User([User Client / Browser]) ::: client
-    Vite[React Frontend UI] ::: client
-    FastAPI[FastAPI Backend Server] ::: api
-    FAISS[(FAISS Vector DB)] ::: db
-    Postgres[(PostgreSQL)] ::: db
-    Redis[(Upstash Redis Cache)] ::: db
-    Router{AI Model Router} ::: ai
-    Groq[Groq LLaMA 3.3] ::: ai
-    Gemini[Google Gemini 2.5] ::: ai
-    OpenRouter[OpenRouter Fallbacks] ::: ai
 
-    %% Connections
-    User <-->|WebSocket / SSE| Vite
-    Vite <-->|REST API| FastAPI
-    FastAPI <-->|Embeddings Retrieval| FAISS
-    FastAPI <-->|Session / Chat History| Postgres
-    FastAPI <-->|Global Edge Caching| Redis
-    FastAPI -->|Prompt & Context| Router
-    Router -->|Primary Text| Groq
-    Router -->|Multimodal / Vision| Gemini
-    Router -.->|Fallback Routing| OpenRouter
+    class User,Vite client;
+    class FastAPI api;
+    class FAISS,Postgres,Redis db;
+    class Router,Groq,Gemini,OpenRouter ai;
 ```
 
 ## Security & Privacy
