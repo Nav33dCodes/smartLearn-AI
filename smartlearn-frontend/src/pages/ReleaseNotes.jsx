@@ -21,16 +21,6 @@ const releases = [
           "Custom Instructions: A dedicated space to define strict, permanent rules for the AI (e.g., 'Always reply in French').",
           "Zero Performance Hit: Your persona is instantly stitched into the core system prompt at the backend router level, guaranteeing perfect adherence with absolutely zero added latency."
         ]
-      },
-      {
-        title: "Direct URL Scraping",
-        description: "The AI is now capable of reading entire websites instantly, bypassing basic search engine snippets.",
-        bullets: [
-          "Automatic Extraction: Just paste a URL into your message, and the backend regex engine automatically intercepts it.",
-          "Stealth Bypassing: Upgraded the scraper to intelligently route through enterprise extraction APIs to pierce through anti-bot firewalls (like Cloudflare), gracefully falling back to BeautifulSoup for simple sites.",
-          "Live UI Feedback: The UI seamlessly transitions to a 'Reading website...' state while it downloads and injects the raw article into the RAG memory."
-        ]
-      }
     ]
   },
   {
