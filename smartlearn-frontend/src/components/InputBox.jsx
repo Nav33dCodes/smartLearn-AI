@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
-import { Paperclip, ArrowUp, Square, Loader2, FileText, X, Mic, Globe, Check, Plus } from "lucide-react";
+import { ArrowRight, BrainCircuit, Zap, Shield, FileText, Sparkles, Code2, Database, PlaySquare, Image as ImageIcon, CheckCircle2, Cpu, Network, Globe, Mail, ChevronDown, Lock, BookOpen, HelpCircle, Search, Trash2, Paperclip, ArrowUp, Square, Loader2, X, Mic, Plus, Check } from 'lucide-react';
 import api from '../lib/axios';
 import { Button } from "./ui/button";
 import { useUploadPdf } from "../hooks/useChats";
@@ -18,7 +18,6 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
   const plusMenuRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (plusMenuRef.current && !plusMenuRef.current.contains(event.target)) {
@@ -268,32 +267,32 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute bottom-full left-0 mb-3 w-56 bg-white dark:bg-[#1e293b] border border-border shadow-2xl rounded-2xl overflow-hidden z-[100] flex flex-col p-1.5"
+                    className="absolute bottom-full left-0 mb-3 w-56 bg-[#0a0a0a] border-2 border-red-900/50 shadow-[0_0_30px_rgba(220,38,38,0.15)] rounded-2xl overflow-hidden z-[100] flex flex-col p-1.5 backdrop-blur-xl"
                   >
                     <button
                       type="button"
                       onClick={() => { fileInputRef.current?.click(); setShowPlusMenu(false); }}
-                      className="flex items-center gap-3 px-3 py-2.5 text-sm hover:bg-muted rounded-xl transition-colors text-foreground"
+                      className="flex items-center gap-3 px-3 py-2.5 text-sm hover:bg-zinc-900 rounded-xl transition-colors text-zinc-300 hover:text-zinc-100"
                       disabled={uploadPdfMutation.isPending || !activeChatId}
                     >
-                      <div className="bg-primary/10 p-1.5 rounded-lg text-primary">
+                      <div className="bg-red-500/10 p-1.5 rounded-lg text-red-500 border border-red-500/20">
                         <FileText size={16} />
                       </div>
-                      <span className="font-medium">Upload Document</span>
+                      <span className="font-bold">Upload Document</span>
                     </button>
                     
-                    <div className="h-px bg-border my-1.5 mx-2" />
+                    <div className="h-px bg-red-900/30 my-1.5 mx-2" />
                     
-                    <div className="px-3 py-1.5 text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wider">
+                    <div className="px-3 py-1.5 text-[10px] font-black text-red-500 uppercase tracking-[0.1em]">
                       Web Search Mode
                     </div>
                     
                     <button
                       type="button"
                       onClick={() => { setSearchWeb("auto"); setShowPlusMenu(false); }}
-                      className={`flex items-center gap-3 px-3 py-2 text-[13px] hover:bg-muted rounded-xl transition-colors ${searchWeb === "auto" ? "text-blue-500 font-medium bg-blue-500/5" : "text-foreground"}`}
+                      className={`flex items-center gap-3 px-3 py-2 text-[13px] hover:bg-zinc-900 rounded-xl transition-colors ${searchWeb === "auto" ? "text-blue-400 font-bold bg-blue-500/10 border border-blue-500/20" : "text-zinc-400"}`}
                     >
-                      <Globe size={16} className={searchWeb === "auto" ? "text-blue-500" : "text-muted-foreground"} /> 
+                      <Globe size={16} className={searchWeb === "auto" ? "text-blue-400" : "text-zinc-500"} /> 
                       <div className="flex flex-col items-start">
                         <span>Auto Search</span>
                       </div>
@@ -303,9 +302,9 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
                     <button
                       type="button"
                       onClick={() => { setSearchWeb("on"); setShowPlusMenu(false); }}
-                      className={`flex items-center gap-3 px-3 py-2 text-[13px] hover:bg-muted rounded-xl transition-colors ${searchWeb === "on" ? "text-primary font-medium bg-primary/5" : "text-foreground"}`}
+                      className={`flex items-center gap-3 px-3 py-2 text-[13px] hover:bg-zinc-900 rounded-xl transition-colors ${searchWeb === "on" ? "text-red-400 font-bold bg-red-500/10 border border-red-500/20" : "text-zinc-400"}`}
                     >
-                      <Globe size={16} className={searchWeb === "on" ? "text-primary" : "text-muted-foreground"} /> 
+                      <Globe size={16} className={searchWeb === "on" ? "text-red-400" : "text-zinc-500"} /> 
                       <div className="flex flex-col items-start">
                         <span>Always On</span>
                       </div>
@@ -315,13 +314,13 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
                     <button
                       type="button"
                       onClick={() => { setSearchWeb("off"); setShowPlusMenu(false); }}
-                      className={`flex items-center gap-3 px-3 py-2 text-[13px] hover:bg-muted rounded-xl transition-colors ${searchWeb === "off" ? "text-muted-foreground font-medium" : "text-foreground"}`}
+                      className={`flex items-center gap-3 px-3 py-2 text-[13px] hover:bg-zinc-900 rounded-xl transition-colors ${searchWeb === "off" ? "text-zinc-300 font-bold bg-zinc-800" : "text-zinc-500"}`}
                     >
-                      <X size={16} className="text-muted-foreground" /> 
+                      <X size={16} className={searchWeb === "off" ? "text-zinc-300" : "text-zinc-600"} /> 
                       <div className="flex flex-col items-start">
                         <span>Disabled</span>
                       </div>
-                      {searchWeb === "off" && <Check size={14} className="ml-auto text-muted-foreground" />}
+                      {searchWeb === "off" && <Check size={14} className="ml-auto" />}
                     </button>
                   </motion.div>
                 )}
