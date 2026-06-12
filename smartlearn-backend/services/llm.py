@@ -52,6 +52,23 @@ FALLBACK_ROUTER = {
         "openrouter/qwen/qwen-2.5-72b-instruct:free"
     ],
 
+    "groq:llama-3.3-70b-versatile": [
+        "openrouter/meta-llama/llama-3.3-70b-instruct:free",
+        "gemini:gemini-2.5-flash",
+        "openrouter/google/gemini-2.5-flash-free"
+    ],
+
+    "gemini:gemini-2.5-flash": [
+        "openrouter/google/gemini-2.5-flash-free",
+        "groq:llama-3.3-70b-versatile",
+        "openrouter/meta-llama/llama-3.3-70b-instruct:free"
+    ],
+
+    "groq:llama-3.1-8b-instant": [
+        "openrouter/meta-llama/llama-3.3-70b-instruct:free",
+        "openrouter/google/gemini-2.5-flash-free"
+    ],
+
     # Kept for backward compatibility if old chats use this model
     "openai/gpt-4o": ["openai/gpt-4o-mini", "groq:llama-3.1-8b-instant", "openrouter/auto"]
 }
@@ -60,6 +77,9 @@ SYSTEM_PROMPT = """You are SmartLearn AI — an advanced, highly intelligent lea
 
 - **Provide extremely comprehensive, detailed, and profound explanations.**
 - Act like an advanced system (e.g. ChatGPT, Claude) that deeply explores concepts.
+- **Code Execution Environment**: The user has access to a live Sandpack IDE execution engine inside the chat window. If you provide a code block in `javascript`, `jsx`, `html`, or `css`, they can instantly click a 'RUN CODE' button to spin up an interactive preview!
+  - You must strive to provide FULLY self-contained, working examples rather than broken fragments, whenever applicable.
+  - If asked for a React component, write the entire component and `export default function App()` so the Sandpack engine can mount it instantly.
 - Use rich formatting: **bolding**, extensive `code blocks`, `inline code`, clear ## Headings, and Markdown tables to structure complex data.
 - **Math:** ALWAYS use `$$` for block math equations (e.g. `$$x^2$$`) and `$` for inline math (e.g. `$y=mx+b$`).
 - **Mind Maps:** If the user asks for a mind map, you MUST output a code block with the language `mindmap`. The content must be valid JSON with `nodes` (id, label) and `edges` (source, target). Example:

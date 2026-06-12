@@ -3,7 +3,8 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { Copy, Check, WrapText, Volume2, Square, Download, Loader2 } from "lucide-react";
+import { Copy, Check, WrapText, Volume2, Square, Download, Loader2, Play } from "lucide-react";
+const SandpackBlock = React.lazy(() => import("./SandpackBlock"));
 import QuizBlock from "./QuizBlock";
 import FlashcardBlock from "./FlashcardBlock";
 import MermaidBlock from "./MermaidBlock";
@@ -88,6 +89,26 @@ function DownloadButton({ text, language }) {
 function CodeBlock({ language, codeText }) {
   const [wrapped, setWrapped] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [showSandpack, setShowSandpack] = useState(false);
+  
+  const isRunnable = ['javascript', 'js', 'jsx', 'react', 'html', 'css', 'typescript', 'ts'].includes(language?.toLowerCase()) || codeText.includes('import React');
+
+  if (showSandpack) {
+    return (
+      <div className="relative group">
+        <button 
+          onClick={() => setShowSandpack(false)}
+          className="absolute top-4 right-4 z-[60] text-xs px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 border border-white/10 text-white rounded-lg transition opacity-0 group-hover:opacity-100 flex items-center gap-2 shadow-lg"
+        >
+          <Square size={12} className="fill-current" />
+          Stop Execution
+        </button>
+        <React.Suspense fallback={<div className="h-[500px] w-full rounded-2xl bg-[#09090b] flex items-center justify-center text-muted-foreground animate-pulse border border-white/10 my-6 shadow-xl">Booting IDE Engine...</div>}>
+          <SandpackBlock code={codeText} language={language} />
+        </React.Suspense>
+      </div>
+    );
+  }
 
   return (
     <div 
@@ -107,6 +128,15 @@ function CodeBlock({ language, codeText }) {
         </div>
         
         <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          {isRunnable && (
+            <button
+              onClick={() => setShowSandpack(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 mr-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 transition-colors text-[11px] font-bold tracking-wide shadow-sm"
+            >
+              <Play size={12} className="fill-current" />
+              <span>RUN CODE</span>
+            </button>
+          )}
           <WrapToggle wrapped={wrapped} onToggle={() => setWrapped(w => !w)} />
           <DownloadButton text={codeText} language={language} />
           <CopyButton text={codeText} />
