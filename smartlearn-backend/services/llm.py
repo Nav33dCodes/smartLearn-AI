@@ -243,16 +243,16 @@ def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: Lis
             
             # Prevent mid-stream UI corruption if connection drops while typing
             if tokens_yielded:
-                yield f"\n\n> ⚠️ **Network Disconnect:** The AI stream was interrupted mid-sentence. Please try asking again. (Error: {e})"
+                yield "\n\n> 🛑 **Connection Interrupted**\n> The connection to the AI engine was unexpectedly dropped. Please try regenerating your response."
                 return
             # If this is the LAST model in our fallback chain, we must yield the error to the user
             if current_model == model_chain[-1]:
                 if "rate_limit" in err_str or "429" in err_str:
-                    yield f"\n\n⚠️ Rate limit hit on all {len(model_chain)} models in the cascade. Please wait 30 seconds and try again."
-                elif "insufficient" in err_str or "credits" in err_str:
-                    yield "\n\n⚠️ Your OpenRouter account ran out of credits, and no free fallbacks were available."
+                    yield "\n\n🛑 **High Traffic Volume**\nWe are currently experiencing exceptionally high demand. Please wait a few moments and try your request again."
+                elif "insufficient" in err_str or "credits" in err_str or "not configured" in err_str:
+                    yield "\n\n🛑 **Model Currently Unavailable**\nThis specific AI model is currently undergoing maintenance or experiencing degraded service. Please try using the **SmartLearn Auto** model instead."
                 else:
-                    yield f"\n\n⚠️ Models unavailable. (Final Error: {e})"
+                    yield "\n\n🛑 **Service Interruption**\nThe AI engine encountered an unexpected issue while processing your request. Please try again shortly."
                 return
             else:
                 # Log the error and continue to the next fallback model in the loop
