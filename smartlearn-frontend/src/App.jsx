@@ -59,7 +59,7 @@ function ChatDashboard() {
     return localStorage.getItem("sl_theme_color") || "#ff3131"; // default Red
   });
   const [selectedModelId, setSelectedModelId] = useState(() => {
-    return localStorage.getItem("sl_model") || "openrouter/auto";
+    return localStorage.getItem("sl_model") || "gemini:gemini-2.5-flash";
   });
   const [isMobile, setIsMobile] = useState(false);
 
@@ -97,7 +97,7 @@ function ChatDashboard() {
   useEffect(() => {
     // Clean up invalid models from local storage gracefully
     if (!MODELS.some(m => m.id === selectedModelId)) {
-      setSelectedModelId("openrouter/auto");
+      setSelectedModelId("gemini:gemini-2.5-flash");
     }
   }, [selectedModelId]);
 

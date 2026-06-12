@@ -42,19 +42,30 @@ DEFAULT_MODEL = "groq:llama-3.1-8b-instant"
 # Advanced Fallback Architecture
 FALLBACK_ROUTER = {
     # 1. The "Everyday Speed" Route (100% Free)
-    "groq:llama-3.3-70b-versatile": ["groq:llama-3.1-8b-instant", "gemini:gemini-2.5-flash"],
+    "groq:llama-3.3-70b-versatile": ["groq:llama-3.1-8b-instant", "gemini:gemini-2.5-flash", "openrouter/auto"],
+    
+    # 2. The Gemini Flash Route
+    "gemini:gemini-2.5-flash": ["groq:llama-3.1-8b-instant", "groq:llama-3.3-70b-versatile", "openrouter/auto"],
     
     # 2. The "Deep Study" Route (100% Free)
-    "gemini:gemini-2.5-pro": ["gemini:gemini-2.5-flash", "groq:llama-3.3-70b-versatile"],
+    "gemini:gemini-2.5-pro": ["gemini:gemini-2.5-flash", "groq:llama-3.3-70b-versatile", "groq:llama-3.1-8b-instant", "openrouter/auto"],
     
     # 3. The "Genius/Coding" Route (Paid via OpenRouter)
-    "anthropic/claude-3.5-sonnet": ["openrouter/auto", "gemini:gemini-2.5-pro"],
+    "anthropic/claude-3.5-sonnet": ["openrouter/auto", "gemini:gemini-2.5-pro", "groq:llama-3.3-70b-versatile"],
     
     # 4. The "Auto" Route
-    "openrouter/auto": ["gemini:gemini-2.5-flash"],
+    "openrouter/auto": [
+        "gemini:gemini-2.5-flash", 
+        "groq:llama-3.3-70b-versatile",
+        "openrouter/deepseek/deepseek-r1-distill-llama-70b:free",
+        "openrouter/meta-llama/llama-3.3-70b-instruct:free",
+        "openrouter/qwen/qwen-2.5-72b-instruct:free",
+        "openrouter/google/gemini-2.5-flash-free",
+        "groq:llama-3.1-8b-instant"
+    ],
 
     # Kept for backward compatibility if old chats use this model
-    "openai/gpt-4o": ["openai/gpt-4o-mini", "groq:llama-3.1-8b-instant"]
+    "openai/gpt-4o": ["openai/gpt-4o-mini", "groq:llama-3.1-8b-instant", "openrouter/auto"]
 }
 
 SYSTEM_PROMPT = """You are SmartLearn AI — an advanced, highly intelligent learning assistant and professional tutor.
@@ -243,7 +254,7 @@ def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: Lis
             # If this is the LAST model in our fallback chain, we must yield the error to the user
             if current_model == model_chain[-1]:
                 if "rate_limit" in err_str or "429" in err_str:
-                    yield "\n\n⚠️ Rate limit hit on all fallback models. Please wait a moment and try again."
+                    yield f"\n\n⚠️ Rate limit hit on all {len(model_chain)} models in the cascade. Please wait 30 seconds and try again."
                 elif "insufficient" in err_str or "credits" in err_str:
                     yield "\n\n⚠️ Your OpenRouter account ran out of credits, and no free fallbacks were available."
                 else:
