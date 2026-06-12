@@ -380,7 +380,6 @@ export default function Landing() {
                 { title: 'Multimodal Vision', desc: 'Upload images instantly. Our powerful browser-side compression engine perfectly analyzes visual data with zero API token bloat.' },
                 { title: 'Live Sandpack IDE', desc: 'Instantly run, edit, and preview React and JavaScript applications right inside the chat window.' },
                 { title: 'Personalization Engine', desc: 'Define your exact AI Persona, Tone, and Custom Instructions to tailor the entire learning experience.' },
-                { title: 'Direct Web Scraping', desc: 'Paste any URL into the chat. The AI will instantly bypass anti-bot firewalls and read the entire website.' },
                 { title: 'Textbook Math Rendering', desc: 'Beautifully formats complex physics and calculus equations using native KaTeX integration.' },
                 { title: 'Real-time Voice AI', desc: 'Speak naturally to your AI tutor and have your audio instantly transcribed.' },
                 { title: 'Multi-Model Fallback', desc: 'Automatically routes queries between Gemini 2.5, Claude, and Groq to guarantee 100% uptime.' },
