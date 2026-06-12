@@ -39,6 +39,13 @@ export default function Landing() {
   
   const heroTabs = [
     {
+      id: 'vision',
+      icon: <ImageIcon size={18} />,
+      title: "Native Vision",
+      description: "Fully Multimodal AI",
+      bullets: ["Upload images instantly via zero-cost Base64 encoding", "Browser-side compression engine for blazing speed", "Powered by Gemini 2.5 Flash's massive context window"]
+    },
+    {
       id: 'learning',
       icon: <BrainCircuit size={18} />,
       title: "Interactive Learning",
@@ -358,11 +365,12 @@ export default function Landing() {
               <p className="text-zinc-400 text-lg">Built from the ground up for speed, reliability, and security.</p>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative">
               {/* Background Node Connection Lines */}
               <div className="hidden lg:block absolute top-1/2 left-0 w-full h-[2px] bg-red-900/20 -z-10 -translate-y-1/2" />
               
               {[
+                { title: 'Multimodal Vision', desc: 'Upload images instantly. Our powerful browser-side compression engine perfectly analyzes visual data with zero API token bloat.' },
                 { title: 'Interactive Mind Mapping', desc: 'Instantly visualize complex relationships with our automatic drag-and-drop node graph engine.' },
                 { title: 'Textbook Math Rendering', desc: 'Beautifully formats complex physics and calculus equations using native KaTeX integration.' },
                 { title: 'Real-time Voice AI', desc: 'Speak naturally to your AI tutor and have your audio instantly transcribed.' },
