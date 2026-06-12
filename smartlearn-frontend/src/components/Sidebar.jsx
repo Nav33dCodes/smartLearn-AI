@@ -39,6 +39,7 @@ function Sidebar({
     const newVal = !isHistoryHidden;
     setIsHistoryHidden(newVal);
     localStorage.setItem('sl_history_hidden', String(newVal));
+    window.dispatchEvent(new Event('sl_history_toggled'));
   };
 
   useEffect(() => {

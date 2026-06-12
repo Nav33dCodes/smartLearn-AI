@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, Trash2, X, MessageSquare, Check, CheckSquare, Square, Download, Archive, Filter, Edit2 } from 'lucide-react';
+import { Search, Trash2, X, MessageSquare, Check, CheckSquare, Square, Download, Archive, Filter, Edit2, ShieldAlert } from 'lucide-react';
 import { GroupedVirtuoso } from 'react-virtuoso';
 import { useDeleteChat, useArchiveChat, useRenameChat } from '../hooks/useChats';
 import { Button } from './ui/button';
@@ -17,6 +17,22 @@ export default function ChatsManager({ chatsData, onOpenChat }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  
+  const [isHistoryHidden, setIsHistoryHidden] = useState(() => {
+    return localStorage.getItem('sl_history_hidden') === 'true';
+  });
+
+  useEffect(() => {
+    const handleStorage = () => {
+      setIsHistoryHidden(localStorage.getItem('sl_history_hidden') === 'true');
+    };
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('sl_history_toggled', handleStorage);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('sl_history_toggled', handleStorage);
+    };
+  }, []);
 
   const sortOptions = [
     { value: 'date-desc', label: 'Newest First' },
@@ -301,8 +317,20 @@ export default function ChatsManager({ chatsData, onOpenChat }) {
       <div className="flex-1 px-6 md:px-12 py-6">
         <div className="max-w-5xl mx-auto h-full flex flex-col gap-4">
           
-          {/* Global Select All */}
-          {filteredChats.length > 0 && (
+          {isHistoryHidden ? (
+            <div className="flex flex-col items-center justify-center py-24 text-center">
+              <div className="h-16 w-16 bg-muted/40 rounded-full flex items-center justify-center mb-6">
+                <ShieldAlert className="w-8 h-8 text-muted-foreground/60" />
+              </div>
+              <h2 className="text-2xl font-semibold tracking-tight text-foreground mb-3">History is off</h2>
+              <p className="text-muted-foreground max-w-md mx-auto leading-relaxed">
+                Your chat history is hidden for privacy. Enable it from the sidebar or settings to view your previous conversations here.
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Global Select All */}
+              {filteredChats.length > 0 && (
             <div className="flex items-center gap-3 px-3 flex-none pb-2">
               <button 
                 onClick={handleSelectAll}
@@ -400,6 +428,8 @@ export default function ChatsManager({ chatsData, onOpenChat }) {
                 );
               }}
             />
+          )}
+            </>
           )}
         </div>
       </div>
