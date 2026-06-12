@@ -37,28 +37,53 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
     return () => clearInterval(interval);
   }, []);
 
+  const [isAutoScrollLocked, setIsAutoScrollLocked] = useState(false);
+  const lastScrollTop = useRef(0);
+
   const handleScroll = () => {
     if (!scrollContainerRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
-    const isScrolledUp = scrollHeight - scrollTop - clientHeight > 200;
+    
+    // Detect scroll direction
+    const scrollingUp = scrollTop < lastScrollTop.current;
+    lastScrollTop.current = scrollTop;
+
+    const distanceToBottom = scrollHeight - scrollTop - clientHeight;
+    const isScrolledUp = distanceToBottom > 200;
     setShowScrollButton(isScrolledUp);
+
+    // SMART LOCKING: If the AI is typing and the user forcefully scrolls up, lock the auto-scroll.
+    if (loading && scrollingUp && distanceToBottom > 50) {
+      setIsAutoScrollLocked(true);
+    }
+    
+    // If the user manually scrolls back down to the bottom, re-engage auto-scroll
+    if (distanceToBottom < 10) {
+      setIsAutoScrollLocked(false);
+    }
   };
+
+  useEffect(() => {
+    // Reset auto-scroll lock when a new generation starts
+    if (!loading) {
+      setIsAutoScrollLocked(false);
+    }
+  }, [loading]);
 
   useEffect(() => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
-      const { scrollTop, scrollHeight, clientHeight } = container;
-      const isNearBottom = scrollHeight - scrollTop - clientHeight < 150;
+      const { scrollHeight } = container;
       
-      // If we are generating and near the bottom, pin the scroll to the bottom smoothly
-      if (loading && isNearBottom) {
+      // Only pin to bottom if the scroll lock is NOT engaged
+      if (loading && !isAutoScrollLocked) {
         container.scrollTop = scrollHeight;
       } else if (!loading && messages[messages.length - 1]?.role === "user") {
         // Smooth scroll for new user messages
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
       }
     }
-  }, [messages, loading]);
+  }, [messages, loading, isAutoScrollLocked]);
   if ((isChatsLoading || isHistoryLoading) && messages.length === 0) {
     return (
       <div className="flex-1 overflow-y-auto pt-14 pb-40 px-4 sm:px-6 md:px-8">
@@ -331,12 +356,15 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
             className="fixed bottom-32 right-8 z-50 md:right-12"
           >
             <button
-              onClick={() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" })}
+              onClick={() => {
+                setIsAutoScrollLocked(false);
+                messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+              }}
               className="p-2.5 bg-[#0a0a0a] border border-white/10 rounded-full shadow-2xl text-zinc-400 hover:text-white hover:bg-white/5 transition-all relative flex items-center justify-center"
               title="Scroll to bottom"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
-              {loading && <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#0a0a0a]" />}
+              {loading && <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#0a0a0a] animate-pulse" />}
             </button>
           </motion.div>
         )}
