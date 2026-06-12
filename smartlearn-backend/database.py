@@ -62,6 +62,10 @@ class User(Base):
     password_hash = Column(Text, nullable=False)
     is_verified = Column(Boolean, default=False)
     avatar = Column(Text, nullable=True)
+    nickname = Column(Text, default="")
+    occupation = Column(Text, default="")
+    style_tone = Column(Text, default="")
+    custom_instructions = Column(Text, default="")
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

@@ -51,6 +51,12 @@ class UpdatePasswordRequest(BaseModel):
 class DeleteAccountRequest(BaseModel):
     otp: str
 
+class UpdatePersonalizationRequest(BaseModel):
+    nickname: str = ""
+    occupation: str = ""
+    style_tone: str = ""
+    custom_instructions: str = ""
+
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from services.jwt_handler import verify_token
 
@@ -258,8 +264,41 @@ def delete_all_chats(db: Session = Depends(get_db), current_user: User = Depends
 @router.post("/user/delete-request")
 def request_account_deletion(background_tasks: BackgroundTasks, db: Session = Depends(get_db), current_user: User = Depends(get_current_user_auth)):
     otp_code = store_otp(current_user.email)
-    background_tasks.add_task(send_delete_account_otp_email, current_user.email, otp_code)
-    return {"message": "Deletion OTP sent to email"}
+    background_tasks.add_task(send_delete_account_otp_email, current_user.email, current_user.name, otp_code)
+    return {"message": "OTP sent to your email for account deletion verification."}
+
+@router.put("/personalization")
+def update_personalization(req: UpdatePersonalizationRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user_auth)):
+    current_user.nickname = req.nickname
+    current_user.occupation = req.occupation
+    current_user.style_tone = req.style_tone
+    current_user.custom_instructions = req.custom_instructions
+    db.commit()
+    db.refresh(current_user)
+    
+    from services.redis_client import set_cache
+    cache_key = f"user_profile:{current_user.id}"
+    set_cache(cache_key, {
+        "id": current_user.id, "name": current_user.name, "email": current_user.email, "avatar": current_user.avatar,
+        "nickname": current_user.nickname or "",
+        "occupation": current_user.occupation or "",
+        "style_tone": current_user.style_tone or "",
+        "custom_instructions": current_user.custom_instructions or ""
+    }, expire_seconds=3600)
+    
+    return {
+        "message": "Personalization settings updated",
+        "user": {
+            "id": current_user.id,
+            "name": current_user.name,
+            "email": current_user.email,
+            "avatar": current_user.avatar,
+            "nickname": current_user.nickname,
+            "occupation": current_user.occupation,
+            "style_tone": current_user.style_tone,
+            "custom_instructions": current_user.custom_instructions
+        }
+    }
 
 @router.delete("/user/account")
 def delete_account(req: DeleteAccountRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user_auth)):

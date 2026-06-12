@@ -176,7 +176,16 @@ If NO search is needed, output EXACTLY 'NO_SEARCH'."""
 # ────────────────────────────────────────────────────
 # STREAMING  (primary — used by /chat endpoint)
 # ────────────────────────────────────────────────────
-def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: List[Dict] = None, image_data: str = None) -> Generator[str, None, None]:
+def stream_llm_response(
+    prompt: str, 
+    model_id: str = DEFAULT_MODEL, 
+    history: List[Dict] = None, 
+    image_data: str = None,
+    nickname: str = "",
+    occupation: str = "",
+    style_tone: str = "",
+    custom_instructions: str = ""
+) -> Generator[str, None, None]:
     """
     Yields tokens one by one with multi-turn conversation memory and advanced cascading model fallback.
     """
@@ -190,6 +199,16 @@ def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: Lis
              model_chain.append("openrouter/google/gemini-2.5-flash-free")
 
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    
+    # ── Persona Injection ──
+    if nickname or occupation or style_tone or custom_instructions:
+        persona_block = "### USER PERSONA & CUSTOM INSTRUCTIONS\nThe user has provided the following explicit instructions for how you should interact with them:\n"
+        if nickname: persona_block += f"- **User's preferred name/nickname**: {nickname} (Use this occasionally but naturally).\n"
+        if occupation: persona_block += f"- **User's occupation/role**: {occupation} (Tailor your examples to their background).\n"
+        if style_tone: persona_block += f"- **AI Style & Tone**: {style_tone} (Strictly adhere to this tone).\n"
+        if custom_instructions: persona_block += f"- **Custom Instructions**: {custom_instructions}\n"
+        messages[0]["content"] += f"\n\n{persona_block}"
+
     if history:
         messages.extend(history[-10:])  # Bound history to last 10 messages to prevent token overflow
         

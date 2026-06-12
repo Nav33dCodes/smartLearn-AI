@@ -90,3 +90,19 @@ export function useExportData() {
     }
   });
 }
+
+export function useUpdatePersonalization() {
+  const { user, login } = useAuth();
+  
+  return useMutation({
+    mutationFn: async ({ nickname, occupation, style_tone, custom_instructions }) => {
+      const res = await api.put(`${API}/auth/personalization`, { nickname, occupation, style_tone, custom_instructions });
+      return res.data;
+    },
+    onSuccess: (data, variables) => {
+      const token = localStorage.getItem('access_token');
+      const refreshToken = localStorage.getItem('refresh_token');
+      login({ ...user, ...variables }, token, refreshToken);
+    }
+  });
+}

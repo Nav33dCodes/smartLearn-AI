@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User as UserIcon, Settings as SettingsIcon, Sun, Moon, Loader2, Info, Lock, Camera, CheckCircle2, Shield, Download, Trash2, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { X, User as UserIcon, Settings as SettingsIcon, Sun, Moon, Loader2, Info, Lock, Camera, CheckCircle2, Shield, Download, Trash2, AlertTriangle, ArrowLeft, Brain } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useUpdateName, useUpdatePassword, useUpdateAvatar, useExportData, useDeleteAllChats, useRequestDeleteAccount, useConfirmDeleteAccount } from '../hooks/useUser';
+import { useUpdateName, useUpdatePassword, useUpdateAvatar, useExportData, useDeleteAllChats, useRequestDeleteAccount, useConfirmDeleteAccount, useUpdatePersonalization } from '../hooks/useUser';
 import { useChats, useUnarchiveChat, useDeleteChat, useRevokeShare, useArchiveAllChats } from '../hooks/useChats';
 import { toast } from 'sonner';
 
@@ -24,6 +24,13 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode, 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const updatePasswordMutation = useUpdatePassword();
+
+  // Personalization State
+  const [nickname, setNickname] = useState(user?.nickname || "");
+  const [occupation, setOccupation] = useState(user?.occupation || "");
+  const [styleTone, setStyleTone] = useState(user?.style_tone || "");
+  const [customInstructions, setCustomInstructions] = useState(user?.custom_instructions || "");
+  const updatePersonalizationMutation = useUpdatePersonalization();
 
   // Data & Privacy State
   const exportMutation = useExportData();
@@ -80,6 +87,17 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode, 
         toast.error(err.response?.data?.detail || "Failed to update password");
       }
     });
+  };
+
+  const handleUpdatePersonalization = (e) => {
+    e.preventDefault();
+    updatePersonalizationMutation.mutate(
+      { nickname, occupation, style_tone: styleTone, custom_instructions: customInstructions },
+      {
+        onSuccess: () => toast.success("Personalization updated! The AI will now use these instructions."),
+        onError: () => toast.error("Failed to update personalization settings")
+      }
+    );
   };
 
   const handleAvatarChange = (e) => {
@@ -226,6 +244,7 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode, 
           <h2 className="text-xl font-semibold mb-4 px-2 tracking-tight">Settings</h2>
           
           <TabButton id="profile" label="Profile" icon={UserIcon} />
+          <TabButton id="personalization" label="Personalization" icon={Brain} />
           <TabButton id="appearance" label="Appearance" icon={Sun} />
           <TabButton id="account" label="Account" icon={Lock} />
           <TabButton id="data" label="Data & Privacy" icon={Shield} />
@@ -282,6 +301,86 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode, 
                       {updateNameMutation.isPending && <Loader2 size={14} className="animate-spin" />}
                       Save Profile
                     </button>
+                  </form>
+                </motion.div>
+              )}
+
+              {/* PERSONALIZATION TAB */}
+              {activeTab === 'personalization' && (
+                <motion.div key="personalization" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="max-w-2xl">
+                  <div className="mb-6 pb-4 border-b border-zinc-200 dark:border-zinc-800">
+                    <h3 className="text-xl font-semibold flex items-center gap-2">
+                      <Brain className="text-primary" size={24} /> 
+                      AI Personalization Engine
+                    </h3>
+                    <p className="text-sm text-muted-foreground mt-1">Configure how the AI thinks, speaks, and responds to you. Changes apply immediately to all new messages.</p>
+                  </div>
+
+                  <form onSubmit={handleUpdatePersonalization} className="space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Your Nickname</label>
+                        <input
+                          type="text"
+                          value={nickname}
+                          onChange={(e) => setNickname(e.target.value)}
+                          placeholder="What should I call you?"
+                          className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Occupation / Role</label>
+                        <input
+                          type="text"
+                          value={occupation}
+                          onChange={(e) => setOccupation(e.target.value)}
+                          placeholder="e.g. Software Engineer, Student"
+                          className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Base Style & Tone</label>
+                      <select
+                        value={styleTone}
+                        onChange={(e) => setStyleTone(e.target.value)}
+                        className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                      >
+                        <option value="" className="bg-white dark:bg-zinc-900 text-black dark:text-white">Default (Balanced & Professional)</option>
+                        <option value="Socratic Tutor (Ask guiding questions instead of direct answers)" className="bg-white dark:bg-zinc-900 text-black dark:text-white">Socratic Tutor (Guiding Questions)</option>
+                        <option value="Direct & Concise (No fluff, straight to the point)" className="bg-white dark:bg-zinc-900 text-black dark:text-white">Direct & Concise</option>
+                        <option value="Highly Academic (Use sophisticated terminology and citations)" className="bg-white dark:bg-zinc-900 text-black dark:text-white">Highly Academic</option>
+                        <option value="Explain Like I'm 5 (Use simple words and fun analogies)" className="bg-white dark:bg-zinc-900 text-black dark:text-white">Explain Like I'm 5</option>
+                        <option value="Code Ninja (Minimal talking, maximum code snippets)" className="bg-white dark:bg-zinc-900 text-black dark:text-white">Code Ninja</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium flex items-center justify-between">
+                        Custom Instructions
+                        <span className="text-xs text-muted-foreground font-normal">Supports markdown</span>
+                      </label>
+                      <textarea
+                        value={customInstructions}
+                        onChange={(e) => setCustomInstructions(e.target.value)}
+                        placeholder="E.g., Always reply in Spanish. Never use bullet points. When writing code, always use Python unless specified otherwise."
+                        rows={5}
+                        className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none resize-none font-mono text-sm"
+                      />
+                    </div>
+
+                    <div className="pt-2">
+                      <button
+                        type="submit"
+                        disabled={updatePersonalizationMutation.isPending}
+                        className="px-6 py-2.5 bg-primary text-primary-foreground rounded-xl font-medium hover:opacity-90 transition-opacity flex items-center gap-2"
+                      >
+                        {updatePersonalizationMutation.isPending ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
+                        Save Personalization
+                      </button>
+                    </div>
                   </form>
                 </motion.div>
               )}

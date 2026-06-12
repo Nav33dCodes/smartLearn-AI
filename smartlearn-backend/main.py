@@ -34,11 +34,15 @@ from sqlalchemy import select, func
 security = HTTPBearer()
 
 class CachedUser:
-    def __init__(self, id, name, email, avatar):
+    def __init__(self, id, name, email, avatar, nickname="", occupation="", style_tone="", custom_instructions=""):
         self.id = id
         self.name = name
         self.email = email
         self.avatar = avatar
+        self.nickname = nickname
+        self.occupation = occupation
+        self.style_tone = style_tone
+        self.custom_instructions = custom_instructions
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)):
     payload = verify_token(credentials.credentials, token_type="access")
@@ -56,7 +60,13 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
         
-    set_cache(cache_key, {"id": user.id, "name": user.name, "email": user.email, "avatar": user.avatar}, expire_seconds=3600)
+    set_cache(cache_key, {
+        "id": user.id, "name": user.name, "email": user.email, "avatar": user.avatar,
+        "nickname": user.nickname or "",
+        "occupation": user.occupation or "",
+        "style_tone": user.style_tone or "",
+        "custom_instructions": user.custom_instructions or ""
+    }, expire_seconds=3600)
     return user
 
 def get_full_chat_id(user_id: int, chat_id: str) -> str:
@@ -83,6 +93,10 @@ async def lifespan(app: FastAPI):
         db.execute(text("SELECT 1"))
         try:
             db.execute(text("ALTER TABLE chat_metadata ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT FALSE"))
+            db.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS nickname TEXT DEFAULT ''"))
+            db.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS occupation TEXT DEFAULT ''"))
+            db.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS style_tone TEXT DEFAULT ''"))
+            db.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_instructions TEXT DEFAULT ''"))
         except Exception:
             pass
         db.commit()
@@ -255,7 +269,16 @@ def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_user: Use
                 user_prompt = f"Current Date and Time: {current_time}\n\nQuestion: {message}\n\nYou are SmartLearn AI, an advanced, professional tutor. Please answer the student's question comprehensively. Your response MUST be detailed, highly structured, and utilize rich Markdown formatting."
 
             # 6. Stream LLM with conversation history
-            for token in stream_llm_response(user_prompt, model_id=data.model, history=conversation_history, image_data=data.image_data):
+            for token in stream_llm_response(
+                user_prompt, 
+                model_id=data.model, 
+                history=conversation_history, 
+                image_data=data.image_data,
+                nickname=current_user.nickname,
+                occupation=current_user.occupation,
+                style_tone=current_user.style_tone,
+                custom_instructions=current_user.custom_instructions
+            ):
                 full_response.append(token)
                 yield f"data: {json.dumps({'token': token})}\n\n"
 
