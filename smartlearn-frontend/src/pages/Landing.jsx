@@ -236,44 +236,40 @@ export default function Landing() {
             <div className="absolute inset-y-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-zinc-950 to-transparent z-20 pointer-events-none" />
             <div className="absolute inset-y-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-zinc-950 to-transparent z-20 pointer-events-none" />
             
-            <p className="text-center text-sm font-medium text-zinc-500 uppercase tracking-widest mb-10 relative z-30">
-              Integrated with the industry's most powerful platforms
+            <p className="text-center text-sm font-medium text-zinc-500 uppercase tracking-[0.2em] mb-16 relative z-30">
+              Powered by the industry's most advanced infrastructure
             </p>
             
-            <div className="flex animate-marquee gap-16 sm:gap-24 px-6 transition-all duration-700 items-center">
+            <div className="flex animate-marquee gap-16 sm:gap-24 px-6 transition-all duration-700 items-center relative z-30">
               {[
-                { name: 'Claude', file: 'claude' },
-                { name: 'DeepSeek', file: 'deepseek' },
                 { name: 'Gemini', file: 'gemini' },
                 { name: 'Gmail', file: 'gmail' },
                 { name: 'Groq', file: 'groq' },
-                { name: 'Llama', file: 'llama' },
                 { name: 'Neon DB', file: 'neon' },
                 { name: 'OpenRouter', file: 'openrouter' },
                 { name: 'Redis', file: 'redis' },
                 { name: 'Tavily', file: 'tavily' },
                 { name: 'YouTube', file: 'youtube' },
                 // Duplicate the array exactly to create the seamless loop
-                { name: 'Claude', file: 'claude' },
-                { name: 'DeepSeek', file: 'deepseek' },
                 { name: 'Gemini', file: 'gemini' },
                 { name: 'Gmail', file: 'gmail' },
                 { name: 'Groq', file: 'groq' },
-                { name: 'Llama', file: 'llama' },
                 { name: 'Neon DB', file: 'neon' },
                 { name: 'OpenRouter', file: 'openrouter' },
                 { name: 'Redis', file: 'redis' },
                 { name: 'Tavily', file: 'tavily' },
                 { name: 'YouTube', file: 'youtube' },
               ].map((tech, i) => (
-                <div key={i} className="flex flex-col items-center gap-4 group/icon min-w-[120px]">
-                  <div className="w-20 h-20 rounded-2xl bg-zinc-900/40 backdrop-blur-md flex flex-col items-center justify-center overflow-hidden border border-zinc-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.3)] group-hover/icon:-translate-y-1 group-hover/icon:border-zinc-700 group-hover/icon:shadow-[0_8px_30px_rgba(255,255,255,0.08)] transition-all duration-300 p-4 relative">
-                    <img src={`/images/logos/${tech.file}.svg`} alt={`${tech.name} Logo`} className="w-full h-full object-contain relative z-10 transition-transform duration-500 group-hover/icon:scale-110" onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} />
-                    <div className="absolute inset-0 hidden items-center justify-center bg-zinc-800/80 text-zinc-300 text-[10px] font-mono text-center px-1" style={{ display: 'none' }}>
-                      Add {tech.file}.svg
-                    </div>
+                <div key={i} className="flex flex-col items-center gap-5 group/icon min-w-[100px] cursor-pointer">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-[1.25rem] bg-white/[0.02] flex items-center justify-center border border-white/[0.05] shadow-sm group-hover/icon:shadow-[0_0_30px_rgba(255,255,255,0.06)] group-hover/icon:bg-white/[0.04] group-hover/icon:border-white/[0.1] transition-all duration-500 p-4 sm:p-5 relative">
+                    <img 
+                      src={`/images/logos/${tech.file}.svg`} 
+                      alt={`${tech.name} Logo`} 
+                      className="w-full h-full object-contain relative z-10 transition-all duration-500 group-hover/icon:scale-[1.15] filter grayscale opacity-50 group-hover/icon:grayscale-0 group-hover/icon:opacity-100" 
+                      onError={(e) => { e.target.style.display='none'; }} 
+                    />
                   </div>
-                  <span className="text-sm font-semibold tracking-wide text-zinc-400 group-hover/icon:text-zinc-200 transition-colors">{tech.name}</span>
+                  <span className="text-xs sm:text-sm font-medium tracking-widest text-zinc-600 group-hover/icon:text-zinc-300 transition-colors duration-500">{tech.name}</span>
                 </div>
               ))}
             </div>
@@ -334,9 +330,9 @@ export default function Landing() {
               </div>
             </div>
             <div className="w-full md:w-1/2 space-y-6">
-              <h3 className="text-3xl sm:text-4xl font-bold text-zinc-100">Multi-Model Intelligence</h3>
+              <h3 className="text-3xl sm:text-4xl font-bold text-zinc-100">Intelligent 4-Engine Fallback</h3>
               <p className="text-zinc-400 text-lg leading-relaxed">
-                Never lock yourself into a single ecosystem again. SmartLearn allows you to query your documents using the world's most advanced frontier models—from Claude 3.5 to GPT-4o and DeepSeek. Effortlessly switch models based on your specific reasoning, coding, or analysis tasks, just like the best industry tools.
+                Never experience a dropped query again. SmartLearn integrates natively with Google Gemini 2.5 and Groq Inference. If one engine hits a rate limit, our mathematical router seamlessly cascades your prompt to the next available engine with zero disruption, guaranteeing 100% uptime.
               </p>
             </div>
           </motion.div>
