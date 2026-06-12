@@ -33,9 +33,9 @@ function CopyButton({ text }) {
   };
 
   return (
-    <button onClick={handleCopy} className="code-copy-btn flex items-center gap-1.5 p-1.5 rounded-md hover:bg-muted/50 transition-colors text-xs text-muted-foreground hover:text-foreground" title="Copy code">
-      {copied ? <Check size={13} className="text-emerald-500" /> : <Copy size={13} />}
-      <span className={copied ? "text-emerald-500" : ""}>{copied ? "Copied" : "Copy"}</span>
+    <button onClick={handleCopy} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-[11px] font-medium text-muted-foreground hover:text-white" title="Copy code">
+      {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+      <span className={copied ? "text-emerald-400" : ""}>{copied ? "Copied" : "Copy"}</span>
     </button>
   );
 }
@@ -45,11 +45,10 @@ function WrapToggle({ wrapped, onToggle }) {
   return (
     <button
       onClick={onToggle}
-      className="code-copy-btn"
+      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-[11px] font-medium text-muted-foreground hover:text-white"
       title={wrapped ? "Disable word wrap" : "Enable word wrap"}
-      style={{ marginRight: 4 }}
     >
-      <WrapText size={13} />
+      <WrapText size={14} />
       <span>{wrapped ? "Unwrap" : "Wrap"}</span>
     </button>
   );
@@ -78,8 +77,8 @@ function DownloadButton({ text, language }) {
   };
 
   return (
-    <button onClick={handleDownload} className="code-copy-btn" title="Download code">
-      <Download size={13} />
+    <button onClick={handleDownload} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-[11px] font-medium text-muted-foreground hover:text-white" title="Download code">
+      <Download size={14} />
       <span>Download</span>
     </button>
   );
@@ -92,13 +91,22 @@ function CodeBlock({ language, codeText }) {
 
   return (
     <div 
-      className="code-block-wrapper border border-border overflow-hidden rounded-xl shadow-sm my-6 group relative"
+      className="overflow-hidden rounded-2xl shadow-xl my-6 group relative border border-white/10"
+      style={{ backgroundColor: '#09090b' }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="code-block-header bg-muted/20 px-4 py-2.5 border-b border-border flex items-center justify-between">
-        <span className="code-lang text-xs font-bold text-muted-foreground uppercase tracking-wider bg-muted/50 px-2 py-1 rounded-md">{language || "text"}</span>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }} className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <div className="bg-white/[0.03] backdrop-blur-md px-4 py-3 border-b border-white/5 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-[#ff5f56] shadow-inner"></div>
+            <div className="w-3 h-3 rounded-full bg-[#ffbd2e] shadow-inner"></div>
+            <div className="w-3 h-3 rounded-full bg-[#27c93f] shadow-inner"></div>
+          </div>
+          <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.1em] opacity-80">{language || "text"}</span>
+        </div>
+        
+        <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <WrapToggle wrapped={wrapped} onToggle={() => setWrapped(w => !w)} />
           <DownloadButton text={codeText} language={language} />
           <CopyButton text={codeText} />
@@ -108,16 +116,18 @@ function CodeBlock({ language, codeText }) {
         style={vscDarkPlus}
         language={language}
         PreTag="div"
-        showLineNumbers={isHovered}
+        showLineNumbers={true}
         wrapLines={wrapped}
         wrapLongLines={wrapped}
+        lineNumberStyle={{ minWidth: "2.5em", paddingRight: "1em", color: "#404040", textAlign: "right", userSelect: "none" }}
         customStyle={{
           margin: 0,
-          padding: "1.25rem 1.25rem",
+          padding: "1.25rem 0",
           fontSize: "0.85rem",
-          borderRadius: "0",
-          backgroundColor: "#0d0d0d", // Darker background
-          lineHeight: 1.65,
+          borderRadius: "0 0 16px 16px",
+          backgroundColor: "transparent",
+          lineHeight: 1.6,
+          fontFamily: "'JetBrains Mono', 'Fira Code', 'Menlo', 'Monaco', 'Consolas', monospace",
           overflowX: wrapped ? "hidden" : "auto",
         }}
       >
