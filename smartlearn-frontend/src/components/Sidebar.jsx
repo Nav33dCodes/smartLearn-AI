@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, memo } from 'react';
-import { Plus, Trash2, MessageSquare, Search, PanelLeftClose, LogOut, Edit2, Pin, PinOff, Archive, MoreHorizontal, Sparkles, Settings, ExternalLink, Database } from "lucide-react";
+import { Plus, Trash2, MessageSquare, Search, PanelLeftClose, LogOut, Edit2, Pin, PinOff, Archive, MoreHorizontal, Sparkles, Settings, ExternalLink, Database, ShieldAlert } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useChats, useDeleteChat, useRenameChat, usePinChat, useArchiveChat } from "../hooks/useChats";
 import { useAuth } from "../context/AuthContext";
@@ -326,6 +326,16 @@ function Sidebar({
                       </div>
                       <ExternalLink size={14} className="text-muted-foreground opacity-50" />
                     </button>
+
+                    {user?.id === 1 && (
+                      <button
+                        onClick={() => { window.open('/admin', '_blank'); setShowUserMenu(false); }}
+                        className="flex items-center gap-3 px-3 py-2.5 text-sm hover:bg-muted rounded-xl transition-colors text-foreground text-left"
+                      >
+                        <ShieldAlert size={16} className="text-amber-500" />
+                        <span className="font-medium text-amber-500">Admin Panel</span>
+                      </button>
+                    )}
 
                     <div className="h-px bg-border my-1.5 mx-2" />
                     
