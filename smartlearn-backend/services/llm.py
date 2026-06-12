@@ -13,7 +13,7 @@ if os.getenv("OPENROUTER_API_KEY") or os.getenv("GROQ_API_KEY"):
     openrouter_client = OpenAI(
         api_key=os.getenv("OPENROUTER_API_KEY", os.getenv("GROQ_API_KEY")),
         base_url="https://openrouter.ai/api/v1",
-        timeout=45.0
+        timeout=15.0
     )
 
 # Groq Official Client (with timeout)
@@ -21,7 +21,7 @@ groq_client = None
 if os.getenv("GROQ_API_KEY"):
     groq_client = Groq(
         api_key=os.getenv("GROQ_API_KEY"),
-        timeout=45.0
+        timeout=15.0
     )
 
 # Gemini Official Client (OpenAI Compatible)
@@ -30,7 +30,7 @@ if os.getenv("GEMINI_API_KEY"):
     gemini_client = OpenAI(
         api_key=os.getenv("GEMINI_API_KEY"),
         base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
-        timeout=45.0
+        timeout=15.0
     )
 
 tavily_client = None
@@ -58,10 +58,10 @@ FALLBACK_ROUTER = {
         "gemini:gemini-2.5-flash", 
         "groq:llama-3.3-70b-versatile",
         "openrouter/deepseek/deepseek-r1-distill-llama-70b:free",
-        "openrouter/meta-llama/llama-3.3-70b-instruct:free",
-        "openrouter/qwen/qwen-2.5-72b-instruct:free",
         "openrouter/google/gemini-2.5-flash-free",
-        "groq:llama-3.1-8b-instant"
+        "groq:llama-3.1-8b-instant",
+        "openrouter/meta-llama/llama-3.3-70b-instruct:free",
+        "openrouter/qwen/qwen-2.5-72b-instruct:free"
     ],
 
     # Kept for backward compatibility if old chats use this model
@@ -194,13 +194,13 @@ def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: Lis
     """
     model_chain = [model_id] + FALLBACK_ROUTER.get(model_id, [])
 
-    # Build multi-turn conversation
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     if history:
         messages.extend(history[-10:])  # Bound history to last 10 messages to prevent token overflow
     messages.append({"role": "user", "content": prompt})
 
     for current_model in model_chain:
+        tokens_yielded = False
         try:
             if current_model.startswith("groq:"):
                 if not groq_client:
@@ -244,6 +244,7 @@ def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: Lis
                 if chunk.choices and len(chunk.choices) > 0:
                     token = chunk.choices[0].delta.content
                     if token:
+                        tokens_yielded = True
                         yield token
             
             # Successfully finished streaming, break out of fallback loop
@@ -251,6 +252,11 @@ def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: Lis
 
         except Exception as e:
             err_str = str(e).lower()
+            
+            # Prevent mid-stream UI corruption if connection drops while typing
+            if tokens_yielded:
+                yield f"\n\n> ⚠️ **Network Disconnect:** The AI stream was interrupted mid-sentence. Please try asking again. (Error: {e})"
+                return
             # If this is the LAST model in our fallback chain, we must yield the error to the user
             if current_model == model_chain[-1]:
                 if "rate_limit" in err_str or "429" in err_str:

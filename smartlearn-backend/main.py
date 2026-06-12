@@ -200,7 +200,8 @@ def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_user: Use
         ).order_by(Chat.id.desc()).limit(10).all()
         recent.reverse()  # Restore chronological order
         for c in recent:
-            conversation_history.append({"role": "user", "content": c.message})
+            msg = c.message[:2000] if len(c.message) > 2000 else c.message
+            conversation_history.append({"role": "user", "content": msg})
             resp = c.response[:2000] if len(c.response) > 2000 else c.response
             conversation_history.append({"role": "assistant", "content": resp})
         if conversation_history:
