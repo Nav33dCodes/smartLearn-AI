@@ -19,6 +19,15 @@ const releases = [
         bullets: [
           "Historical Truncation: Both past AI responses and past user prompts are now strictly bounded to 2000 characters when passed into the AI's multi-turn memory. This ensures massive text dumps in the past won't accidentally crash the AI's limited context window today."
         ]
+      },
+      {
+        title: "Public Launch Readiness",
+        description: "Hardened the backend configuration and sanitized all diagnostic output for a professional public release.",
+        bullets: [
+          "Hot-Reload Environments: Upgraded the Python backend to aggressively override cached memory when the `.env` file changes. Pasting new API keys no longer requires a hard server reboot; they are instantly recognized on hot-reload.",
+          "Sanitized Diagnostics: Stripped out all developer-facing stack traces, HTTP codes (e.g., 401, 429), and internal secrets from the chat UI. Errors are now presented as highly polished, consumer-friendly messages identical to ChatGPT and Gemini's production environments.",
+          "Strict Route Enforcement: When explicitly selecting a native model (like Groq or Gemini) from the UI, the backend will now strictly obey your choice without falling back to third-party routers, ensuring predictable behavior."
+        ]
       }
     ]
   },
