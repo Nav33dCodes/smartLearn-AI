@@ -24,7 +24,7 @@ const formatRelativeTime = (ts) => {
 export default function ChatWindow({ messages, loading, streamStatus, isChatsLoading, isHistoryLoading, onSuggestionClick, regenerateMessage }) {
   const { user } = useAuth();
   const messagesEndRef = useRef(null);
-  const [openSources, setOpenSources] = useState({});
+  const [activeSourceIndex, setActiveSourceIndex] = useState(null);
   const scrollContainerRef = useRef(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [, setTick] = useState(0);
@@ -197,13 +197,13 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
                       
                     <button
                       onClick={() => {
-                        setOpenSources(prev => ({ ...prev, [index]: !prev[index] }));
+                        setActiveSourceIndex(prev => prev === index ? null : index);
                       }}
-                      className={`p-1.5 rounded-md transition-all duration-300 flex items-center gap-1.5 border ${openSources[index] ? 'bg-primary/10 text-primary border-primary/20' : 'text-muted-foreground hover:text-primary border-transparent hover:border-primary'}`}
-                      title="Toggle Sources & Videos"
+                      className={`p-1.5 rounded-md transition-all duration-300 flex items-center gap-1.5 border ${activeSourceIndex === index ? 'bg-primary/10 text-primary border-primary/20' : 'text-muted-foreground hover:text-primary border-transparent hover:border-primary'}`}
+                      title="Toggle Context & Sources"
                     >
                       <BookOpen size={14} />
-                      <span className="text-xs font-medium">Sources</span>
+                      <span className="text-xs font-medium">Context</span>
                     </button>
 
                     {isLast && !loading && (
@@ -223,22 +223,6 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
                     </div>
                   )}
                   
-                  {/* INLINE SOURCES */}
-                  <AnimatePresence>
-                    {openSources[index] && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                        animate={{ opacity: 1, height: "auto", marginTop: 16 }}
-                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                        className="overflow-hidden"
-                      >
-                        <YouTubeRecommendations 
-                          userQuery={index > 0 && messages[index - 1]?.role === 'user' ? messages[index - 1].content : "Learn about this topic"}
-                          shouldFetch={true}
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
               </div>
             </div>
@@ -272,6 +256,70 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
         
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Right Sidebar Drawer for Context & Sources */}
+      <AnimatePresence>
+        {activeSourceIndex !== null && (
+          <motion.div
+            initial={{ opacity: 0, x: "100%" }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed top-14 right-0 bottom-0 w-full md:w-[400px] bg-[#050505]/95 backdrop-blur-2xl border-l border-white/10 shadow-2xl z-40 flex flex-col"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <BookOpen size={18} className="text-primary" />
+                <h3 className="font-semibold text-zinc-200">Context & Sources</h3>
+              </div>
+              <button 
+                onClick={() => setActiveSourceIndex(null)}
+                className="p-1.5 rounded-full hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-8">
+              {/* Web Sources */}
+              {messages[activeSourceIndex]?.sources && messages[activeSourceIndex].sources.length > 0 && (
+                <div className="flex flex-col gap-3">
+                  <h4 className="text-[11px] font-bold tracking-widest uppercase text-zinc-500">Web Sources</h4>
+                  <div className="grid grid-cols-1 gap-2">
+                    {messages[activeSourceIndex].sources.map((url, i) => {
+                      try {
+                        const domain = new URL(url).hostname.replace('www.', '');
+                        return (
+                          <a key={i} href={url} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 rounded-xl transition-all group">
+                            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+                              <img src={`https://www.google.com/s2/favicons?domain=${domain}&sz=32`} className="w-4 h-4" alt={domain} />
+                            </div>
+                            <div className="flex flex-col min-w-0 flex-1">
+                              <span className="text-[13px] font-semibold text-zinc-200 truncate group-hover:text-primary transition-colors">{domain}</span>
+                              <span className="text-[11px] text-zinc-500 truncate">{url}</span>
+                            </div>
+                          </a>
+                        );
+                      } catch (e) { return null; }
+                    })}
+                  </div>
+                </div>
+              )}
+              
+              {/* YouTube Recommendations */}
+              <div className="flex flex-col gap-3">
+                <h4 className="text-[11px] font-bold tracking-widest uppercase text-zinc-500">Related Videos</h4>
+                <YouTubeRecommendations 
+                  userQuery={activeSourceIndex > 0 && messages[activeSourceIndex - 1]?.role === 'user' ? messages[activeSourceIndex - 1].content : "Learn about this topic"}
+                  shouldFetch={true}
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {showScrollButton && (
