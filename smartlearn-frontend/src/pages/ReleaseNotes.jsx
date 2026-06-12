@@ -2,6 +2,36 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 12, 2026 — UI Simplification & State Synchronization (Phase 3)",
+    features: [
+      {
+        title: "Cross-Tab State Synchronization",
+        description: "Fixed a critical architectural bug where long-running AI streams (like Mind Maps) would infinitely spin if the browser connection dropped or the user switched tabs.",
+        bullets: [
+          "Auto-Recovery System: The React frontend now silently triggers a background database fetch the moment a stream finishes or disconnects, instantly healing the UI state with the final generated result.",
+          "Window Focus Syncing: Switching back to an old tab now instantly forces the chat to sync with the backend, allowing users to start massive generations in one tab and view the results perfectly in another without infinite loading spinners."
+        ]
+      },
+      {
+        title: "Flashcard Engine V2 & 3D Aesthetics",
+        description: "Completely overhauled the Flashcard rendering engine to be mathematically robust and visually stunning.",
+        bullets: [
+          "Robust Markdown Parser: Built a custom data sanitizer that automatically strips out LLM-hallucinated markdown blocks (e.g. ```json) before parsing, permanently fixing the infinite loading bug.",
+          "OLED & 3D Overhaul: Restyled the flashcards to match the premium OLED Black and Red aesthetic. Engineered a pure CSS 3D perspective transform to make the cards flip exactly like physical glass."
+        ]
+      },
+      {
+        title: "Minimalist Interface Streamlining",
+        description: "Stripped out bulky UI elements in favor of a hyper-professional, ultra-minimalist aesthetic inspired by Gemini and Apple.",
+        bullets: [
+          "Sleek Model Selector: Replaced the massive, text-heavy model dropdown with a highly compact, dark glass pill that only shows the essential icon and name.",
+          "Professional Status Indicators: Ripped out the bubbly, animated 'Thinking' and 'Searching Web' pills. The AI's status is now displayed as elegant, distraction-free muted text next to the logo.",
+          "Compact Attachment Menu: Condensed the '+' attachment menu into a razor-sharp horizontal list, stripping out unnecessary borders and uppercase headers."
+        ]
+      }
+    ]
+  },
+  {
     date: "June 12, 2026 — Architecture Redesign & UX Overhaul (Phase 2)",
     features: [
       {
