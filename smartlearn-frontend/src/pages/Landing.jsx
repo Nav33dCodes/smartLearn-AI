@@ -53,11 +53,18 @@ export default function Landing() {
       bullets: ["Interactive Drag-and-Drop Mind Maps", "Textbook-Quality Math & Formula Rendering", "Dynamic Quizzes & Flashcard Generation"]
     },
     {
-      id: 'speed',
-      icon: <Zap size={18} />,
-      title: "Premium Speed & Voice",
-      description: "Instantaneous & Multi-Modal",
-      bullets: ["Real-time Voice Interactions (Speech-to-Text)", "60fps Smooth Token Rendering Engine", "Zero jank async streaming"]
+      id: 'sandpack',
+      icon: <Code2 size={18} />,
+      title: "Live Code Execution",
+      description: "Interactive Sandpack IDE",
+      bullets: ["Run React & JavaScript instantly inside the chat", "Hot-reloading browser preview window", "Lazy-loaded for zero-latency performance"]
+    },
+    {
+      id: 'personalize',
+      icon: <BrainCircuit size={18} />,
+      title: "Personalization Engine",
+      description: "Custom AI Archetypes & Tone",
+      bullets: ["Define strict custom instructions for the AI", "Choose from premium AI personas like 'Code Ninja'", "Zero-latency backend prompt injection"]
     },
     {
       id: 'models',
@@ -371,14 +378,14 @@ export default function Landing() {
               
               {[
                 { title: 'Multimodal Vision', desc: 'Upload images instantly. Our powerful browser-side compression engine perfectly analyzes visual data with zero API token bloat.' },
-                { title: 'Interactive Mind Mapping', desc: 'Instantly visualize complex relationships with our automatic drag-and-drop node graph engine.' },
+                { title: 'Live Sandpack IDE', desc: 'Instantly run, edit, and preview React and JavaScript applications right inside the chat window.' },
+                { title: 'Personalization Engine', desc: 'Define your exact AI Persona, Tone, and Custom Instructions to tailor the entire learning experience.' },
+                { title: 'Direct Web Scraping', desc: 'Paste any URL into the chat. The AI will instantly bypass anti-bot firewalls and read the entire website.' },
                 { title: 'Textbook Math Rendering', desc: 'Beautifully formats complex physics and calculus equations using native KaTeX integration.' },
                 { title: 'Real-time Voice AI', desc: 'Speak naturally to your AI tutor and have your audio instantly transcribed.' },
-                { title: 'Dynamic Study Tools', desc: 'Seamlessly generates interactive 3D flashcards and live quizzes directly inside your chat stream.' },
                 { title: 'Multi-Model Fallback', desc: 'Automatically routes queries between Gemini 2.5, Claude, and Groq to guarantee 100% uptime.' },
                 { title: 'Global Edge Caching', desc: 'Powered by Upstash Redis, your sessions and frequent queries are cached globally for sub-millisecond retrieval.' },
-                { title: 'Format Agnostic', desc: 'Upload PDFs, Word documents, Markdown, or raw text files. Our pipeline processes them flawlessly.' },
-                { title: 'Strict Privacy', desc: 'Your documents are fully encrypted at rest and never used to train public foundational AI models.' }
+                { title: 'Format Agnostic', desc: 'Upload PDFs, Word documents, Markdown, or raw text files. Our pipeline processes them flawlessly.' }
               ].map((feat, i) => (
                 <div key={i} className="relative flex flex-col bg-[#0a0a0a] border-2 border-red-900/30 rounded-xl p-6 hover:border-red-500 transition-all duration-300 group shadow-lg">
                   {/* Top Handle */}
