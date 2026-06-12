@@ -2,6 +2,28 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 12, 2026 — Architecture Redesign & UX Overhaul (Phase 2)",
+    features: [
+      {
+        title: "Native Gemini 2.5 Integration",
+        description: "Bypassed third-party routers by securely wiring the backend directly into Google's newest v1beta generative AI endpoints.",
+        bullets: [
+          "Zero-Cost Deep Context: Students can now access Google's massive 2-Million token context window (Gemini 2.5 Pro & Flash) completely for free using native API keys.",
+          "Mathematical Fallback Cascade: Architected an elite fallback router that silently catches API rate limits and OpenRouter credit exhaustion, seamlessly cascading your query down to free engines like Groq or Gemini without interrupting your chat."
+        ]
+      },
+      {
+        title: "Premium Interface Redesign",
+        description: "Completely overhauled the chat interface to deliver an ultra-premium, distraction-free learning environment.",
+        bullets: [
+          "Minimalist Model Selector: Removed the bulky top-header dropdown. The active model is now elegantly displayed as simple text in the bottom right of the chat box, expanding upwards into a beautiful glassmorphic menu when clicked.",
+          "IDE-Grade Code Blocks: Code snippets now render with a Mac OS-style window frame, featuring red/yellow/green window dots, 'backdrop-blur' glassmorphic headers, and always-on line numbers.",
+          "Elite Typography: Code blocks now utilize the 'JetBrains Mono' and 'Fira Code' font stacks for perfect legibility and gorgeous programming ligatures."
+        ]
+      }
+    ]
+  },
+  {
     date: "June 12, 2026 — Advanced Educational Features (Phase 1)",
     features: [
       {
