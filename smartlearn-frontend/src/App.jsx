@@ -12,7 +12,7 @@ import { useChats, useChatHistory, useShareChat } from "./hooks/useChats";
 import { useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
-import ModelSelector from "./components/ModelSelector";
+import ModelSelector, { MODELS } from "./components/ModelSelector";
 import { MessageSquare, LayoutDashboard, Settings, LogOut, PanelLeftClose, Search, Menu, Send } from "lucide-react";
 
 // Lazy Loaded Routes & Heavy Components
@@ -59,7 +59,7 @@ function ChatDashboard() {
     return localStorage.getItem("sl_theme_color") || "#ff3131"; // default Red
   });
   const [selectedModelId, setSelectedModelId] = useState(() => {
-    return localStorage.getItem("sl_model") || "groq:llama-3.1-8b-instant";
+    return localStorage.getItem("sl_model") || "openrouter/auto";
   });
   const [isMobile, setIsMobile] = useState(false);
 
@@ -92,6 +92,13 @@ function ChatDashboard() {
 
   useEffect(() => {
     localStorage.setItem("sl_model", selectedModelId);
+  }, [selectedModelId]);
+
+  useEffect(() => {
+    // Clean up invalid models from local storage gracefully
+    if (!MODELS.some(m => m.id === selectedModelId)) {
+      setSelectedModelId("openrouter/auto");
+    }
   }, [selectedModelId]);
 
   const createNewChat = useCallback(() => {
