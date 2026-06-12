@@ -30,6 +30,14 @@ SmartLearn AI transcends traditional chatbot interfaces by offering a suite of i
 
 The infrastructure is meticulously separated into a high-performance Python backend and a lightning-fast React frontend.
 
+<p align="left">
+  <img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi">
+  <img alt="React" src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB">
+  <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white">
+  <img alt="TailwindCSS" src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white">
+  <img alt="Redis" src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white">
+</p>
+
 ### Frontend 
 - React 19 (Vite)
 - TailwindCSS (Utility-first styling with custom glassmorphism)
@@ -43,6 +51,42 @@ The infrastructure is meticulously separated into a high-performance Python back
 - FAISS & Sentence Transformers (In-memory semantic vector search)
 - Upstash Redis (Global edge caching for sub-millisecond retrieval)
 - Dynamic Model Routing (Groq, Gemini, OpenRouter)
+
+## Architecture Flow
+
+The following diagram illustrates the high-level data flow and component interaction within the SmartLearn AI ecosystem:
+
+```mermaid
+graph TD
+    %% Define Styles
+    classDef client fill:#0a0a0a,stroke:#38B2AC,stroke-width:2px,color:#fff
+    classDef api fill:#005571,stroke:#fff,stroke-width:2px,color:#fff
+    classDef db fill:#316192,stroke:#fff,stroke-width:2px,color:#fff
+    classDef ai fill:#DC382D,stroke:#fff,stroke-width:2px,color:#fff
+    
+    %% Nodes
+    User([User Client / Browser]) ::: client
+    Vite[React Frontend UI] ::: client
+    FastAPI[FastAPI Backend Server] ::: api
+    FAISS[(FAISS Vector DB)] ::: db
+    Postgres[(PostgreSQL)] ::: db
+    Redis[(Upstash Redis Cache)] ::: db
+    Router{AI Model Router} ::: ai
+    Groq[Groq LLaMA 3.3] ::: ai
+    Gemini[Google Gemini 2.5] ::: ai
+    OpenRouter[OpenRouter Fallbacks] ::: ai
+
+    %% Connections
+    User <-->|WebSocket / SSE| Vite
+    Vite <-->|REST API| FastAPI
+    FastAPI <-->|Embeddings Retrieval| FAISS
+    FastAPI <-->|Session / Chat History| Postgres
+    FastAPI <-->|Global Edge Caching| Redis
+    FastAPI -->|Prompt & Context| Router
+    Router -->|Primary Text| Groq
+    Router -->|Multimodal / Vision| Gemini
+    Router -.->|Fallback Routing| OpenRouter
+```
 
 ## Security & Privacy
 
@@ -67,6 +111,9 @@ pip install -r requirements.txt
 SmartLearn AI requires a `.env` file situated in the `smartlearn-backend/` root directory. The system utilizes an intelligent fallback router, meaning you only need to provide API keys for the foundational models you intend to use. 
 
 Create a `.env` file using the following industry-standard template:
+
+<details>
+<summary><b>Click to expand Environment Variable Template</b></summary>
 
 ```env
 # ────────────────────────────────────────────────────
@@ -108,6 +155,7 @@ TAVILY_API_KEY="tvly-..."
 # YouTube API for extracting transcripts and analyzing video data
 YOUTUBE_API_KEY="AIza..."
 ```
+</details>
 
 Start the asynchronous server:
 ```bash
@@ -126,15 +174,6 @@ Start the Vite development server:
 npm run dev
 ```
 The frontend initializes on `http://localhost:5173`.
-
-## Architecture Flow
-
-1. Data Ingestion: Documents (PDF, DOCX, TXT) are uploaded and sanitized.
-2. Vectorization: Text is chunked and embedded via Sentence Transformers, then indexed in FAISS.
-3. Query Routing: User prompts are evaluated for required context (Web Search vs. Vector Retrieval).
-4. Prompt Construction: Persona settings, historical context, and RAG data are compiled into a strict system prompt.
-5. Inference: The query is routed to the optimal AI model via the Fallback Router.
-6. Streaming: The response is streamed asynchronously back to the client and cached globally.
 
 ## Leadership & Engineering
 
