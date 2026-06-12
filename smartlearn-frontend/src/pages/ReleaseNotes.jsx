@@ -2,6 +2,35 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 13, 2026 — Vision, Privacy & Settings (Phase 6)",
+    features: [
+      {
+        title: "📸 Native Vision (Base64 Image Uploads)",
+        description: "Your AI is now fully multimodal! You can upload images directly into the chat, and the AI will perfectly analyze and reason about them.",
+        bullets: [
+          "Zero-Cost Architecture: Built a powerful browser-side HTML5 compression engine that instantly shrinks large photos down to a few kilobytes before encoding them to Base64. This completely neutralizes massive API token costs.",
+          "Smart Auto-Routing: If an image is detected in the payload, the backend automatically intercepts and reroutes the request directly to Gemini 2.5 Flash, intelligently bypassing standard text-only models.",
+          "Database Optimization: The AI 'sees' the image in real-time, but the massive Base64 string is purposefully discarded from your SQLite database to ensure your backend remains 100% empty of bloat and lightning fast."
+        ]
+      },
+      {
+        title: "🔒 Global Privacy Mode (Hide Chat History)",
+        description: "Implemented an enterprise-grade privacy feature that completely hides your chat history from view—perfect for screen sharing, Zoom meetings, or streaming.",
+        bullets: [
+          "Cross-View Synchronization: Hiding chat history now instantly removes it from both the Sidebar and the central Chats Manager dashboard simultaneously, replacing them with a beautiful privacy shield UI.",
+          "Cached Persistence: Your privacy preferences are securely saved in your browser's local cache so they persist perfectly across page reloads."
+        ]
+      },
+      {
+        title: "⚙️ Settings Modal Upgrades",
+        description: "Centralized user preferences into a polished, iOS-style settings modal.",
+        bullets: [
+          "Data & Privacy Tab: The Chat History toggle has been permanently relocated into a dedicated Data & Privacy tab using a sleek, native-feeling toggle switch."
+        ]
+      }
+    ]
+  },
+  {
     date: "June 12, 2026 — UI Mechanics & Premium Aesthetics (Phase 5)",
     features: [
       {
