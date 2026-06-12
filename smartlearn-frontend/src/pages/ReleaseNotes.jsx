@@ -2,6 +2,38 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 12, 2026 — UI Mechanics & Premium Aesthetics (Phase 5)",
+    features: [
+      {
+        title: "Premium Data Tables",
+        description: "Completely overhauled the Markdown table rendering engine to deliver a highly polished, analytical aesthetic without requiring heavy third-party libraries.",
+        bullets: [
+          "OLED Glassmorphism: Tables now render inside beautifully rounded, translucent dark glass containers with glowing borders.",
+          "Smart Pill Badges: Built an intelligent regex engine that automatically detects common analytical terms (e.g., 'Fast', 'Slow', 'Yes', 'No', 'High', 'Low') inside table cells and upgrades them into colored, glowing pill badges.",
+          "Code Block Pre-processor: Engineered a custom data sanitizer that automatically intercepts and strips out AI-hallucinated markdown wrappers, ensuring your tables never render as raw code strings.",
+          "Sticky Architecture: Implemented sticky headers and custom horizontal scrollbars to ensure massive datasets remain perfectly readable on both desktop and mobile screens."
+        ]
+      },
+      {
+        title: "Smart Auto-Scroll Locking",
+        description: "Solved one of the most frustrating UX problems in modern AI chatbots by decoupling the scrollbar from the live generation stream.",
+        bullets: [
+          "Velocity Detection: If the AI is generating a massive essay and you try to scroll up to read the top, the UI instantly detects your scroll velocity and severs the auto-scroll connection, letting you read in peace without violently jerking you back down.",
+          "Instant Re-engagement: Simply scrolling back down to the bottom of the chat instantly re-locks the scrollbar to the live stream.",
+          "Active Stream Indicator: Added a glowing, pulsing red indicator to the floating 'Scroll to Bottom' button to let you know the AI is still typing off-screen while you read."
+        ]
+      },
+      {
+        title: "Dynamic Input Controls",
+        description: "Upgraded the chat input mechanics to feel infinitely smoother and more responsive during generation.",
+        bullets: [
+          "Morphing Stop Button: The standard 'Send' button now dynamically morphs into a sleek, square 'Stop Generating' button the exact millisecond the AI begins typing, identical to ChatGPT's production UI.",
+          "Removed Clutter: Deleted the redundant floating 'Stop generating' text button that previously sat awkwardly above the input box."
+        ]
+      }
+    ]
+  },
+  {
     date: "June 12, 2026 — Enterprise Fallback Architecture & Stability (Phase 4)",
     features: [
       {
