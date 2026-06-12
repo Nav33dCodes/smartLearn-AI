@@ -2,6 +2,36 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 12, 2026 — Advanced Educational Features (Phase 1)",
+    features: [
+      {
+        title: "Interactive Drag-and-Drop Mind Maps",
+        description: "The AI can now instantly visualize complex topics by generating highly interactive, drag-and-drop mind maps directly inside the chat.",
+        bullets: [
+          "React Flow Integration: Leveraged the powerful @xyflow/react engine to render smooth, scalable node graphs.",
+          "Automatic Layout Engine: Intercepts raw JSON data from the AI and uses Dagre to mathematically calculate the perfect hierarchical layout before rendering.",
+          "Interactive Canvas: Students can pan, zoom, and drag concepts around the screen to better understand relationships."
+        ]
+      },
+      {
+        title: "Textbook-Quality Math & Science Rendering",
+        description: "Completely overhauled how the platform handles mathematics, physics, and complex formulas.",
+        bullets: [
+          "KaTeX Integration: Integrated rehype-katex and remark-math into the markdown pipeline.",
+          "Seamless Inline Math: Instantly transforms raw LaTeX syntax (like $$E=mc^2$$) into beautiful, textbook-quality equations that look exactly like a printed textbook.",
+          "Zero-Jank Rendering: Math rendering happens instantly during the streaming response with zero layout shift."
+        ]
+      },
+      {
+        title: "Database Reliability Upgrades",
+        description: "Architected a much more resilient database connection pool to eliminate dropped websocket streams.",
+        bullets: [
+          "TCP Keepalives: Injected strict TCP keepalive packets and idle connection recycling into the SQLAlchemy async engine, permanently fixing the 'unexpected EOF' SSL errors when fetching from Neon PostgreSQL."
+        ]
+      }
+    ]
+  },
+  {
     date: "June 11, 2026 — Advanced AI Architecture & Premium UI Overhaul",
     features: [
       {
