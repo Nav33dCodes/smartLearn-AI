@@ -237,16 +237,10 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
             </div>
             
             {streamStatus ? (
-              <div className="flex items-center gap-2.5 mt-1.5 h-8 px-4 rounded-full border border-primary/30 bg-primary/5 text-sm font-medium text-primary shadow-sm shadow-primary/5">
-                {streamStatus === 'evaluating' && (
-                  <><motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 3, ease: "linear" }}><BrainCircuit size={15} /></motion.div> Thinking...</>
-                )}
-                {streamStatus === 'searching_web' && (
-                  <><motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 3, ease: "linear" }}><Globe size={15} /></motion.div> Searching the web...</>
-                )}
-                {streamStatus === 'search_complete' && (
-                  <><Check size={15} /> Reading results...</>
-                )}
+              <div className="flex items-center mt-2.5 ml-1 text-[13px] font-medium text-muted-foreground tracking-wide">
+                {streamStatus === 'evaluating' && "Thinking..."}
+                {streamStatus === 'searching_web' && "Searching the web..."}
+                {streamStatus === 'search_complete' && "Reading results..."}
               </div>
             ) : (
               <div className="flex items-center gap-1.5 pt-2 ml-1">
