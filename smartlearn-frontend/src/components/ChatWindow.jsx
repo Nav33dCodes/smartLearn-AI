@@ -86,7 +86,7 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
           return (
             <motion.div 
               key={index} 
-              initial={{ opacity: 0, y: 15 }}
+              initial={isLast ? { opacity: 0, y: 15 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
               className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}

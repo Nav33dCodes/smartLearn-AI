@@ -194,10 +194,10 @@ def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_user: Use
     # ── 1. Fetch conversation history for multi-turn memory ──
     conversation_history = []
     try:
-        past_chats = db.query(Chat).filter(
+        recent = db.query(Chat).filter(
             Chat.chat_id == chat_id, Chat.user_id == current_user.id
-        ).order_by(Chat.id.asc()).all()
-        recent = past_chats[-10:] if len(past_chats) > 10 else past_chats
+        ).order_by(Chat.id.desc()).limit(10).all()
+        recent.reverse()  # Restore chronological order
         for c in recent:
             conversation_history.append({"role": "user", "content": c.message})
             resp = c.response[:2000] if len(c.response) > 2000 else c.response
