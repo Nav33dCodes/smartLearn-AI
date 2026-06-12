@@ -223,15 +223,29 @@ const markdownRenderers = {
   ),
   hr: () => <hr className="my-8 border-border" />,
   table: ({ children }) => (
-    <div className="my-6 w-full max-w-[100%] overflow-x-auto rounded-lg border border-border shadow-sm bg-card">
-      <table className="w-full text-left text-[15px] border-collapse">{children}</table>
+    <div className="my-8 w-full max-w-[100%] overflow-x-auto rounded-xl border border-white/10 shadow-2xl bg-[#0a0a0a] custom-scrollbar relative">
+      <table className="w-full text-left text-[14px] border-collapse relative">{children}</table>
     </div>
   ),
-  thead: ({ children }) => <thead className="bg-muted text-muted-foreground border-b border-border">{children}</thead>,
-  tbody: ({ children }) => <tbody className="divide-y divide-border">{children}</tbody>,
-  tr: ({ children }) => <tr className="transition-colors hover:bg-muted/30">{children}</tr>,
-  th: ({ children }) => <th className="px-4 py-3 font-semibold text-foreground border-r border-border last:border-r-0 whitespace-nowrap">{children}</th>,
-  td: ({ children }) => <td className="px-4 py-3 align-top leading-relaxed border-r border-border last:border-r-0 break-words min-w-[120px]">{children}</td>,
+  thead: ({ children }) => <thead className="bg-[#121212] text-zinc-300 border-b border-white/10">{children}</thead>,
+  tbody: ({ children }) => <tbody className="divide-y divide-white/5">{children}</tbody>,
+  tr: ({ children }) => <tr className="transition-colors hover:bg-white/5 group">{children}</tr>,
+  th: ({ children }) => <th className="px-5 py-3.5 font-bold text-zinc-100 tracking-wide border-r border-white/5 last:border-r-0 whitespace-nowrap bg-[#121212]">{children}</th>,
+  td: ({ children }) => {
+    let content = children;
+    if (Array.isArray(children) && typeof children[0] === 'string') {
+        const text = children[0].trim();
+        const lower = text.toLowerCase();
+        if (["yes", "high", "fast", "supported", "true", "good", "excellent", "strong"].includes(lower)) {
+            content = <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase bg-green-500/10 text-green-400 border border-green-500/20">{text}</span>;
+        } else if (["no", "low", "slow", "unsupported", "false", "bad", "poor", "weak"].includes(lower)) {
+            content = <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase bg-red-500/10 text-red-400 border border-red-500/20">{text}</span>;
+        } else if (["medium", "moderate", "partial", "average", "mixed"].includes(lower)) {
+            content = <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">{text}</span>;
+        }
+    }
+    return <td className="px-5 py-3.5 align-top leading-relaxed text-zinc-300 border-r border-white/5 last:border-r-0 break-words min-w-[120px] group-hover:text-zinc-100 transition-colors">{content}</td>;
+  },
   a: ({ children, href }) => (
     <a href={href} target="_blank" rel="noopener noreferrer" className="font-medium text-primary underline underline-offset-4 hover:text-primary/80 transition-colors">
       {children}
@@ -317,7 +331,12 @@ function AIMessage({ content, isGenerating }) {
 
   if (!content) return null;
 
-  const displayContent = isGenerating ? content + " ▋" : content;
+  // Pre-processor: Strip hallucinatory markdown code blocks strictly wrapped around tables
+  // This prevents react-markdown from rendering a data table as raw text inside a code block.
+  let sanitizedContent = content;
+  sanitizedContent = sanitizedContent.replace(/```(?:markdown|md|text)?\s*\n((?:\|.*\|\s*\n)+)```/gi, '\n$1\n');
+
+  const displayContent = isGenerating ? sanitizedContent + " ▋" : sanitizedContent;
 
   return (
     <div className="group relative">
