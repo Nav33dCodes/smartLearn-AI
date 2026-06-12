@@ -164,21 +164,6 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
   return (
     <div className={isEmpty ? "w-full pointer-events-none relative" : "absolute bottom-0 left-0 right-0 pt-8 pb-6 px-4 pointer-events-none z-50 bg-gradient-to-t from-background via-background/90 to-transparent"}>
       <div className="max-w-3xl mx-auto relative flex flex-col gap-2 pointer-events-auto w-full">
-        
-        {loading && (
-          <div className="flex justify-center absolute -top-14 left-0 right-0">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="rounded-full shadow-sm bg-background border-border text-xs font-medium gap-1.5 h-8"
-              onClick={stopGeneration}
-            >
-              <Square size={12} className="fill-current" />
-              Stop generating
-            </Button>
-          </div>
-        )}
-
         <div 
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -333,19 +318,31 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
                 )}
               </Button>
 
-              <Button
-                onClick={handleSend}
-                disabled={(!input.trim() && attachedFiles.length === 0) || loading || attachedFiles.some(f => f.status === "uploading")}
-                size="icon"
-                className={`h-10 w-10 sm:h-8 sm:w-8 rounded-lg transition-all ${
-                  (input.trim() || attachedFiles.length > 0) && !loading && !attachedFiles.some(f => f.status === "uploading")
-                    ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
-                    : 'bg-muted text-muted-foreground opacity-50'
-                }`}
-                title="Send message (Cmd/Ctrl + Enter)"
-              >
-                <ArrowUp size={18} />
-              </Button>
+              {loading ? (
+                <Button
+                  onClick={stopGeneration}
+                  type="button"
+                  size="icon"
+                  className="h-10 w-10 sm:h-8 sm:w-8 rounded-lg bg-zinc-800 text-zinc-300 hover:bg-red-500/20 hover:text-red-500 transition-all focus-ring"
+                  title="Stop generating"
+                >
+                  <Square size={14} className="fill-current" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSend}
+                  disabled={(!input.trim() && attachedFiles.length === 0) || attachedFiles.some(f => f.status === "uploading")}
+                  size="icon"
+                  className={`h-10 w-10 sm:h-8 sm:w-8 rounded-lg transition-all ${
+                    (input.trim() || attachedFiles.length > 0) && !attachedFiles.some(f => f.status === "uploading")
+                      ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                      : 'bg-muted text-muted-foreground opacity-50'
+                  }`}
+                  title="Send message (Cmd/Ctrl + Enter)"
+                >
+                  <ArrowUp size={18} />
+                </Button>
+              )}
             </div>
           </div>
         </div>
