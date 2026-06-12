@@ -4,32 +4,25 @@ import { ChevronDown, Check, Sparkles, Zap, Brain, Rocket, Wand2 } from 'lucide-
 
 export const MODELS = [
   {
-    id: "groq:llama-3.3-70b-versatile",
-    name: "Groq Fast (Llama 3.3)",
-    provider: "Groq",
-    icon: Zap,
-    description: "Lightning fast responses for general queries. 100% Free."
-  },
-  {
-    id: "gemini:gemini-2.5-pro",
-    name: "Gemini Native (Pro)",
-    provider: "Google",
-    icon: Brain,
-    description: "Google's smartest model. Massive context for deep study. 100% Free."
-  },
-  {
-    id: "anthropic/claude-3.5-sonnet",
-    name: "Claude 3.5 Sonnet (Premium)",
-    provider: "Anthropic",
-    icon: Sparkles,
-    description: "Best coding model in the world. (Requires OpenRouter Credits)."
-  },
-  {
     id: "openrouter/auto",
     name: "SmartLearn Auto",
     provider: "OpenRouter",
     icon: Wand2,
     description: "Intelligently routes prompts to balance cost and capability."
+  },
+  {
+    id: "gemini:gemini-2.5-flash",
+    name: "Gemini 2.5 Flash",
+    provider: "Google",
+    icon: Brain,
+    description: "Google's ultra-fast native multi-modal study model. 100% Free."
+  },
+  {
+    id: "groq:llama-3.3-70b-versatile",
+    name: "Groq Fast (Llama 3.3)",
+    provider: "Groq",
+    icon: Zap,
+    description: "Lightning fast responses for general queries. 100% Free."
   }
 ];
 
@@ -68,7 +61,7 @@ export default function ModelSelector({ selectedModelId, onModelSelect }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.98 }}
               transition={{ duration: 0.15, ease: "easeOut" }}
-              className="absolute top-full left-0 mt-2 w-[340px] bg-background border border-border shadow-2xl rounded-3xl overflow-hidden p-2 z-50 origin-top-left"
+              className="absolute top-full left-0 mt-3 w-[350px] bg-background/70 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.2)] rounded-3xl overflow-hidden p-2 z-50 origin-top-left"
             >
             {MODELS.map((model) => {
               const Icon = model.icon;
@@ -81,16 +74,16 @@ export default function ModelSelector({ selectedModelId, onModelSelect }) {
                     onModelSelect(model.id);
                     setIsOpen(false);
                   }}
-                  className={`w-full flex items-start gap-4 p-3 rounded-2xl text-left transition-all duration-200 group ${
-                    isSelected ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-muted/60'
+                  className={`w-full flex items-start gap-4 p-3 rounded-2xl text-left transition-all duration-300 group ${
+                    isSelected ? 'bg-primary/10 shadow-sm' : 'hover:bg-white/5'
                   }`}
                 >
-                  <div className={`mt-0.5 shrink-0 p-2 rounded-full transition-colors ${isSelected ? 'bg-primary/10 text-primary' : 'bg-transparent text-muted-foreground group-hover:text-foreground'}`}>
-                    <Icon size={20} className={isSelected ? 'fill-primary/20' : ''} />
+                  <div className={`mt-0.5 shrink-0 p-2 rounded-full transition-colors duration-300 ${isSelected ? 'bg-primary/20 text-primary' : 'bg-transparent text-muted-foreground group-hover:text-primary'}`}>
+                    <Icon size={20} strokeWidth={isSelected ? 2.5 : 2} className={isSelected ? 'drop-shadow-[0_0_8px_rgba(var(--primary),0.5)]' : ''} />
                   </div>
                   <div className="flex-1 min-w-0 pr-2">
                     <div className="flex items-center justify-between">
-                      <span className={`font-semibold text-[15px] leading-tight ${isSelected ? 'text-primary' : 'text-foreground'}`}>
+                      <span className={`font-semibold text-[15px] leading-tight tracking-wide ${isSelected ? 'text-primary' : 'text-foreground/90 group-hover:text-foreground'}`}>
                         {model.name}
                       </span>
                       {isSelected && <Check size={18} className="text-primary shrink-0" />}
