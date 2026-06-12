@@ -7,6 +7,10 @@ import { Copy, Check, WrapText, Volume2, Square, Download, Loader2 } from "lucid
 import QuizBlock from "./QuizBlock";
 import FlashcardBlock from "./FlashcardBlock";
 import MermaidBlock from "./MermaidBlock";
+import MindMapBlock from "./MindMapBlock";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 
 const API = import.meta.env.DEV
   ? "http://localhost:8000"
@@ -163,6 +167,9 @@ const markdownRenderers = {
       if (lang === "mermaid") {
         return <MermaidBlock data={codeText} />;
       }
+      if (lang === "mindmap") {
+        return <MindMapBlock data={codeText} />;
+      }
       return <CodeBlock language={match[1]} codeText={codeText} />;
     }
 
@@ -300,12 +307,15 @@ function AIMessage({ content }) {
 
   return (
     <div className="group relative">
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        components={markdownRenderers}
-      >
-        {content}
-      </ReactMarkdown>
+      <div className="markdown-body">
+        <ReactMarkdown 
+          remarkPlugins={[remarkGfm, remarkMath]} 
+          rehypePlugins={[rehypeKatex]}
+          components={markdownRenderers}
+        >
+          {content}
+        </ReactMarkdown>
+      </div>
       
       <div className="mt-3 flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
         <button 
