@@ -26,28 +26,28 @@ export default function Landing() {
       icon: <BrainCircuit size={18} />,
       title: "Interactive Learning",
       description: "Next-Gen Educational Tools",
-      bullets: ["3D Physics Flashcards for memorization", "Vector-Rendered Mind Maps (Mermaid.js)", "Interactive Quizzes with step-by-step logic"]
+      bullets: ["Interactive Drag-and-Drop Mind Maps", "Textbook-Quality Math & Formula Rendering", "Dynamic Quizzes & Flashcard Generation"]
     },
     {
       id: 'speed',
       icon: <Zap size={18} />,
-      title: "Premium Speed",
-      description: "60fps Smooth Typing Engine",
-      bullets: ["Native 60fps token rendering (requestAnimationFrame)", "Zero server-thread blocking for instant streams", "Gorgeous shimmering skeleton loaders"]
+      title: "Premium Speed & Voice",
+      description: "Instantaneous & Multi-Modal",
+      bullets: ["Real-time Voice Interactions (Speech-to-Text)", "60fps Smooth Token Rendering Engine", "Zero jank async streaming"]
     },
     {
       id: 'models',
       icon: <Network size={18} />,
-      title: "Multi-Model Intelligence",
-      description: "The 5 Pillar Architecture",
-      bullets: ["Claude 3.5 Sonnet for deep research", "GPT-4o & DeepSeek for logic & coding", "Groq Instant for blistering LPU inference"]
+      title: "Multi-Model Fallback",
+      description: "The 4-Engine Architecture",
+      bullets: ["Native Gemini 2.5 integration with 2M context", "SmartLearn Auto dynamic routing", "Flawless Fallback Cascade for 100% uptime"]
     },
     {
-      id: 'scale',
-      icon: <Database size={18} />,
-      title: "Enterprise Scale",
-      description: "Crash-Proof & Asynchronous",
-      bullets: ["Upstash Redis for sub-millisecond global caching", "Neon Serverless Postgres for immense scale", "True Async queries preventing thread locks"]
+      id: 'ui',
+      icon: <Code2 size={18} />,
+      title: "IDE-Grade UI",
+      description: "Premium Distraction-Free Design",
+      bullets: ["Mac OS-styled IDE Code Blocks with Fira Code", "Glassmorphic floating model selector menus", "Beautifully minimalist, premium aesthetics"]
     }
   ];
 
@@ -353,7 +353,11 @@ export default function Landing() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
-                { title: 'Optimistic UI', desc: 'Interfaces update instantly before the server even responds, creating a seamless, zero-latency experience.' },
+                { title: 'Interactive Mind Mapping', desc: 'Instantly visualize complex relationships with our automatic drag-and-drop node graph engine.' },
+                { title: 'Textbook Math Rendering', desc: 'Beautifully formats complex physics and calculus equations using native KaTeX integration.' },
+                { title: 'Real-time Voice AI', desc: 'Speak naturally to your AI tutor and have your audio instantly transcribed.' },
+                { title: 'Dynamic Study Tools', desc: 'Seamlessly generates interactive 3D flashcards and live quizzes directly inside your chat stream.' },
+                { title: 'Multi-Model Fallback', desc: 'Automatically routes queries between Gemini 2.5, Claude, and Groq to guarantee 100% uptime.' },
                 { title: 'Global Edge Caching', desc: 'Powered by Upstash Redis, your sessions and frequent queries are cached globally for sub-millisecond retrieval.' },
                 { title: 'Format Agnostic', desc: 'Upload PDFs, Word documents, Markdown, or raw text files. Our pipeline processes them flawlessly.' },
                 { title: 'Strict Privacy', desc: 'Your documents are fully encrypted at rest and never used to train public foundational AI models.' }
