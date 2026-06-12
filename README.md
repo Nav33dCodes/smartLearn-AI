@@ -1,7 +1,7 @@
 # SmartLearn AI
 
 <p align="left">
-  <img alt="GitHub Release" src="https://img.shields.io/badge/Release-v2.0-red?style=flat-square">
+  <img alt="GitHub Release" src="https://img.shields.io/badge/Release-v13.7.4.0-red?style=flat-square">
   <img alt="Python" src="https://img.shields.io/badge/Python-3.11%2B-blue?style=flat-square&logo=python">
   <img alt="React" src="https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react">
   <img alt="License" src="https://img.shields.io/badge/License-MIT-green?style=flat-square">
