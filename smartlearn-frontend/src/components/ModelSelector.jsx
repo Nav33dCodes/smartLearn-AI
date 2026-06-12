@@ -40,13 +40,11 @@ export default function ModelSelector({ selectedModelId, onModelSelect }) {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-muted/80 text-foreground transition-colors font-semibold text-[15px] group cursor-pointer focus-ring"
+        className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors group cursor-pointer"
         title="Select AI Engine"
       >
-        <span className="flex items-center gap-2">
-          SmartLearn <span className="opacity-70 font-medium">{selectedModel.name.split(' ')[0]}</span>
-        </span>
-        <ChevronDown size={16} className={`text-muted-foreground transition-transform duration-200 ml-1 ${isOpen ? 'rotate-180' : ''}`} />
+        <SelectedIcon size={12} className="opacity-70 group-hover:opacity-100 transition-opacity" />
+        <span className="tracking-wide">Model: {selectedModel.name}</span>
       </button>
 
       <AnimatePresence>
@@ -61,7 +59,7 @@ export default function ModelSelector({ selectedModelId, onModelSelect }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.98 }}
               transition={{ duration: 0.15, ease: "easeOut" }}
-              className="absolute top-full left-0 mt-3 w-[350px] bg-background/70 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.2)] rounded-3xl overflow-hidden p-2 z-50 origin-top-left"
+              className="absolute bottom-full right-0 mb-2 w-[350px] bg-background/70 backdrop-blur-2xl border border-white/10 shadow-[0_-8px_32px_rgba(0,0,0,0.2)] rounded-3xl overflow-hidden p-2 z-50 origin-bottom-right"
             >
             {MODELS.map((model) => {
               const Icon = model.icon;

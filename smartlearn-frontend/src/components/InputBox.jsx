@@ -367,8 +367,13 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
           </div>
         </div>
         
-        <div className="text-center text-[11px] text-muted-foreground mt-1.5 px-4 font-medium">
-          SmartLearn AI can make mistakes. Consider verifying important information.
+        <div className="flex justify-between items-center mt-1.5 px-4 w-full">
+          <div className="text-center text-[11px] text-muted-foreground font-medium flex-1">
+            SmartLearn AI can make mistakes. Consider verifying important information.
+          </div>
+          <div className="flex-shrink-0 relative">
+            <ModelSelector selectedModelId={selectedModelId} onModelSelect={setSelectedModelId} />
+          </div>
         </div>
       </div>
     </div>

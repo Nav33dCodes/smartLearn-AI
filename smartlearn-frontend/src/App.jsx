@@ -353,7 +353,6 @@ function ChatDashboard() {
                 <PanelLeftOpen size={18} />
               </button>
             )}
-            <ModelSelector selectedModelId={selectedModelId} onModelSelect={setSelectedModelId} />
           </div>
 
           {activeChatId && activeMessages.length > 0 && (
