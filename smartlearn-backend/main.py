@@ -122,6 +122,7 @@ class ChatRequest(BaseModel):
     chat_id: Optional[str] = None
     search_web: Optional[str] = "auto"
     model: Optional[str] = "groq:llama-3.1-8b-instant"
+    image_data: Optional[str] = None
 
 class RenameRequest(BaseModel):
     title: str
@@ -254,7 +255,7 @@ def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_user: Use
                 user_prompt = f"Current Date and Time: {current_time}\n\nQuestion: {message}\n\nYou are SmartLearn AI, an advanced, professional tutor. Please answer the student's question comprehensively. Your response MUST be detailed, highly structured, and utilize rich Markdown formatting."
 
             # 6. Stream LLM with conversation history
-            for token in stream_llm_response(user_prompt, model_id=data.model, history=conversation_history):
+            for token in stream_llm_response(user_prompt, model_id=data.model, history=conversation_history, image_data=data.image_data):
                 full_response.append(token)
                 yield f"data: {json.dumps({'token': token})}\n\n"
 

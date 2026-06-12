@@ -176,16 +176,33 @@ If NO search is needed, output EXACTLY 'NO_SEARCH'."""
 # ────────────────────────────────────────────────────
 # STREAMING  (primary — used by /chat endpoint)
 # ────────────────────────────────────────────────────
-def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: List[Dict] = None) -> Generator[str, None, None]:
+def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: List[Dict] = None, image_data: str = None) -> Generator[str, None, None]:
     """
     Yields tokens one by one with multi-turn conversation memory and advanced cascading model fallback.
     """
     model_chain = [model_id] + FALLBACK_ROUTER.get(model_id, [])
 
+    # Vision Override: If an image is provided, force routing to Gemini 2.5 Flash
+    if image_data:
+        model_chain = ["gemini:gemini-2.5-flash"]
+        # In case the user explicitly chose a fallback we don't have, auto fallback to openrouter
+        if "gemini:gemini-2.5-flash" not in FALLBACK_ROUTER:
+             model_chain.append("openrouter/google/gemini-2.5-flash-free")
+
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     if history:
         messages.extend(history[-10:])  # Bound history to last 10 messages to prevent token overflow
-    messages.append({"role": "user", "content": prompt})
+        
+    if image_data:
+        messages.append({
+            "role": "user",
+            "content": [
+                {"type": "text", "text": prompt},
+                {"type": "image_url", "image_url": {"url": image_data}}
+            ]
+        })
+    else:
+        messages.append({"role": "user", "content": prompt})
 
     for current_model in model_chain:
         tokens_yielded = False

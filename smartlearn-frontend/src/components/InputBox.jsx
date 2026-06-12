@@ -9,8 +9,10 @@ import ModelSelector from "./ModelSelector";
 
 export default function InputBox({ input, setInput, sendMessage, loading, stopGeneration, textareaRef, activeChatId, isEmpty, selectedModelId, setSelectedModelId }) {
   const fileInputRef = useRef(null);
+  const imageInputRef = useRef(null);
   const uploadPdfMutation = useUploadPdf();
   const [attachedFiles, setAttachedFiles] = useState([]);
+  const [attachedImage, setAttachedImage] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [searchWeb, setSearchWeb] = useState("auto"); // "auto", "on", "off"
@@ -102,11 +104,12 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
       ? attachedFiles.map(f => `[FILE:${f.name}]`).join('\n') + '\n\n'
       : "";
       
-    const baseInput = input.trim() ? input.trim() : "Please analyze the attached document(s).";
+    const baseInput = input.trim() ? input.trim() : attachedImage ? "Please analyze the attached image." : "Please analyze the attached document(s).";
     const messageToSend = fileListStr + baseInput;
     
-    sendMessage(messageToSend, searchWeb);
+    sendMessage(messageToSend, searchWeb, attachedImage);
     setAttachedFiles([]);
+    setAttachedImage(null);
     setInput("");
   };
 
@@ -136,6 +139,60 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
     if (file) uploadFile(file);
   };
 
+  const compressImage = (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Compress to 70% quality JPEG
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          resolve({ dataUrl, name: file.name });
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const loadingToast = toast.loading("Compressing image...");
+      try {
+        const compressed = await compressImage(file);
+        setAttachedImage(compressed.dataUrl);
+        toast.success("Image attached successfully", { id: loadingToast });
+      } catch (err) {
+        toast.error("Failed to process image", { id: loadingToast });
+      }
+      if (imageInputRef.current) imageInputRef.current.value = '';
+    }
+  };
+
   const removeFile = (id) => {
     setAttachedFiles(prev => prev.filter(f => f.id !== id));
   };
@@ -156,8 +213,15 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
     const file = e.dataTransfer.files?.[0];
     if (file) {
       const isValidType = file.type === "application/pdf" || file.name.match(/\.(txt|doc|docx)$/i);
-      if (isValidType) uploadFile(file);
-      else toast.error("Unsupported file type. Please upload PDF, TXT, or DOCX.");
+      const isImage = file.type.startsWith("image/");
+      
+      if (isValidType) {
+        uploadFile(file);
+      } else if (isImage) {
+        handleImageChange({ target: { files: [file] } });
+      } else {
+        toast.error("Unsupported file type. Please upload PDF, TXT, DOCX, or Images.");
+      }
     }
   }, [activeChatId]);
 
@@ -176,13 +240,32 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
         >
           {isDragging && (
             <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/80 backdrop-blur-sm rounded-[32px]">
-              <p className="font-medium text-primary">Drop document to attach</p>
+              <p className="font-medium text-primary">Drop document or image to attach</p>
             </div>
           )}
 
-          {attachedFiles.length > 0 && (
+          {(attachedFiles.length > 0 || attachedImage) && (
             <div className="px-4 pt-3 flex flex-wrap gap-2">
               <AnimatePresence>
+                {attachedImage && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="flex items-center gap-2 bg-muted/60 border border-border rounded-lg px-2 py-1 max-w-[200px]"
+                  >
+                    <img src={attachedImage} alt="Attached" className="h-6 w-6 object-cover rounded shadow-sm" />
+                    <span className="text-xs font-medium truncate flex-1 text-foreground">
+                      Attached Image
+                    </span>
+                    <button 
+                      onClick={() => setAttachedImage(null)}
+                      className="text-muted-foreground hover:text-foreground hover:bg-muted p-0.5 rounded transition-colors shrink-0"
+                    >
+                      <X size={12} />
+                    </button>
+                  </motion.div>
+                )}
                 {attachedFiles.map(file => (
                   <motion.div
                     key={file.id}
@@ -218,7 +301,7 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
             onKeyDown={handleKeyDown}
             placeholder={isDragging ? "Drop here..." : isRecording ? "Listening..." : "Message SmartLearn..."}
             className={`w-full max-h-[200px] bg-transparent resize-none border-0 px-6 pb-12 focus:outline-none focus:ring-0 text-[15px] placeholder:text-muted-foreground ${
-              attachedFiles.length > 0 ? "pt-2" : "pt-4"
+              (attachedFiles.length > 0 || attachedImage) ? "pt-2" : "pt-4"
             }`}
             rows={1}
           />
@@ -229,6 +312,13 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
               ref={fileInputRef}
               onChange={handleFileChange}
               accept=".pdf,.txt,.doc,.docx"
+              className="hidden"
+            />
+            <input
+              type="file"
+              ref={imageInputRef}
+              onChange={handleImageChange}
+              accept="image/*"
               className="hidden"
             />
             
@@ -262,7 +352,18 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
                     >
                       <div className="flex items-center gap-2.5">
                         <FileText size={16} className="text-zinc-500" />
-                        <span className="font-bold">Upload File</span>
+                        <span className="font-bold">Upload Document</span>
+                      </div>
+                    </button>
+                    
+                    <button
+                      type="button"
+                      onClick={() => { imageInputRef.current?.click(); setShowPlusMenu(false); }}
+                      className="flex items-center justify-between px-3 py-2.5 text-[13px] hover:bg-zinc-900 rounded-xl transition-colors text-zinc-400 hover:text-zinc-200"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <ImageIcon size={16} className="text-zinc-500" />
+                        <span className="font-bold">Upload Image</span>
                       </div>
                     </button>
                     
@@ -331,10 +432,10 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
               ) : (
                 <Button
                   onClick={handleSend}
-                  disabled={(!input.trim() && attachedFiles.length === 0) || attachedFiles.some(f => f.status === "uploading")}
+                  disabled={(!input.trim() && attachedFiles.length === 0 && !attachedImage) || attachedFiles.some(f => f.status === "uploading")}
                   size="icon"
                   className={`h-10 w-10 sm:h-8 sm:w-8 rounded-lg transition-all ${
-                    (input.trim() || attachedFiles.length > 0) && !attachedFiles.some(f => f.status === "uploading")
+                    (input.trim() || attachedFiles.length > 0 || attachedImage) && !attachedFiles.some(f => f.status === "uploading")
                       ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
                       : 'bg-muted text-muted-foreground opacity-50'
                   }`}
