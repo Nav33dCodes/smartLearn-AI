@@ -1,5 +1,12 @@
 # SmartLearn AI
 
+<p align="left">
+  <img alt="GitHub Release" src="https://img.shields.io/badge/Release-v2.0-red?style=flat-square">
+  <img alt="Python" src="https://img.shields.io/badge/Python-3.11%2B-blue?style=flat-square&logo=python">
+  <img alt="React" src="https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react">
+  <img alt="License" src="https://img.shields.io/badge/License-MIT-green?style=flat-square">
+</p>
+
 SmartLearn AI is a next-generation cognitive architecture and educational assistant. Built from the ground up to deliver uncompromising speed, reliability, and intelligence, the platform seamlessly integrates a sophisticated Retrieval-Augmented Generation (RAG) pipeline with real-time multi-modal AI capabilities.
 
 ## Enterprise-Grade Architecture
@@ -130,3 +137,20 @@ The frontend initializes on `http://localhost:5173`.
 
 - **Sanan Malik** – CEO & Visionary
 - **Naveed Ahmed** – Lead Architect & Developer
+
+---
+
+## Contributing
+
+We welcome contributions from the open-source community. If you would like to contribute:
+1. Fork the repository.
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`).
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
+4. Push to the branch (`git push origin feature/AmazingFeature`).
+5. Open a Pull Request.
+
+Please ensure all PRs pass internal linting and maintain the zero-latency architectural standards established by the core team.
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
