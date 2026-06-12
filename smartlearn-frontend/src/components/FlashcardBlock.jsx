@@ -5,9 +5,19 @@ import { Layers, ChevronLeft, ChevronRight, RotateCw } from 'lucide-react';
 export default function FlashcardBlock({ data }) {
   const cards = useMemo(() => {
     try {
-      const result = JSON.parse(data);
-      if (Array.isArray(result)) return result;
-      if (typeof result === 'object' && result !== null) return [result];
+      let cleanData = data;
+      if (typeof cleanData === 'string') {
+        cleanData = cleanData.replace(/```json/g, '').replace(/```/g, '').trim();
+        // Extract just the JSON object/array if the AI hallucinated conversational text around it
+        const jsonMatch = cleanData.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          cleanData = jsonMatch[0];
+        }
+        cleanData = cleanData.replace(/,\s*([\]}])/g, '$1'); // Fix trailing commas
+        const result = JSON.parse(cleanData);
+        if (Array.isArray(result)) return result;
+        if (typeof result === 'object' && result !== null) return [result];
+      }
       return [];
     } catch (e) {
       return [];
@@ -58,38 +68,38 @@ export default function FlashcardBlock({ data }) {
       {/* Card Body */}
       <div className="p-6 md:p-8 flex flex-col items-center justify-center min-h-[300px]">
         <div 
-          className="relative w-full max-w-sm h-64 cursor-pointer"
+          className="relative w-full max-w-sm h-64 cursor-pointer perspective-1000"
           onClick={() => setIsFlipped(!isFlipped)}
         >
           <AnimatePresence mode="wait">
             {!isFlipped ? (
               <motion.div
                 key="front"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                className="absolute inset-0 bg-gradient-to-br from-background to-muted/30 border border-border rounded-2xl shadow-sm flex flex-col items-center justify-center p-6 text-center"
+                initial={{ opacity: 0, rotateY: 90 }}
+                animate={{ opacity: 1, rotateY: 0 }}
+                exit={{ opacity: 0, rotateY: -90 }}
+                transition={{ duration: 0.3 }}
+                className="absolute inset-0 bg-[#0f0f0f] border-2 border-white/10 rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] hover:border-red-500/50 hover:shadow-[0_0_30px_rgba(220,38,38,0.15)] flex flex-col items-center justify-center p-8 text-center transition-all duration-300"
               >
-                <span className="absolute top-4 left-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Front</span>
-                <h3 className="text-xl md:text-2xl font-semibold text-foreground leading-snug">
+                <span className="absolute top-5 left-6 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Front</span>
+                <h3 className="text-xl md:text-2xl font-bold text-zinc-100 leading-snug">
                   {cards[currentIndex].front}
                 </h3>
-                <div className="absolute bottom-4 text-muted-foreground/50 flex items-center gap-1.5 text-xs font-medium">
-                  <RotateCw size={12} /> Click to reveal
+                <div className="absolute bottom-5 text-muted-foreground/40 flex items-center gap-1.5 text-[11px] font-bold tracking-widest uppercase">
+                  <RotateCw size={12} /> Click to flip
                 </div>
               </motion.div>
             ) : (
               <motion.div
                 key="back"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                className="absolute inset-0 bg-primary text-primary-foreground rounded-2xl shadow-md flex flex-col items-center justify-center p-6 text-center"
+                initial={{ opacity: 0, rotateY: -90 }}
+                animate={{ opacity: 1, rotateY: 0 }}
+                exit={{ opacity: 0, rotateY: 90 }}
+                transition={{ duration: 0.3 }}
+                className="absolute inset-0 bg-red-600 border-2 border-red-500 text-white rounded-3xl shadow-[0_10px_40px_rgba(220,38,38,0.3)] flex flex-col items-center justify-center p-8 text-center"
               >
-                <span className="absolute top-4 left-4 text-xs font-bold text-primary-foreground/70 uppercase tracking-widest">Back</span>
-                <p className="text-lg md:text-xl font-medium leading-relaxed">
+                <span className="absolute top-5 left-6 text-[10px] font-black text-white/60 uppercase tracking-[0.2em]">Back</span>
+                <p className="text-lg md:text-xl font-bold leading-relaxed">
                   {cards[currentIndex].back}
                 </p>
               </motion.div>
