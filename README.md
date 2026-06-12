@@ -20,8 +20,11 @@ SmartLearn AI transcends traditional chatbot interfaces by offering a suite of i
 - **Advanced Fallback Architecture:** Engineered for 100% uptime. The proprietary router dynamically cascades queries across elite foundational models (including Groq LLaMA 3.3, Google Gemini, and OpenRouter variants). If a provider encounters a rate limit or network timeout, the system seamlessly redirects the stream without interrupting the user experience.
 - **AI Personalization Engine:** A comprehensive configuration suite allowing users to define strict custom instructions, assign professional archetypes (e.g., 'Socratic Tutor', 'Code Ninja'), and dictate AI behavioral tones. These personas are dynamically injected at the backend router level for zero-latency adherence.
 - **Direct Web Extraction:** Capable of bypassing basic search engine snippets. The system leverages enterprise-grade extraction APIs (Tavily) to pierce through anti-bot firewalls, downloading and injecting raw website content directly into the active RAG memory.
+- **YouTube Video Analysis:** Seamlessly extracts closed captions and metadata from YouTube URLs, injecting entire video transcripts into the RAG context for instant Q&A.
 - **Visual Knowledge Architecture:** Automatically extracts complex relationships from uploaded documents and plots them into a living, interactive node graph utilizing React Flow.
-- **Mathematical & Structural Rendering:** Native KaTeX integration ensures textbook-quality formatting for advanced calculus, physics equations, and data tables.
+- **Premium Data Tables & Structural Rendering:** Engineered custom Markdown processing to produce OLED-style glassmorphic tables with intelligent regex-based colored pill badges for analytical metrics. Native KaTeX integration ensures textbook-quality formatting for advanced calculus and physics equations.
+- **Dynamic UI Mechanics:** Features an intelligent auto-scroll locking algorithm that detects manual scroll velocity to gracefully detach during live streams, paired with sleek, morphing control buttons to mirror top-tier production environments.
+- **Secure Account Management:** Enterprise-grade account deletion and data purging flow, heavily secured by a time-sensitive OTP (One-Time Password) email verification pipeline.
 
 ## Technical Stack
 
