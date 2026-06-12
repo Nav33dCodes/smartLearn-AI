@@ -2,6 +2,38 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 13, 2026 — Personalization Engine & Sandpack IDE (Phase 7)",
+    features: [
+      {
+        title: "Sandpack Live Code Execution",
+        description: "The static code syntax highlighter has been officially upgraded into a fully interactive browser-based IDE!",
+        bullets: [
+          "Zero-Latency IDE: You can now write, run, edit, and preview full React and JavaScript applications directly inside the chat window.",
+          "Lazy-Loaded Architecture: To keep the app blazing fast, the heavy IDE engine is lazy-loaded. It only boots up when you explicitly click the new 'RUN CODE' button on supported code blocks.",
+          "Live Browser Preview: Instantly hot-reload changes inside the chat without ever needing to open a separate IDE."
+        ]
+      },
+      {
+        title: "AI Personalization Engine",
+        description: "A premium configuration suite allowing granular control over exactly how the AI speaks, thinks, and interacts with you.",
+        bullets: [
+          "Tone & Archetypes: Choose from a diverse set of AI personas, such as 'Code Ninja' or 'Socratic Tutor', to completely change how the AI answers questions.",
+          "Custom Instructions: A dedicated space to define strict, permanent rules for the AI (e.g., 'Always reply in French').",
+          "Zero Performance Hit: Your persona is instantly stitched into the core system prompt at the backend router level, guaranteeing perfect adherence with absolutely zero added latency."
+        ]
+      },
+      {
+        title: "Direct URL Scraping",
+        description: "The AI is now capable of reading entire websites instantly, bypassing basic search engine snippets.",
+        bullets: [
+          "Automatic Extraction: Just paste a URL into your message, and the backend regex engine automatically intercepts it.",
+          "Stealth Bypassing: Upgraded the scraper to intelligently route through enterprise extraction APIs to pierce through anti-bot firewalls (like Cloudflare), gracefully falling back to BeautifulSoup for simple sites.",
+          "Live UI Feedback: The UI seamlessly transitions to a 'Reading website...' state while it downloads and injects the raw article into the RAG memory."
+        ]
+      }
+    ]
+  },
+  {
     date: "June 13, 2026 — Vision, Privacy & Settings (Phase 6)",
     features: [
       {
