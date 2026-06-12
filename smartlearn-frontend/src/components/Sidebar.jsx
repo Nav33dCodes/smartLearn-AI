@@ -30,6 +30,16 @@ function Sidebar({
   const [editTitle, setEditTitle] = useState("");
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const dropdownRef = useRef(null);
+  
+  const [isHistoryHidden, setIsHistoryHidden] = useState(() => {
+    return localStorage.getItem('sl_history_hidden') === 'true';
+  });
+
+  const toggleHistoryHidden = () => {
+    const newVal = !isHistoryHidden;
+    setIsHistoryHidden(newVal);
+    localStorage.setItem('sl_history_hidden', String(newVal));
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -101,6 +111,7 @@ function Sidebar({
 
   const renderChatList = (chats, title) => {
     if (chats.length === 0) return null;
+
     return (
       <div className="mb-4">
         <div className="text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-widest px-3 mb-1.5 mt-4">
@@ -282,6 +293,15 @@ function Sidebar({
                 <div key={i} className="w-full h-8 bg-muted/60 rounded-md animate-pulse"></div>
               ))}
             </div>
+          ) : isHistoryHidden ? (
+            <div className="flex flex-col items-center p-4 text-center mt-2 bg-black/5 dark:bg-white/5 rounded-xl border border-transparent">
+              <ShieldAlert className="w-6 h-6 text-muted-foreground/60 mb-2" />
+              <p className="text-sm font-semibold text-foreground mb-1">History is off</p>
+              <p className="text-xs text-muted-foreground mb-4">Your chats are hidden for privacy.</p>
+              <Button variant="outline" size="sm" onClick={toggleHistoryHidden} className="h-8 px-4 text-[11px] uppercase tracking-wider font-bold">
+                Enable
+              </Button>
+            </div>
           ) : (
             <>
               {filteredChats.length === 0 && (
@@ -327,8 +347,6 @@ function Sidebar({
                       <ExternalLink size={14} className="text-muted-foreground opacity-50" />
                     </button>
 
-
-
                     <div className="h-px bg-border my-1.5 mx-2" />
                     
                     <button
@@ -369,6 +387,8 @@ function Sidebar({
         setDarkMode={setDarkMode}
         themeColor={themeColor}
         setThemeColor={setThemeColor}
+        isHistoryHidden={isHistoryHidden}
+        toggleHistoryHidden={toggleHistoryHidden}
       />
 
       {/* Logout Confirmation Modal */}

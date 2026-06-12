@@ -7,7 +7,7 @@ import { useUpdateName, useUpdatePassword, useUpdateAvatar, useExportData, useDe
 import { useChats, useUnarchiveChat, useDeleteChat, useRevokeShare, useArchiveAllChats } from '../hooks/useChats';
 import { toast } from 'sonner';
 
-export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode, themeColor, setThemeColor }) {
+export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode, themeColor, setThemeColor, isHistoryHidden, toggleHistoryHidden }) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
 
@@ -367,6 +367,16 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode, 
                   <h3 className="text-lg font-medium mb-6 pb-2 border-b border-zinc-200 dark:border-zinc-800">Data & Privacy</h3>
                   
                   <div className="flex flex-col">
+                    <div className="flex items-center justify-between py-4 border-b border-zinc-200 dark:border-zinc-800">
+                      <div>
+                        <div className="text-sm font-medium">Show chat history</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">Display your previous conversations in the sidebar</div>
+                      </div>
+                      <button onClick={toggleHistoryHidden} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${!isHistoryHidden ? 'bg-primary' : 'bg-zinc-300 dark:bg-zinc-700'}`}>
+                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${!isHistoryHidden ? 'translate-x-4' : 'translate-x-1'}`} />
+                      </button>
+                    </div>
+
                     <div className="flex items-center justify-between py-4 border-b border-zinc-200 dark:border-zinc-800">
                       <div>
                         <div className="text-sm font-medium">Export Data</div>
