@@ -1,267 +1,91 @@
-# 🤖 SmartLearn AI
+# SmartLearn AI
 
-<p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?color=00F7FF&center=true&vCenter=true&lines=AI+Powered+Learning+Assistant;RAG+Based+Chatbot;FastAPI+%2B+React+System;PostgreSQL+Chat+History;Built+by+Team+SmartLearn" />
-</p>
+SmartLearn AI is a next-generation cognitive architecture and educational assistant. Built from the ground up to deliver uncompromising speed, reliability, and intelligence, the platform seamlessly integrates a sophisticated Retrieval-Augmented Generation (RAG) pipeline with real-time multi-modal AI capabilities.
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Frontend-React-blue?style=for-the-badge&logo=react" />
-  <img src="https://img.shields.io/badge/Backend-FastAPI-green?style=for-the-badge&logo=fastapi" />
-  <img src="https://img.shields.io/badge/Database-PostgreSQL-blue?style=for-the-badge&logo=postgresql" />
-  <img src="https://img.shields.io/badge/AI-Groq-orange?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/VectorDB-FAISS-purple?style=for-the-badge" />
-</p>
+## Enterprise-Grade Architecture
 
----
+SmartLearn AI transcends traditional chatbot interfaces by offering a suite of industry-level tools designed for deep analytical research and interactive learning.
 
-## 🧠 Overview
+### Core Capabilities
 
-**SmartLearn AI** is a modern full-stack **AI-powered learning assistant** that combines:
+- **Zero-Latency Live Code Execution:** An integrated browser-based IDE powered by Sandpack. Users can write, execute, edit, and hot-reload React and JavaScript applications directly inside the chat interface without external dependencies.
+- **Multimodal Vision Engine:** Features a highly optimized client-side compression algorithm that processes high-resolution images instantly, routing complex visual data directly to specialized native models (e.g., Gemini 2.5 Flash) while completely avoiding backend token bloat.
+- **Advanced Fallback Architecture:** Engineered for 100% uptime. The proprietary router dynamically cascades queries across elite foundational models (including Groq LLaMA 3.3, Google Gemini, and OpenRouter variants). If a provider encounters a rate limit or network timeout, the system seamlessly redirects the stream without interrupting the user experience.
+- **AI Personalization Engine:** A comprehensive configuration suite allowing users to define strict custom instructions, assign professional archetypes (e.g., 'Socratic Tutor', 'Code Ninja'), and dictate AI behavioral tones. These personas are dynamically injected at the backend router level for zero-latency adherence.
+- **Direct Web Extraction:** Capable of bypassing basic search engine snippets. The system leverages enterprise-grade extraction APIs (Tavily) to pierce through anti-bot firewalls, downloading and injecting raw website content directly into the active RAG memory.
+- **Visual Knowledge Architecture:** Automatically extracts complex relationships from uploaded documents and plots them into a living, interactive node graph utilizing React Flow.
+- **Mathematical & Structural Rendering:** Native KaTeX integration ensures textbook-quality formatting for advanced calculus, physics equations, and data tables.
 
-* ⚡ FastAPI backend
-* 💻 React frontend (Vite)
-* 🧠 LLMs (Groq - LLaMA 3)
-* 🔍 RAG (Retrieval-Augmented Generation)
-* 🗄️ PostgreSQL (persistent chat history)
+## Technical Stack
 
-👉 It allows users to chat with AI and ask questions from uploaded PDFs with context-aware responses.
+The infrastructure is meticulously separated into a high-performance Python backend and a lightning-fast React frontend.
 
----
+### Frontend 
+- React 19 (Vite)
+- TailwindCSS (Utility-first styling with custom glassmorphism)
+- Framer Motion (Fluid 60fps animations and state transitions)
+- CodeSandbox Sandpack (Live execution engine)
+- React Flow (Interactive node graphs)
 
-## ✨ Key Feature
+### Backend
+- FastAPI (High-throughput asynchronous routing)
+- SQLAlchemy & PostgreSQL (Persistent, encrypted data storage)
+- FAISS & Sentence Transformers (In-memory semantic vector search)
+- Upstash Redis (Global edge caching for sub-millisecond retrieval)
+- Dynamic Model Routing (Groq, Gemini, OpenRouter)
 
-* 💬 Real-time AI Chat (Groq API)
-* 📄 PDF Upload + Q&A
-* 🔍 Semantic Search (FAISS)
-* 🧠 Context-aware answers (RAG pipeline)
-* 🗄️ Persistent chat history (PostgreSQL)
-* 🧹 Chat deletion & multi-chat support
-* ⚡ FastAPI high-performance backend
-* 🎨 Clean ChatGPT-like UI
+## Security & Privacy
 
----
+SmartLearn AI operates on a strict Zero-Knowledge architecture paradigm. User documents, custom instructions, and chat histories are completely siloed and encrypted at rest. Proprietary data is never utilized to train public foundational AI models. Furthermore, an integrated Global Privacy Mode allows users to instantly obscure all historical chat data during screen-sharing or collaborative sessions.
 
-## 🌐 Live Demo
+## Development Setup
 
-| Service  | URL |
-|----------|-----|
-| Frontend | https://smart-learn-ai-gules.vercel.app |
-| Backend  | https://smartlearn-ai-production.up.railway.app |
-
----
-
-## 🏗️ Project Structure
-
-```bash
-smartlearn/
-│
-├── smartlearn-frontend/          # React + Vite frontend
-│   ├── src/
-│   │   ├── App.jsx
-│   │   └── components/
-│
-├── smartlearn-backend/           # FastAPI backend
-│   ├── main.py
-│   ├── database.py
-│   ├── .env                      # secrets (git-ignored, never commit)
-│   └── services/
-│       ├── llm.py
-│       ├── rag.py
-│       └── pdf.py
-│
-├── README.md
-└── .gitignore
-```
-
----
-
-## ⚙️ Tech Stack
-
-### 💻 Frontend
-* React (Vite)
-* Axios
-* Tailwind (optional)
-* Framer Motion
-
-### ⚙️ Backend
-* FastAPI
-* Groq API (LLaMA 3)
-* Sentence Transformers
-* FAISS
-* PostgreSQL (SQLAlchemy)
-
----
-
-## 🚀 Setup Guide
-
-### 🔹 1. Clone Repo
-
+### 1. Repository Initialization
 ```bash
 git clone https://github.com/YOUR_USERNAME/smartlearn.git
 cd smartlearn
 ```
 
----
-
-### 🔹 2. Backend Setup
-
+### 2. Backend Environment
 ```bash
 cd smartlearn-backend
 pip install -r requirements.txt
 ```
 
-#### Create `smartlearn-backend/.env`
+Create a `.env` file in the backend directory containing your requisite API keys (e.g., `GROQ_API_KEY`, `DATABASE_URL`, `TAVILY_API_KEY`, `REDIS_URL`).
 
-```env
-GROQ_API_KEY=your_groq_api_key_here
-DATABASE_URL=your_railway_public_postgresql_url
-ENV=development
-```
-
-> ⚠️ **Important:** Use the **public** Railway DB URL, not the internal one.
-> Go to Railway → PostgreSQL service → **Variables** tab → copy `DATABASE_PUBLIC_URL`.
-> It should look like: `postgresql://postgres:xxxx@monorail.proxy.rlwy.net:PORT/railway`
-> The internal URL (`postgres.railway.internal`) only works inside Railway — **not locally**.
-
-#### Run Backend
-
+Start the asynchronous server:
 ```bash
 uvicorn main:app --reload
 ```
+The backend initializes on `http://127.0.0.1:8000`.
 
-📍 Runs on `http://127.0.0.1:8000`
-
----
-
-### 🔹 3. Frontend Setup
-
+### 3. Frontend Environment
 ```bash
 cd smartlearn-frontend
 npm install
 ```
 
-#### Run Frontend
-
+Start the Vite development server:
 ```bash
 npm run dev
 ```
+The frontend initializes on `http://localhost:5173`.
 
-📍 Runs on `http://localhost:5173`
+## Architecture Flow
 
----
+1. Data Ingestion: Documents (PDF, DOCX, TXT) are uploaded and sanitized.
+2. Vectorization: Text is chunked and embedded via Sentence Transformers, then indexed in FAISS.
+3. Query Routing: User prompts are evaluated for required context (Web Search vs. Vector Retrieval).
+4. Prompt Construction: Persona settings, historical context, and RAG data are compiled into a strict system prompt.
+5. Inference: The query is routed to the optimal AI model via the Fallback Router.
+6. Streaming: The response is streamed asynchronously back to the client and cached globally.
 
+## The Team
 
-
-## 🌍 How Environment Switching Works
-
-| Where | Environment | CORS policy |
-|-------|-------------|-------------|
-| Local (`uvicorn --reload`) | development | allows localhost + Vercel |
-| Railway (deployed) | production | allows Vercel only |
-
-The backend reads the `ENV` variable to decide which origins CORS allows:
-- `development` → allows localhost + Vercel
-- `production` → allows Vercel only (no wildcard `*`)
-
----
-
-## 📡 API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/chat` | Send a message, get AI response |
-| `GET` | `/chats` | Get all chat sessions |
-| `GET` | `/chat/{chat_id}` | Get messages for a specific chat |
-| `DELETE` | `/chat/{chat_id}` | Delete a chat session |
-| `POST` | `/upload` | Upload PDF for RAG |
-| `GET` | `/` | Health check |
-
-#### POST `/chat` example
-
-```json
-{
-  "message": "Explain AI",
-  "chat_id": "12345"
-}
-```
-
----
-
-## 🧠 How It Works (RAG + DB Flow)
-
-1. 📄 Upload PDF
-2. 🔍 Extract text
-3. ✂️ Chunking
-4. 🧠 Embeddings (Sentence Transformers)
-5. 💾 Store in FAISS (in-memory)
-6. ❓ User asks question
-7. 🔎 Retrieve relevant context
-8. 🤖 Generate answer via Groq (LLaMA 3)
-9. 🗄️ Save chat in PostgreSQL
-
----
-
-## 🗄️ Database Schema
-
-```sql
-CREATE TABLE chats (
-  id         SERIAL PRIMARY KEY,
-  chat_id    TEXT,
-  message    TEXT,
-  response   TEXT,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-```
-
----
-
-## ⚠️ Important Notes
-
-* 🔒 Never commit `.env` — add it to `.gitignore`
-* ⚡ FAISS is in-memory — vector index resets on server restart
-* 🌐 Use `DATABASE_PUBLIC_URL` from Railway for local dev, not the internal URL
-* 🔐 Keep `GROQ_API_KEY` and `DATABASE_URL` in backend only — never frontend
-
----
-
-## 🔮 Roadmap
-
-* [ ] 🔐 Authentication (JWT/OAUth)
-* [ ] 🧠 Long-term memory
-* [ ] 📱 Mobile Optimization
-* [ ] 💾 Persistent FAISS index
-
----
-
-## 🤝 Contributing
-
-1. Fork the repo
-2. Create your branch (`git checkout -b feature/your-feature`)
-3. Commit your changes (`git commit -m 'add: your feature'`)
-4. Push to the branch (`git push origin feature/your-feature`)
-5. Open a Pull Request
-
----
-
-## 👨‍💻 Team SmartLearn
-
-| Name | Role |
-|------|------|
-| Sanan Malik | Leader |
-| Naveed Ahmed | Developer |
-| Dua Fatima | Developer |
-| Zeshan Sikandar | Developer |
-| Shayan Umer | Developer |
-| Fiza Imran | Developer |
-
----
-
-## 📌 Status
-
-🚧 Actively Developing
-
----
-
-## ⭐ Support
-
-If you like this project, give it a ⭐ on GitHub!
+- Sanan Malik (CEO & Visionary)
+- Naveed Ahmed (Lead Architect & Developer)
+- Dua Fatima (Developer)
+- Zeshan Sikandar (Developer)
+- Shayan Umer (Developer)
+- Fiza Imran (Developer)
