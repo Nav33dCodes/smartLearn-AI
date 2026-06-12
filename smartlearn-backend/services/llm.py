@@ -41,19 +41,7 @@ DEFAULT_MODEL = "groq:llama-3.1-8b-instant"
 
 # Advanced Fallback Architecture
 FALLBACK_ROUTER = {
-    # 1. The "Everyday Speed" Route (100% Free)
-    "groq:llama-3.3-70b-versatile": ["groq:llama-3.1-8b-instant", "gemini:gemini-2.5-flash", "openrouter/auto"],
-    
-    # 2. The Gemini Flash Route
-    "gemini:gemini-2.5-flash": ["groq:llama-3.1-8b-instant", "groq:llama-3.3-70b-versatile", "openrouter/auto"],
-    
-    # 2. The "Deep Study" Route (100% Free)
-    "gemini:gemini-2.5-pro": ["gemini:gemini-2.5-flash", "groq:llama-3.3-70b-versatile", "groq:llama-3.1-8b-instant", "openrouter/auto"],
-    
-    # 3. The "Genius/Coding" Route (Paid via OpenRouter)
-    "anthropic/claude-3.5-sonnet": ["openrouter/auto", "gemini:gemini-2.5-pro", "groq:llama-3.3-70b-versatile"],
-    
-    # 4. The "Auto" Route
+    # The "SmartLearn Auto" Route (The Ultimate Fallback Safety Net)
     "openrouter/auto": [
         "gemini:gemini-2.5-flash", 
         "groq:llama-3.3-70b-versatile",
