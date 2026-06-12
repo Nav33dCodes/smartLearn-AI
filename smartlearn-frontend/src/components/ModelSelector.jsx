@@ -4,25 +4,32 @@ import { ChevronDown, Check, Sparkles, Zap, Brain, Rocket, Wand2 } from 'lucide-
 
 export const MODELS = [
   {
+    id: "groq:llama-3.3-70b-versatile",
+    name: "Groq Fast (Llama 3.3)",
+    provider: "Groq",
+    icon: Zap,
+    description: "Lightning fast responses for general queries. 100% Free."
+  },
+  {
+    id: "gemini:gemini-2.5-pro",
+    name: "Gemini Native (Pro)",
+    provider: "Google",
+    icon: Brain,
+    description: "Google's smartest model. Massive context for deep study. 100% Free."
+  },
+  {
+    id: "anthropic/claude-3.5-sonnet",
+    name: "Claude 3.5 Sonnet (Premium)",
+    provider: "Anthropic",
+    icon: Sparkles,
+    description: "Best coding model in the world. (Requires OpenRouter Credits)."
+  },
+  {
     id: "openrouter/auto",
-    name: "Auto (Dynamic)",
+    name: "SmartLearn Auto",
     provider: "OpenRouter",
     icon: Wand2,
     description: "Intelligently routes prompts to balance cost and capability."
-  },
-  {
-    id: "groq:llama-3.1-8b-instant",
-    name: "Groq Llama 3.1 8B (Instant)",
-    provider: "Groq",
-    icon: Zap,
-    description: "Blistering native Groq speeds for general queries."
-  },
-  {
-    id: "groq:llama-3.3-70b-versatile",
-    name: "Llama 3.3 70B (Fast)",
-    provider: "Groq",
-    icon: Sparkles,
-    description: "Lightning fast responses for general queries."
   }
 ];
 

@@ -24,6 +24,15 @@ if os.getenv("GROQ_API_KEY"):
         timeout=45.0
     )
 
+# Gemini Official Client (OpenAI Compatible)
+gemini_client = None
+if os.getenv("GEMINI_API_KEY"):
+    gemini_client = OpenAI(
+        api_key=os.getenv("GEMINI_API_KEY"),
+        base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+        timeout=45.0
+    )
+
 tavily_client = None
 if os.getenv("TAVILY_API_KEY"):
     tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
@@ -32,19 +41,18 @@ DEFAULT_MODEL = "groq:llama-3.1-8b-instant"
 
 # Advanced Fallback Architecture
 FALLBACK_ROUTER = {
-    # 0. OpenRouter Auto Route
-    "openrouter/auto": ["groq:llama-3.3-70b-versatile", "groq:llama-3.1-8b-instant"],
-    # 1. Groq Fast Route
-    "groq:llama-3.1-8b-instant": ["meta-llama/llama-3.1-8b-instruct"],
-    # 2. Groq Heavy Route
-    "groq:llama-3.3-70b-versatile": ["groq:llama-3.1-8b-instant", "meta-llama/llama-3.3-70b-instruct"],
-    # 3. Anthropic Research Route
-    "anthropic/claude-3.5-sonnet": ["anthropic/claude-3-haiku", "groq:llama-3.1-8b-instant"],
-    # 4. DeepSeek Coding Route
-    "deepseek/deepseek-coder": ["meta-llama/llama-3.1-8b-instruct", "groq:llama-3.1-8b-instant"],
-    # 5. Gemini Study Route
-    "google/gemini-2.5-flash": ["google/gemini-flash-1.5", "groq:llama-3.1-8b-instant"],
+    # 1. The "Everyday Speed" Route (100% Free)
+    "groq:llama-3.3-70b-versatile": ["groq:llama-3.1-8b-instant", "gemini:gemini-2.5-flash"],
     
+    # 2. The "Deep Study" Route (100% Free)
+    "gemini:gemini-2.5-pro": ["gemini:gemini-2.5-flash", "groq:llama-3.3-70b-versatile"],
+    
+    # 3. The "Genius/Coding" Route (Paid via OpenRouter)
+    "anthropic/claude-3.5-sonnet": ["openrouter/auto", "gemini:gemini-2.5-pro"],
+    
+    # 4. The "Auto" Route
+    "openrouter/auto": ["gemini:gemini-2.5-flash"],
+
     # Kept for backward compatibility if old chats use this model
     "openai/gpt-4o": ["openai/gpt-4o-mini", "groq:llama-3.1-8b-instant"]
 }
@@ -189,6 +197,12 @@ def stream_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: Lis
                 active_client = groq_client
                 actual_model = current_model.replace("groq:", "")
                 extra_args = {}
+            elif current_model.startswith("gemini:"):
+                if not gemini_client:
+                    raise Exception("Gemini API key not configured")
+                active_client = gemini_client
+                actual_model = current_model.replace("gemini:", "")
+                extra_args = {}
             else:
                 if not openrouter_client:
                     raise Exception("OpenRouter API key not configured")
@@ -258,6 +272,12 @@ def get_llm_response(prompt: str, model_id: str = DEFAULT_MODEL, history: List[D
                     raise Exception("Groq API key not configured")
                 active_client = groq_client
                 actual_model = current_model.replace("groq:", "")
+                extra_args = {}
+            elif current_model.startswith("gemini:"):
+                if not gemini_client:
+                    raise Exception("Gemini API key not configured")
+                active_client = gemini_client
+                actual_model = current_model.replace("gemini:", "")
                 extra_args = {}
             else:
                 if not openrouter_client:
