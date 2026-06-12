@@ -267,60 +267,44 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute bottom-full left-0 mb-3 w-56 bg-[#0a0a0a] border-2 border-red-900/50 shadow-[0_0_30px_rgba(220,38,38,0.15)] rounded-2xl overflow-hidden z-[100] flex flex-col p-1.5 backdrop-blur-xl"
+                    className="absolute bottom-full left-0 mb-2 w-[180px] bg-[#0a0a0a] border border-white/10 shadow-2xl rounded-2xl overflow-hidden z-[100] flex flex-col p-1.5 backdrop-blur-xl"
                   >
                     <button
                       type="button"
                       onClick={() => { fileInputRef.current?.click(); setShowPlusMenu(false); }}
-                      className="flex items-center gap-3 px-3 py-2.5 text-sm hover:bg-zinc-900 rounded-xl transition-colors text-zinc-300 hover:text-zinc-100"
+                      className="flex items-center justify-between px-3 py-2.5 text-[13px] hover:bg-zinc-900 rounded-xl transition-colors text-zinc-400 hover:text-zinc-200"
                       disabled={uploadPdfMutation.isPending || !activeChatId}
                     >
-                      <div className="bg-red-500/10 p-1.5 rounded-lg text-red-500 border border-red-500/20">
-                        <FileText size={16} />
+                      <div className="flex items-center gap-2.5">
+                        <FileText size={16} className="text-zinc-500" />
+                        <span className="font-bold">Upload File</span>
                       </div>
-                      <span className="font-bold">Upload Document</span>
                     </button>
                     
-                    <div className="h-px bg-red-900/30 my-1.5 mx-2" />
-                    
-                    <div className="px-3 py-1.5 text-[10px] font-black text-red-500 uppercase tracking-[0.1em]">
-                      Web Search Mode
-                    </div>
+                    <div className="h-px bg-white/5 my-1 mx-2" />
                     
                     <button
                       type="button"
                       onClick={() => { setSearchWeb("auto"); setShowPlusMenu(false); }}
-                      className={`flex items-center gap-3 px-3 py-2 text-[13px] hover:bg-zinc-900 rounded-xl transition-colors ${searchWeb === "auto" ? "text-blue-400 font-bold bg-blue-500/10 border border-blue-500/20" : "text-zinc-400"}`}
+                      className={`flex items-center justify-between px-3 py-2.5 text-[13px] hover:bg-zinc-900 rounded-xl transition-colors ${searchWeb === "auto" ? "bg-blue-500/10 text-zinc-200" : "text-zinc-400 hover:text-zinc-200"}`}
                     >
-                      <Globe size={16} className={searchWeb === "auto" ? "text-blue-400" : "text-zinc-500"} /> 
-                      <div className="flex flex-col items-start">
-                        <span>Auto Search</span>
+                      <div className="flex items-center gap-2.5">
+                        <Globe size={16} className={searchWeb === "auto" ? "text-blue-400" : "text-zinc-500"} /> 
+                        <span className="font-bold">Web Search</span>
                       </div>
-                      {searchWeb === "auto" && <Check size={14} className="ml-auto" />}
+                      {searchWeb === "auto" && <Check size={14} className="text-blue-400" />}
                     </button>
-
-                    <button
-                      type="button"
-                      onClick={() => { setSearchWeb("on"); setShowPlusMenu(false); }}
-                      className={`flex items-center gap-3 px-3 py-2 text-[13px] hover:bg-zinc-900 rounded-xl transition-colors ${searchWeb === "on" ? "text-red-400 font-bold bg-red-500/10 border border-red-500/20" : "text-zinc-400"}`}
-                    >
-                      <Globe size={16} className={searchWeb === "on" ? "text-red-400" : "text-zinc-500"} /> 
-                      <div className="flex flex-col items-start">
-                        <span>Always On</span>
-                      </div>
-                      {searchWeb === "on" && <Check size={14} className="ml-auto" />}
-                    </button>
-
+                    
                     <button
                       type="button"
                       onClick={() => { setSearchWeb("off"); setShowPlusMenu(false); }}
-                      className={`flex items-center gap-3 px-3 py-2 text-[13px] hover:bg-zinc-900 rounded-xl transition-colors ${searchWeb === "off" ? "text-zinc-300 font-bold bg-zinc-800" : "text-zinc-500"}`}
+                      className={`flex items-center justify-between px-3 py-2.5 text-[13px] hover:bg-zinc-900 rounded-xl transition-colors ${searchWeb === "off" ? "bg-zinc-800 text-zinc-200" : "text-zinc-400 hover:text-zinc-200"}`}
                     >
-                      <X size={16} className={searchWeb === "off" ? "text-zinc-300" : "text-zinc-600"} /> 
-                      <div className="flex flex-col items-start">
-                        <span>Disabled</span>
+                      <div className="flex items-center gap-2.5">
+                        <X size={16} className={searchWeb === "off" ? "text-zinc-400" : "text-zinc-600"} /> 
+                        <span className="font-bold">No Web</span>
                       </div>
-                      {searchWeb === "off" && <Check size={14} className="ml-auto" />}
+                      {searchWeb === "off" && <Check size={14} className="text-zinc-400" />}
                     </button>
                   </motion.div>
                 )}
