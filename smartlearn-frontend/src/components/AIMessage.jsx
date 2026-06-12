@@ -1,4 +1,4 @@
-import React, { useState, memo, useEffect, useRef } from "react";
+import React, { useState, memo, useEffect, useRef, lazy, Suspense } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -11,6 +11,8 @@ import MindMapBlock from "./MindMapBlock";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
+
+const ChartBlock = lazy(() => import("./ChartBlock"));
 
 const API = import.meta.env.DEV
   ? "http://localhost:8000"
@@ -169,6 +171,21 @@ const markdownRenderers = {
       }
       if (lang === "mindmap") {
         return <MindMapBlock data={codeText} />;
+      }
+      if (lang === "chart") {
+        return (
+          <Suspense fallback={
+            <div className="bg-[#0f0f0f] border border-border/50 rounded-2xl h-[300px] my-6 flex flex-col items-center justify-center gap-4 text-muted-foreground relative overflow-hidden">
+              <div className="absolute inset-0 bg-primary/5 animate-pulse"></div>
+              <div className="flex items-center gap-2">
+                <Loader2 size={16} className="animate-spin text-primary" />
+                <span className="font-semibold text-sm tracking-widest uppercase">Loading Chart Engine...</span>
+              </div>
+            </div>
+          }>
+            <ChartBlock data={codeText} />
+          </Suspense>
+        );
       }
       return <CodeBlock language={match[1]} codeText={codeText} />;
     }

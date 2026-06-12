@@ -53,6 +53,13 @@ export default function MindMapBlock({ data }) {
       let cleanData = data;
       if (typeof cleanData === 'string') {
         cleanData = cleanData.replace(/```json/g, '').replace(/```/g, '').trim();
+        
+        // Extract just the JSON object if the AI hallucinated conversational text around it
+        const jsonMatch = cleanData.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          cleanData = jsonMatch[0];
+        }
+        
         // Remove trailing commas that LLMs sometimes generate
         cleanData = cleanData.replace(/,\s*([\]}])/g, '$1');
         cleanData = JSON.parse(cleanData);
