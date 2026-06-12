@@ -52,7 +52,43 @@ cd smartlearn-backend
 pip install -r requirements.txt
 ```
 
-Create a `.env` file in the backend directory containing your requisite API keys (e.g., `GROQ_API_KEY`, `DATABASE_URL`, `TAVILY_API_KEY`, `REDIS_URL`).
+### Environment Configuration
+
+SmartLearn AI requires a `.env` file situated in the `smartlearn-backend/` root directory. The system utilizes an intelligent fallback router, meaning you only need to provide API keys for the foundational models you intend to use. 
+
+Create a `.env` file using the following industry-standard template:
+
+```env
+# ────────────────────────────────────────────────────
+# CORE INFRASTRUCTURE (Required)
+# ────────────────────────────────────────────────────
+# The public connection string to your PostgreSQL instance
+DATABASE_URL="postgresql://user:password@host:port/dbname"
+
+# Secret key for encrypting JWT tokens and session data
+SECRET_KEY="your_secure_random_string"
+
+# ────────────────────────────────────────────────────
+# AI MODEL PROVIDERS (At least one required)
+# ────────────────────────────────────────────────────
+# Groq (Powers LLaMA 3.3 for ultra-low latency text generation)
+GROQ_API_KEY="gsk_..."
+
+# Google Gemini (Powers Gemini 2.5 Flash for multimodal vision tasks)
+GEMINI_API_KEY="AIza..."
+
+# OpenRouter (The primary fallback safety net to guarantee 100% uptime)
+OPENROUTER_API_KEY="sk-or-v1-..."
+
+# ────────────────────────────────────────────────────
+# EXTERNAL INTEGRATIONS (Optional)
+# ────────────────────────────────────────────────────
+# Tavily API for enterprise-grade live web extraction and scraping
+TAVILY_API_KEY="tvly-..."
+
+# Upstash Redis for global edge caching and session state management
+REDIS_URL="rediss://default:password@host:port"
+```
 
 Start the asynchronous server:
 ```bash
@@ -81,11 +117,7 @@ The frontend initializes on `http://localhost:5173`.
 5. Inference: The query is routed to the optimal AI model via the Fallback Router.
 6. Streaming: The response is streamed asynchronously back to the client and cached globally.
 
-## The Team
+## Leadership & Engineering
 
-- Sanan Malik (CEO & Visionary)
-- Naveed Ahmed (Lead Architect & Developer)
-- Dua Fatima (Developer)
-- Zeshan Sikandar (Developer)
-- Shayan Umer (Developer)
-- Fiza Imran (Developer)
+- **Sanan Malik** – CEO & Visionary
+- **Naveed Ahmed** – Lead Architect & Developer
