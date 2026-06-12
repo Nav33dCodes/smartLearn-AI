@@ -5,7 +5,7 @@ from groq import Groq
 from dotenv import load_dotenv
 from tavily import TavilyClient
 
-load_dotenv()
+load_dotenv(override=True)
 
 # OpenRouter Client (with timeout)
 openrouter_client = None
