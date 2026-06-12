@@ -21,7 +21,7 @@ from services.pdf import extract_text, get_pdf_metadata
 from services.rag import store_pdf, search, clear_session, get_stats
 from services.voice import transcribe_audio, generate_speech
 from services.youtube import get_youtube_recommendations
-from services.redis_client import get_cache, set_cache, delete_cache, check_rate_limit
+from services.redis_client import get_cache, set_cache, delete_cache, check_rate_limit, clear_all_cache
 from database import SessionLocal, Chat, get_db, get_async_db, User, ChatMetadata
 from routers import auth
 from services.jwt_handler import verify_token
@@ -615,17 +615,89 @@ def rag_status(chat_id: str = "default", current_user: User = Depends(get_curren
 
 
 # ────────────────────────────────────────────────────
-# STATS
+# ADVANCED ADMIN DASHBOARD
 # ────────────────────────────────────────────────────
-@app.get("/stats")
-def stats():
-    db = SessionLocal()
+def check_admin(current_user: User = Depends(get_current_user)):
+    """Security Middleware: Only allow User ID 1 (Founder/Admin)."""
+    if current_user.id != 1:
+        raise HTTPException(status_code=403, detail="Forbidden: Admin access required.")
+    return current_user
+
+@app.get("/admin/dashboard")
+def admin_dashboard(admin: User = Depends(check_admin), db: Session = Depends(get_db)):
     try:
-        total_messages = db.query(Chat).count()
-        total_sessions = db.query(Chat.chat_id).distinct().count()
-        return {"total_messages": total_messages, "total_sessions": total_sessions}
+        total_users = db.query(func.count(User.id)).scalar()
+        total_chats = db.query(func.count(ChatMetadata.id)).scalar()
+        total_messages = db.query(func.count(Chat.id)).scalar()
+        
+        # Calculate RAG Vector Storage Size
+        rag_dir = "rag_data"
+        rag_files = os.listdir(rag_dir) if os.path.exists(rag_dir) else []
+        rag_count = len([f for f in rag_files if f.endswith("_index.bin")])
+        
+        users = db.query(User).order_by(User.id.desc()).limit(100).all()
+        user_list = [
+            {
+                "id": u.id,
+                "name": u.name,
+                "email": u.email,
+                "is_verified": u.is_verified,
+                "created_at": str(u.created_at.date()) if u.created_at else "Unknown"
+            } for u in users
+        ]
+        
+        return {
+            "stats": {
+                "total_users": total_users,
+                "total_chats": total_chats,
+                "total_messages": total_messages,
+                "rag_vectors": rag_count
+            },
+            "users": user_list
+        }
     except Exception as e:
-        logger.error(f"❌ stats error: {e}")
-        return {"total_messages": 0, "total_sessions": 0}
-    finally:
-        db.close()
+        logger.error(f"❌ Admin Dashboard Error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to load admin stats.")
+
+@app.delete("/admin/users/{user_id}")
+def admin_delete_user(user_id: int, admin: User = Depends(check_admin), db: Session = Depends(get_db)):
+    if user_id == 1:
+        raise HTTPException(status_code=400, detail="Cannot delete the root admin.")
+    try:
+        # Cascade Delete: Chats, Metadata, and finally the User
+        db.query(Chat).filter(Chat.user_id == user_id).delete(synchronize_session=False)
+        db.query(ChatMetadata).filter(ChatMetadata.user_id == user_id).delete(synchronize_session=False)
+        deleted_count = db.query(User).filter(User.id == user_id).delete(synchronize_session=False)
+        
+        db.commit()
+        if deleted_count == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+            
+        return {"status": "success", "message": f"User {user_id} and all associated data permanently deleted."}
+    except Exception as e:
+        db.rollback()
+        logger.error(f"❌ Admin Delete User Error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to delete user.")
+
+@app.post("/admin/system/flush-cache")
+def admin_flush_cache(admin: User = Depends(check_admin)):
+    success = clear_all_cache()
+    if success:
+        return {"status": "success", "message": "All API memory caches have been flushed. Users will fetch fresh data."}
+    raise HTTPException(status_code=500, detail="Failed to flush cache.")
+
+@app.post("/admin/system/purge-rag")
+def admin_purge_rag(admin: User = Depends(check_admin)):
+    rag_dir = "rag_data"
+    deleted_count = 0
+    if os.path.exists(rag_dir):
+        for filename in os.listdir(rag_dir):
+            file_path = os.path.join(rag_dir, filename)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+                    deleted_count += 1
+            except Exception as e:
+                logger.error(f"Failed to delete {file_path}. Reason: {e}")
+    
+    return {"status": "success", "message": f"Successfully purged {deleted_count} RAG Vector files from the hard drive."}

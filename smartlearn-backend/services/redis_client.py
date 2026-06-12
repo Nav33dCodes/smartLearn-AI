@@ -95,6 +95,19 @@ def delete_cache_pattern(pattern: str) -> bool:
         logger.error(f"Cache DELETE PATTERN error: {e}")
         return False
 
+def clear_all_cache() -> bool:
+    """Admin ONLY: Flushes entire Redis DB or clears fallback cache."""
+    try:
+        if _redis_client:
+            _redis_client.flushdb()
+            return True
+        else:
+            _FALLBACK_CACHE.clear()
+            return True
+    except Exception as e:
+        logger.error(f"Cache FLUSH error: {e}")
+        return False
+
 import time
 
 def check_rate_limit(key: str, max_requests: int, window_seconds: int) -> bool:
