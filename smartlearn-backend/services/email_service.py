@@ -5,6 +5,7 @@ from email.mime.multipart import MIMEMultipart
 
 SMTP_EMAIL = os.getenv("SMTP_EMAIL")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173").rstrip("/")
 
 def send_email(to_email: str, subject: str, body: str):
     if not SMTP_EMAIL or not SMTP_PASSWORD:
@@ -97,7 +98,7 @@ def get_premium_template(title: str, content_html: str, show_warning: bool = Fal
     <body>
         <div class="container">
             <div class="logo">
-                <img src="https://smartlearn-ai-production.up.railway.app/images/logo.svg" alt="Logo" width="28" height="28" style="margin-right: 10px;">
+                <img src="{FRONTEND_URL}/images/logo.svg" alt="Logo" width="28" height="28" style="margin-right: 10px;">
                 SmartLearn<span>AI</span>
             </div>
             <h1 class="title">{title}</h1>
@@ -119,7 +120,7 @@ def send_welcome_email(to_email: str, name: str):
     <p class="text">Welcome to the future of learning. We're thrilled to have you onboard.</p>
     <p class="text">SmartLearn AI is designed to help you digest information faster, understand complex topics effortlessly, and unlock your true learning potential using advanced retrieval-augmented generation.</p>
     <div style="margin: 36px 0;">
-        <a href="https://smartlearn-ai-production.up.railway.app" style="background-color: #ff3131; color: #ffffff; font-weight: 600; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 8px; display: inline-block; box-shadow: 0 4px 12px rgba(255, 49, 49, 0.25);">Get Started Now</a>
+        <a href="{FRONTEND_URL}" style="background-color: #ff3131; color: #ffffff; font-weight: 600; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 8px; display: inline-block; box-shadow: 0 4px 12px rgba(255, 49, 49, 0.25);">Get Started Now</a>
     </div>
     <p class="text" style="color: #666666; font-size: 14px;">If you have any questions or need assistance, simply reply to this email. We're here to help.</p>
     """
@@ -146,7 +147,7 @@ def send_password_reset_success_email(to_email: str):
     <p class="text">This email confirms that the password for your SmartLearn AI account has been successfully changed.</p>
     <p class="text">You can now log in to your account using your new password.</p>
     <div style="margin: 36px 0;">
-        <a href="https://smartlearn-ai-production.up.railway.app/login" style="background-color: #ff3131; color: #ffffff; font-weight: 600; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 8px; display: inline-block; box-shadow: 0 4px 12px rgba(255, 49, 49, 0.25);">Log In to Account</a>
+        <a href="{FRONTEND_URL}/login" style="background-color: #ff3131; color: #ffffff; font-weight: 600; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 8px; display: inline-block; box-shadow: 0 4px 12px rgba(255, 49, 49, 0.25);">Log In to Account</a>
     </div>
     """
     warning = "Security Notice: If you did not authorize this change, please contact our support team immediately."

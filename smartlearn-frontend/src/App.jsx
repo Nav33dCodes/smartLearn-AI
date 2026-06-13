@@ -30,9 +30,7 @@ const ChatsManager = lazy(() => import("./components/ChatsManager"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
 
-const API = import.meta.env.DEV
-  ? "http://localhost:8000"
-  : "https://smartlearn-ai-production.up.railway.app";
+const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 function ChatDashboard() {
   const queryClient = useQueryClient();

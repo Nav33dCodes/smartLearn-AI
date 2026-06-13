@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../lib/axios";
 import { useAuth } from "../context/AuthContext";
 
-const API = import.meta.env.DEV ? "http://localhost:8000" : "https://smartlearn-ai-production.up.railway.app";
+const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export function useUpdateName() {
   const { user, login } = useAuth();

@@ -17,9 +17,7 @@ import "katex/dist/katex.min.css";
 
 import "katex/dist/katex.min.css";
 
-const API = import.meta.env.DEV
-  ? "http://localhost:8000"
-  : "https://smartlearn-ai-production.up.railway.app";
+const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 // ── Copy Button ──
 function CopyButton({ text }) {
