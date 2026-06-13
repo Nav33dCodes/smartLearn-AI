@@ -15,6 +15,9 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import ModelSelector, { MODELS } from "./components/ModelSelector";
 import { MessageSquare, LayoutDashboard, Settings, LogOut, PanelLeftClose, Search, Menu, Send } from "lucide-react";
 
+import { ArtifactProvider, useArtifacts } from "./context/ArtifactContext";
+import ArtifactCanvas from "./components/ArtifactCanvas";
+
 // Lazy Loaded Routes & Heavy Components
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -355,6 +358,8 @@ function ChatDashboard() {
     setAbortController(null);
   };
 
+  const { activeArtifact } = useArtifacts();
+
   return (
     <div className="flex h-screen mesh-bg text-foreground overflow-hidden">
       <Sidebar 
@@ -377,8 +382,9 @@ function ChatDashboard() {
         isChatsLoading={isChatsLoading}
       />
 
-      <main className="flex-1 flex flex-col relative w-full h-full overflow-hidden transition-all duration-300">
-        <header className="absolute top-0 left-0 right-0 h-14 px-4 flex items-center justify-between z-40 glass border-b border-border/50">
+      <div className="flex-1 flex flex-row h-full relative overflow-hidden transition-all duration-300">
+        <main className={`flex flex-col relative h-full overflow-hidden transition-all duration-300 ${activeArtifact && !isMobile ? 'w-1/2 shrink-0 border-r border-white/5' : 'w-full flex-1'}`}>
+          <header className="absolute top-0 left-0 right-0 h-14 px-4 flex items-center justify-between z-40 glass border-b border-border/50">
           <div className="flex items-center gap-2">
             {(!sidebarOpen || isMobile) && (
               <button 
@@ -519,7 +525,21 @@ function ChatDashboard() {
             />
           </ErrorBoundary>
         )}
-      </main>
+        </main>
+        
+        {/* The Right-Hand Artifact Canvas Panel */}
+        {activeArtifact && !isMobile && (
+          <div className="w-1/2 shrink-0 h-full">
+            <ArtifactCanvas />
+          </div>
+        )}
+        {/* Mobile Artifact Overlay (Full screen) */}
+        {activeArtifact && isMobile && (
+          <div className="absolute inset-0 z-50">
+            <ArtifactCanvas />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -547,7 +567,9 @@ export default function App() {
 
           <Route path="/app" element={
             <ProtectedRoute>
-              <ChatDashboard />
+              <ArtifactProvider>
+                <ChatDashboard />
+              </ArtifactProvider>
             </ProtectedRoute>
           } />
         </Routes>
