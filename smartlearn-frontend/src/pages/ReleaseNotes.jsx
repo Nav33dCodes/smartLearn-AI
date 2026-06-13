@@ -21,6 +21,24 @@ const releases = [
           "Custom Instructions: A dedicated space to define strict, permanent rules for the AI (e.g., 'Always reply in French').",
           "Zero Performance Hit: Your persona is instantly stitched into the core system prompt at the backend router level, guaranteeing perfect adherence with absolutely zero added latency."
         ]
+      },
+      {
+        title: "Advanced Artifacts System (Canvas UI)",
+        description: "Re-engineered the entire Artifact presentation layer to perfectly match the sleek, split-pane aesthetic of Tier-1 enterprise models.",
+        bullets: [
+          "Sleek Inline Triggers: Artifacts are no longer clunky markdown boxes. They now spawn as beautifully compact, glassmorphic 'pill' triggers perfectly inline with the chat stream.",
+          "Auto-Open Mechanics: The Canvas panel now intelligently auto-opens the exact millisecond the AI finishes generating an artifact, removing all manual clicking.",
+          "Perfect Slider Layout: Re-wrote the global React flexbox architecture so the Canvas smoothly slides its width down to zero when closed, rather than violently snapping the chat back to 100% width."
+        ]
+      },
+      {
+        title: "Sandpack Compiler Architecture Upgrades",
+        description: "Resolved critical, deep-level ghost bugs inside the Sandpack Virtual File System.",
+        bullets: [
+          "Null Iframe Crash Fix: Completely overrode Sandpack's default vanilla files. Javascript is now forced into a bulletproof hidden HTML root, guaranteeing zero crashes during DOM manipulation.",
+          "Dynamic Template Switching: The system now intelligently bypasses the Javascript bundler entirely when the AI generates pure HTML, strictly preventing background boilerplate files from rendering massive red error screens over your websites.",
+          "Pixel-Perfect Rendering: Eliminated double scrollbars and layout clipping by mathematically calculating the exact remaining viewport height (calc(100vh - 56px)) for the IDE."
+        ]
       }
     ]
   },
