@@ -576,9 +576,9 @@ export default function App() {
     <>
       <Toaster 
         position="bottom-right" 
-        duration={2000}
+        duration={2500}
         toastOptions={{
-          className: 'border-l-4 border-l-primary bg-card text-foreground shadow-2xl !rounded-xl',
+          className: '!bg-[#1a1a1a] dark:!bg-[#fcfcfc] !text-white dark:!text-[#111111] !border-0 !shadow-[0_8px_30px_rgba(0,0,0,0.12)] !rounded-full !px-5 !py-3 !font-medium !text-[13px] !tracking-wide',
         }}
       />
       <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center mesh-bg"><div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin"></div></div>}>
