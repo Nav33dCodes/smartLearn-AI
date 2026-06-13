@@ -244,7 +244,10 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
                       <div className="flex items-center mt-3 opacity-0 group-hover:opacity-100 transition-opacity gap-1 pl-1">
                         <button
                           onClick={() => {
-                            navigator.clipboard.writeText(msg.content);
+                            const textToCopy = (msg.content || "").includes("<!-- SOURCES_JSON: ") 
+                              ? (msg.content || "").split("<!-- SOURCES_JSON: ")[0].trimEnd() 
+                              : msg.content;
+                            navigator.clipboard.writeText(textToCopy);
                             import("sonner").then(m => m.toast.success("Copied to clipboard"));
                           }}
                       className="p-1.5 text-muted-foreground hover:text-primary border border-transparent hover:border-primary rounded-md transition-all duration-300"
