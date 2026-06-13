@@ -437,7 +437,7 @@ function ChatDashboard() {
           </Suspense>
         ) : activeMessages.length === 0 && (!isHistoryLoading || isNewChat) ? (
           <div className="flex-1 flex flex-col items-center justify-center px-4 w-full h-full relative z-10 pb-20">
-            <h1 className="text-4xl md:text-[44px] font-semibold tracking-tight text-foreground mb-8 text-center">
+            <h1 className="text-4xl md:text-[42px] font-medium tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-zinc-900 to-zinc-500 dark:from-zinc-100 dark:to-zinc-500 mb-8 text-center select-none">
               How can I help you today, {user?.name ? user.name.split(" ")[0] : "there"}?
             </h1>
             
@@ -462,36 +462,30 @@ function ChatDashboard() {
                     setInput("Create a flashcard deck for: ");
                     setTimeout(() => textareaRef.current?.focus(), 50);
                   }}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-border bg-card hover:bg-muted hover:border-primary/50 text-sm font-medium transition-all shadow-sm group"
+                  className="flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-zinc-100/50 dark:bg-zinc-900/50 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/80 border border-zinc-200/80 dark:border-white/5 text-sm font-medium transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 group backdrop-blur-sm"
                 >
-                  <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                    <Layers size={16} className="text-primary" />
-                  </div>
-                  <span className="text-foreground/80 group-hover:text-foreground">Flashcards</span>
+                  <Layers size={15} className="text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-200 transition-colors duration-300" />
+                  <span className="text-zinc-600 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors duration-300 tracking-wide">Generate Flashcards</span>
                 </button>
                 <button 
                   onClick={() => {
                     setInput("Give me a quick 3-question interactive quiz on: ");
                     setTimeout(() => textareaRef.current?.focus(), 50);
                   }}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-border bg-card hover:bg-muted hover:border-primary/50 text-sm font-medium transition-all shadow-sm group"
+                  className="flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-zinc-100/50 dark:bg-zinc-900/50 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/80 border border-zinc-200/80 dark:border-white/5 text-sm font-medium transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 group backdrop-blur-sm"
                 >
-                  <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                    <BrainCircuit size={16} className="text-primary" />
-                  </div>
-                  <span className="text-foreground/80 group-hover:text-foreground">Interactive Quiz</span>
+                  <BrainCircuit size={15} className="text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-200 transition-colors duration-300" />
+                  <span className="text-zinc-600 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors duration-300 tracking-wide">Interactive Quiz</span>
                 </button>
                 <button 
                   onClick={() => {
                     setInput("Draw a detailed mind map explaining: ");
                     setTimeout(() => textareaRef.current?.focus(), 50);
                   }}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-border bg-card hover:bg-muted hover:border-primary/50 text-sm font-medium transition-all shadow-sm group"
+                  className="flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-zinc-100/50 dark:bg-zinc-900/50 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/80 border border-zinc-200/80 dark:border-white/5 text-sm font-medium transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 group backdrop-blur-sm"
                 >
-                  <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                    <Network size={16} className="text-primary" />
-                  </div>
-                  <span className="text-foreground/80 group-hover:text-foreground">Mind Map</span>
+                  <Network size={15} className="text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-200 transition-colors duration-300" />
+                  <span className="text-zinc-600 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors duration-300 tracking-wide">Create Mind Map</span>
                 </button>
               </div>
             </div>
