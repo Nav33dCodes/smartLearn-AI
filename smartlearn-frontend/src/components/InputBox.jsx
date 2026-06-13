@@ -235,7 +235,7 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
           className={`bg-zinc-100 dark:bg-zinc-900/80 shadow-sm rounded-2xl relative flex flex-col transition-all duration-500 ease-out border border-transparent ${
             isDragging 
               ? 'ring-2 ring-indigo-500 bg-indigo-500/10' 
-              : 'focus-within:bg-white dark:focus-within:bg-[#111111] focus-within:border-black/5 dark:focus-within:border-white/10 focus-within:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:focus-within:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.8)] focus-within:-translate-y-1'
+              : 'focus-within:bg-white dark:focus-within:bg-[#111111] focus-within:border-black/5 dark:focus-within:border-white/10 focus-within:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:focus-within:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.8)]'
           }`}
         >
           {isDragging && (
