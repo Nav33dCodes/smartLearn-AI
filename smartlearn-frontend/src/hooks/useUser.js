@@ -1,8 +1,21 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../lib/axios";
 import { useAuth } from "../context/AuthContext";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+export function useUserProfile() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ['userProfile', user?.id],
+    queryFn: async () => {
+      const res = await api.get(`${API}/auth/user/me`);
+      return res.data;
+    },
+    enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000,
+  });
+}
 
 export function useUpdateName() {
   const { user, login } = useAuth();

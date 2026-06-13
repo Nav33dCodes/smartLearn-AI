@@ -113,7 +113,7 @@ def verify_account(req: VerifyOTPRequest, background_tasks: BackgroundTasks, db:
     
     access_token = create_access_token({"sub": str(user.id)})
     refresh_token = create_refresh_token({"sub": str(user.id)})
-    return {"access_token": access_token, "refresh_token": refresh_token, "user": {"id": user.id, "name": user.name, "email": user.email, "avatar": user.avatar}}
+    return {"access_token": access_token, "refresh_token": refresh_token, "user": {"id": user.id, "name": user.name, "email": user.email, "avatar": user.avatar, "nickname": user.nickname, "occupation": user.occupation, "style_tone": user.style_tone, "custom_instructions": user.custom_instructions}}
 
 @router.post("/resend-verification")
 def resend_verification(req: ResendVerificationRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
@@ -142,7 +142,7 @@ def login(req: LoginRequest, background_tasks: BackgroundTasks, db: Session = De
         
     access_token = create_access_token({"sub": str(user.id)})
     refresh_token = create_refresh_token({"sub": str(user.id)})
-    return {"access_token": access_token, "refresh_token": refresh_token, "user": {"id": user.id, "name": user.name, "email": user.email, "avatar": user.avatar}}
+    return {"access_token": access_token, "refresh_token": refresh_token, "user": {"id": user.id, "name": user.name, "email": user.email, "avatar": user.avatar, "nickname": user.nickname, "occupation": user.occupation, "style_tone": user.style_tone, "custom_instructions": user.custom_instructions}}
 
 @router.post("/logout")
 def logout(credentials: HTTPAuthorizationCredentials = Depends(security)):
@@ -232,6 +232,19 @@ def update_avatar(req: UpdateAvatarRequest, db: Session = Depends(get_db), curre
     from services.redis_client import delete_cache
     delete_cache(f"user_profile:{current_user.id}")
     return {"message": "Avatar updated successfully", "avatar": current_user.avatar}
+
+@router.get("/user/me")
+def get_user_profile(current_user: User = Depends(get_current_user_auth)):
+    return {
+        "id": current_user.id,
+        "name": current_user.name,
+        "email": current_user.email,
+        "avatar": current_user.avatar,
+        "nickname": current_user.nickname,
+        "occupation": current_user.occupation,
+        "style_tone": current_user.style_tone,
+        "custom_instructions": current_user.custom_instructions
+    }
 
 @router.put("/user/password")
 def update_password(req: UpdatePasswordRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user_auth)):
