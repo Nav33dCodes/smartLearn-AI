@@ -245,9 +245,9 @@ function Sidebar({
       >
         <div className="flex flex-col p-3 gap-1">
           <div className="flex items-center justify-between mb-2 px-1">
-            <Link to="/app" className="flex items-center gap-2 group cursor-pointer hover:opacity-80 transition-opacity">
-              <Logo size={20} />
-              <span className="font-semibold text-foreground tracking-tight text-base">SmartLearn</span>
+            <Link to="/app" className="flex items-center gap-3 group cursor-pointer hover:opacity-80 transition-opacity">
+              <Logo size={28} />
+              <span className="font-semibold text-foreground tracking-tight text-xl">SmartLearn</span>
             </Link>
             <button className="h-8 w-8 text-muted-foreground/70 hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-colors flex items-center justify-center" onClick={() => setSidebarOpen(false)}>
               <PanelLeftClose size={16} />

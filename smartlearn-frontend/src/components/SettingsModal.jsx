@@ -367,7 +367,7 @@ export default function SettingsModal({
                     <div>
                       <label className="block text-sm font-medium mb-3">Accent Color</label>
                       <div className="flex gap-4 flex-wrap">
-                        {['#ff3131', '#10b981', '#3b82f6', '#8b5cf6', '#f43f5e', '#f97316', '#52525b'].map(color => (
+                        {['#6366f1', '#0ea5e9', '#10b981', '#8b5cf6', '#f43f5e', '#eab308', '#71717a'].map(color => (
                           <button
                             key={color}
                             onClick={() => setThemeColor(color)}
