@@ -4,10 +4,13 @@ import re
 import gc
 import os
 import json
+import threading
 
 # ── FIXED: Model was loading at import time = 400MB RAM used immediately
 # Now loads lazily on first use
 _model = None
+
+faiss_lock = threading.Lock()
 
 def get_model():
     global _model
@@ -97,21 +100,22 @@ def store_pdf(text: str, chat_id: str = None) -> int:
     idx = faiss.IndexFlatL2(dim)
     idx.add(embeddings)
 
-    if chat_id:
-        # Save to disk instantly to prevent memory leaks
-        index_path = _get_index_path(chat_id)
-        chunks_path = _get_chunks_path(chat_id)
-        
-        faiss.write_index(idx, index_path)
-        with open(chunks_path, "w", encoding="utf-8") as f:
-            json.dump(chunks, f)
+    with faiss_lock:
+        if chat_id:
+            # Save to disk instantly to prevent memory leaks
+            index_path = _get_index_path(chat_id)
+            chunks_path = _get_chunks_path(chat_id)
             
-        # Free FAISS from RAM immediately
-        del idx
-        gc.collect()
-    else:
-        _global_index = idx
-        _global_chunks = chunks
+            faiss.write_index(idx, index_path)
+            with open(chunks_path, "w", encoding="utf-8") as f:
+                json.dump(chunks, f)
+                
+            # Free FAISS from RAM immediately
+            del idx
+            gc.collect()
+        else:
+            _global_index = idx
+            _global_chunks = chunks
 
     return len(chunks)
 

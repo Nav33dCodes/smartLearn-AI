@@ -7,7 +7,7 @@ from services.auth_logic import get_password_hash, verify_password
 from services.jwt_handler import create_access_token, create_refresh_token
 from services.otp_manager import store_otp, verify_and_clear_otp, verify_otp_only
 from services.email_service import send_welcome_email, send_otp_email, send_password_reset_success_email, send_verification_email, send_delete_account_otp_email
-from database import get_db, User, OTP, Chat, ChatMetadata
+from database import Chat, ChatMetadata
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -95,6 +95,10 @@ def signup(req: SignupRequest, background_tasks: BackgroundTasks, db: Session = 
 
 @router.post("/verify-account")
 def verify_account(req: VerifyOTPRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    from services.redis_client import check_rate_limit
+    if not check_rate_limit(f"ratelimit:otp:{req.email}", max_requests=5, window_seconds=300):
+        raise HTTPException(status_code=429, detail="Too many attempts. Please try again later.")
+        
     if not verify_and_clear_otp(req.email, req.otp):
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
         
@@ -184,6 +188,10 @@ def forgot_password(req: ForgotPasswordRequest, background_tasks: BackgroundTask
 
 @router.post("/verify-otp")
 def verify_otp(req: VerifyOTPRequest, db: Session = Depends(get_db)):
+    from services.redis_client import check_rate_limit
+    if not check_rate_limit(f"ratelimit:otp:{req.email}", max_requests=5, window_seconds=300):
+        raise HTTPException(status_code=429, detail="Too many attempts. Please try again later.")
+        
     if not verify_otp_only(req.email, req.otp):
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
         
@@ -191,6 +199,10 @@ def verify_otp(req: VerifyOTPRequest, db: Session = Depends(get_db)):
 
 @router.post("/reset-password")
 def reset_password(req: ResetPasswordRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    from services.redis_client import check_rate_limit
+    if not check_rate_limit(f"ratelimit:otp:{req.email}", max_requests=5, window_seconds=300):
+        raise HTTPException(status_code=429, detail="Too many attempts. Please try again later.")
+        
     if not verify_and_clear_otp(req.email, req.otp):
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
         
