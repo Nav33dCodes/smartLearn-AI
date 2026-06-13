@@ -385,10 +385,10 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
       <AnimatePresence>
         {showScrollButton && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            transition={{ type: "spring", stiffness: 400, damping: 25 }}
             className="fixed bottom-32 right-8 z-50 md:right-12"
           >
             <button
@@ -396,11 +396,11 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
                 setIsAutoScrollLocked(false);
                 messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
               }}
-              className="p-2.5 bg-[#0a0a0a] border border-white/10 rounded-full shadow-2xl text-zinc-400 hover:text-white hover:bg-white/5 transition-all relative flex items-center justify-center"
+              className="p-3 bg-white/80 dark:bg-[#050505]/80 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-white dark:hover:bg-[#111111] hover:-translate-y-1 transition-all duration-300 relative flex items-center justify-center group"
               title="Scroll to bottom"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
-              {loading && <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#0a0a0a] animate-pulse" />}
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-y-0.5 transition-transform duration-300"><path d="m6 9 6 6 6-6"/></svg>
+              {loading && <span className="absolute 0 top-0 right-0 w-2.5 h-2.5 bg-primary rounded-full border-2 border-white dark:border-[#050505] animate-pulse" />}
             </button>
           </motion.div>
         )}
