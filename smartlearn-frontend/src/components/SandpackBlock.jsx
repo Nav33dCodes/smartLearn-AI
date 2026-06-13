@@ -15,6 +15,8 @@ export default function SandpackBlock({ code, language, viewMode = "preview" }) 
     template = "vue";
   } else if (language === 'typescript' || language === 'tsx') {
     template = "react-ts";
+  } else if (language === 'html' || language === 'css') {
+    template = "static";
   }
 
   // Determine main file based on template
