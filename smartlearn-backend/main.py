@@ -644,4 +644,4 @@ def rag_status(chat_id: str = "default", current_user: User = Depends(get_curren
     return get_stats(chat_id=full_chat_id)
 
 
-# ────────────────────────────────────────────────────
+# ────────────────────────────────────────────────────
