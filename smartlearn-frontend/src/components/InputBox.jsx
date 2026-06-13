@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
-import { ArrowRight, BrainCircuit, Zap, Shield, FileText, Sparkles, Code2, Database, PlaySquare, Image as ImageIcon, CheckCircle2, Cpu, Network, Globe, Mail, ChevronDown, Lock, BookOpen, HelpCircle, Search, Trash2, Paperclip, ArrowUp, Square, Loader2, X, Mic, Plus, Check } from 'lucide-react';
+import { ArrowRight, BrainCircuit, Zap, Shield, FileText, Sparkles, Code2, Database, PlaySquare, Image as ImageIcon, CheckCircle2, Cpu, Network, Globe, Mail, ChevronDown, Lock, BookOpen, HelpCircle, Search, Trash2, Paperclip, ArrowUp, Square, Loader2, X, Mic, Plus, Check, Headphones } from 'lucide-react';
 import api from '../lib/axios';
 import { Button } from "./ui/button";
 import { useUploadPdf } from "../hooks/useChats";
@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import ModelSelector from "./ModelSelector";
 
-export default function InputBox({ input, setInput, sendMessage, loading, stopGeneration, textareaRef, activeChatId, isEmpty, selectedModelId, setSelectedModelId }) {
+export default function InputBox({ input, setInput, sendMessage, loading, stopGeneration, textareaRef, activeChatId, isEmpty, selectedModelId, setSelectedModelId, setIsVoiceModeActive }) {
   const fileInputRef = useRef(null);
   const imageInputRef = useRef(null);
   const uploadPdfMutation = useUploadPdf();
@@ -417,6 +417,17 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
                 ) : (
                   <Mic size={18} />
                 )}
+              </Button>
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10 sm:h-8 sm:w-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-primary transition-all focus-ring hover:-translate-y-[1px]"
+                onClick={() => setIsVoiceModeActive && setIsVoiceModeActive(true)}
+                title="Advanced Voice Mode"
+              >
+                <Headphones size={18} />
               </Button>
 
               {loading ? (

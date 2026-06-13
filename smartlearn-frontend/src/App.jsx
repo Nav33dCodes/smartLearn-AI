@@ -8,6 +8,7 @@ import { Routes, Route } from 'react-router-dom';
 import Sidebar from "./components/Sidebar";
 import ChatWindow from "./components/ChatWindow";
 import InputBox from "./components/InputBox";
+import VoiceMode from "./components/VoiceMode";
 import { useChats, useChatHistory, useShareChat } from "./hooks/useChats";
 import { useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -54,6 +55,7 @@ function ChatDashboard() {
   const [streamStatus, setStreamStatus] = useState(null);
   const [abortController, setAbortController] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isVoiceModeActive, setIsVoiceModeActive] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem("sl_theme_pro");
     return savedTheme !== null ? savedTheme === "true" : true;
@@ -455,6 +457,7 @@ function ChatDashboard() {
                 isEmpty={true}
                 selectedModelId={selectedModelId}
                 setSelectedModelId={setSelectedModelId}
+                setIsVoiceModeActive={setIsVoiceModeActive}
               />
 
               <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
@@ -522,6 +525,7 @@ function ChatDashboard() {
               isEmpty={false}
               selectedModelId={selectedModelId}
               setSelectedModelId={setSelectedModelId}
+              setIsVoiceModeActive={setIsVoiceModeActive}
             />
           </ErrorBoundary>
         )}
@@ -533,12 +537,21 @@ function ChatDashboard() {
             {activeArtifact && <ArtifactCanvas />}
           </div>
         )}
-        
         {/* Mobile Artifact Overlay (Full screen) */}
         {activeArtifact && isMobile && (
           <div className="absolute inset-0 z-50">
             <ArtifactCanvas />
           </div>
+        )}
+
+        {/* Global Voice Mode Overlay */}
+        {isVoiceModeActive && (
+          <VoiceMode 
+            onClose={() => setIsVoiceModeActive(false)}
+            sendMessage={sendMessage}
+            loading={loading}
+            activeMessages={activeMessages}
+          />
         )}
       </div>
     </div>
