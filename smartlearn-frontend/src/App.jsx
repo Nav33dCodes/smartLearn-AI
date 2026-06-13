@@ -436,7 +436,7 @@ function ChatDashboard() {
             />
           </Suspense>
         ) : activeMessages.length === 0 && (!isHistoryLoading || isNewChat) ? (
-          <div className="flex-1 flex flex-col items-center justify-center px-4 w-full h-full relative z-10 pb-20">
+          <div className="flex-1 flex flex-col items-center justify-center px-4 w-full h-full relative z-10">
             <h1 className="text-4xl md:text-[42px] font-medium tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-zinc-900 to-zinc-500 dark:from-zinc-100 dark:to-zinc-500 mb-8 text-center select-none">
               How can I help you today, {user?.name ? user.name.split(" ")[0] : "there"}?
             </h1>
