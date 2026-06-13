@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User as UserIcon, Settings as SettingsIcon, Sun, Moon, Loader2, Info, Lock, Camera, CheckCircle2, Shield, Download, Trash2, AlertTriangle, ArrowLeft, Brain } from 'lucide-react';
+import { X, User as UserIcon, Settings as SettingsIcon, Sun, Moon, Loader2, Info, Lock, Camera, CheckCircle2, Shield, Download, Trash2, AlertTriangle, ArrowLeft, Brain, Pencil } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useUpdateName, useUpdatePassword, useUpdateAvatar, useExportData, useDeleteAllChats, useRequestDeleteAccount, useConfirmDeleteAccount, useUpdatePersonalization } from '../hooks/useUser';
 import { useChats, useUnarchiveChat, useDeleteChat, useRevokeShare, useArchiveAllChats } from '../hooks/useChats';
@@ -31,6 +31,7 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode, 
   const [styleTone, setStyleTone] = useState(user?.style_tone || "");
   const [customInstructions, setCustomInstructions] = useState(user?.custom_instructions || "");
   const updatePersonalizationMutation = useUpdatePersonalization();
+  const [isEditingPersonalization, setIsEditingPersonalization] = useState(false);
 
   // Data & Privacy State
   const exportMutation = useExportData();
@@ -202,20 +203,20 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode, 
     <button
       onClick={() => {
         setActiveTab(id);
-        // Reset confirmation states if switching away
+        setIsEditingPersonalization(false);
         if (id !== 'data') {
           setDeleteChatsConfirm(false);
           setDeleteAccountPhase(0);
           setDeleteOtp("");
         }
       }}
-      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+      className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150 ${
         activeTab === id 
-          ? 'bg-zinc-200 dark:bg-zinc-800 text-foreground' 
-          : 'text-muted-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-foreground'
+          ? 'bg-zinc-200/80 dark:bg-zinc-800 text-foreground' 
+          : 'text-muted-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800/40 hover:text-foreground'
       }`}
     >
-      <Icon size={18} />
+      <Icon size={16} />
       {label}
     </button>
   );
@@ -237,11 +238,11 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode, 
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 10 }}
         transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
-        className="relative w-full max-w-5xl h-[85vh] max-h-[800px] bg-background border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl flex overflow-hidden z-10"
+        className="relative w-full max-w-4xl h-[80vh] max-h-[700px] bg-background border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl flex overflow-hidden z-10"
       >
         {/* Sidebar */}
-        <div className="w-48 sm:w-64 bg-zinc-50 dark:bg-zinc-900/50 border-r border-zinc-200 dark:border-zinc-800 p-4 flex flex-col gap-2 shrink-0">
-          <h2 className="text-xl font-semibold mb-4 px-2 tracking-tight">Settings</h2>
+        <div className="w-52 bg-zinc-50/80 dark:bg-zinc-900/30 border-r border-zinc-200 dark:border-zinc-800 p-3 flex flex-col gap-1 shrink-0">
+          <h2 className="text-sm font-semibold mb-3 px-3 pt-1 text-muted-foreground uppercase tracking-wider">Settings</h2>
           
           <TabButton id="profile" label="Profile" icon={UserIcon} />
           <TabButton id="personalization" label="Personalization" icon={Brain} />
@@ -307,81 +308,119 @@ export default function SettingsModal({ isOpen, onClose, darkMode, setDarkMode, 
 
               {/* PERSONALIZATION TAB */}
               {activeTab === 'personalization' && (
-                <motion.div key="personalization" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="max-w-2xl">
-                  <div className="mb-6 pb-4 border-b border-zinc-200 dark:border-zinc-800">
-                    <h3 className="text-xl font-semibold flex items-center gap-2">
-                      <Brain className="text-primary" size={24} /> 
-                      AI Personalization Engine
-                    </h3>
-                    <p className="text-sm text-muted-foreground mt-1">Configure how the AI thinks, speaks, and responds to you. Changes apply immediately to all new messages.</p>
+                <motion.div key="personalization" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="max-w-xl">
+                  <div className="flex items-center justify-between mb-6 pb-3 border-b border-zinc-200 dark:border-zinc-800">
+                    <div>
+                      <h3 className="text-lg font-medium">Personalization</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">These preferences shape how the AI responds to you.</p>
+                    </div>
+                    {!isEditingPersonalization && (
+                      <button
+                        onClick={() => setIsEditingPersonalization(true)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg transition-colors"
+                      >
+                        <Pencil size={12} />
+                        Edit
+                      </button>
+                    )}
                   </div>
 
-                  <form onSubmit={handleUpdatePersonalization} className="space-y-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Your Nickname</label>
+                  {!isEditingPersonalization ? (
+                    /* ── READ-ONLY SUMMARY VIEW ── */
+                    <div className="space-y-0 divide-y divide-zinc-100 dark:divide-zinc-800/60">
+                      {[
+                        { label: 'Nickname', value: user?.nickname },
+                        { label: 'Occupation', value: user?.occupation },
+                        { label: 'Style & Tone', value: user?.style_tone },
+                        { label: 'Custom Instructions', value: user?.custom_instructions, mono: true },
+                      ].map(item => (
+                        <div key={item.label} className="flex items-start justify-between py-3.5 gap-4">
+                          <span className="text-sm text-muted-foreground shrink-0 w-36">{item.label}</span>
+                          <span className={`text-sm text-right ${
+                            item.value ? 'text-foreground' : 'text-muted-foreground/50 italic'
+                          } ${item.mono && item.value ? 'font-mono text-xs leading-relaxed whitespace-pre-wrap' : ''}`}>
+                            {item.value || 'Not set'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    /* ── EDIT FORM VIEW ── */
+                    <form onSubmit={(e) => { handleUpdatePersonalization(e); setIsEditingPersonalization(false); }} className="space-y-5">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-muted-foreground">Nickname</label>
                         <input
                           type="text"
                           value={nickname}
                           onChange={(e) => setNickname(e.target.value)}
-                          placeholder="What should I call you?"
-                          className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                          placeholder="What should the AI call you?"
+                          className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
                         />
                       </div>
-                      
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Occupation / Role</label>
+
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-muted-foreground">Occupation / Role</label>
                         <input
                           type="text"
                           value={occupation}
                           onChange={(e) => setOccupation(e.target.value)}
                           placeholder="e.g. Software Engineer, Student"
-                          className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                          className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
                         />
                       </div>
-                    </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Base Style & Tone</label>
-                      <select
-                        value={styleTone}
-                        onChange={(e) => setStyleTone(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
-                      >
-                        <option value="" className="bg-white dark:bg-zinc-900 text-black dark:text-white">Default (Balanced & Professional)</option>
-                        <option value="Socratic Tutor (Ask guiding questions instead of direct answers)" className="bg-white dark:bg-zinc-900 text-black dark:text-white">Socratic Tutor (Guiding Questions)</option>
-                        <option value="Direct & Concise (No fluff, straight to the point)" className="bg-white dark:bg-zinc-900 text-black dark:text-white">Direct & Concise</option>
-                        <option value="Highly Academic (Use sophisticated terminology and citations)" className="bg-white dark:bg-zinc-900 text-black dark:text-white">Highly Academic</option>
-                        <option value="Explain Like I'm 5 (Use simple words and fun analogies)" className="bg-white dark:bg-zinc-900 text-black dark:text-white">Explain Like I'm 5</option>
-                        <option value="Code Ninja (Minimal talking, maximum code snippets)" className="bg-white dark:bg-zinc-900 text-black dark:text-white">Code Ninja</option>
-                      </select>
-                    </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-muted-foreground">Style & Tone</label>
+                        <select
+                          value={styleTone}
+                          onChange={(e) => setStyleTone(e.target.value)}
+                          className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                        >
+                          <option value="">Default (Balanced & Professional)</option>
+                          <option value="Socratic Tutor (Ask guiding questions instead of direct answers)">Socratic Tutor</option>
+                          <option value="Direct & Concise (No fluff, straight to the point)">Direct & Concise</option>
+                          <option value="Highly Academic (Use sophisticated terminology and citations)">Highly Academic</option>
+                          <option value="Explain Like I'm 5 (Use simple words and fun analogies)">Explain Like I'm 5</option>
+                          <option value="Code Ninja (Minimal talking, maximum code snippets)">Code Ninja</option>
+                        </select>
+                      </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium flex items-center justify-between">
-                        Custom Instructions
-                        <span className="text-xs text-muted-foreground font-normal">Supports markdown</span>
-                      </label>
-                      <textarea
-                        value={customInstructions}
-                        onChange={(e) => setCustomInstructions(e.target.value)}
-                        placeholder="E.g., Always reply in Spanish. Never use bullet points. When writing code, always use Python unless specified otherwise."
-                        rows={5}
-                        className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none resize-none font-mono text-sm"
-                      />
-                    </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-muted-foreground">Custom Instructions</label>
+                        <textarea
+                          value={customInstructions}
+                          onChange={(e) => setCustomInstructions(e.target.value)}
+                          placeholder="E.g., Always reply in Spanish. Never use bullet points."
+                          rows={4}
+                          className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-mono focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none resize-none"
+                        />
+                      </div>
 
-                    <div className="pt-2">
-                      <button
-                        type="submit"
-                        disabled={updatePersonalizationMutation.isPending}
-                        className="px-6 py-2.5 bg-primary text-primary-foreground rounded-xl font-medium hover:opacity-90 transition-opacity flex items-center gap-2"
-                      >
-                        {updatePersonalizationMutation.isPending ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
-                        Save Personalization
-                      </button>
-                    </div>
-                  </form>
+                      <div className="flex items-center gap-2 pt-1">
+                        <button
+                          type="submit"
+                          disabled={updatePersonalizationMutation.isPending}
+                          className="px-4 py-2 bg-foreground text-background rounded-lg text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-2"
+                        >
+                          {updatePersonalizationMutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
+                          Save
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNickname(user?.nickname || "");
+                            setOccupation(user?.occupation || "");
+                            setStyleTone(user?.style_tone || "");
+                            setCustomInstructions(user?.custom_instructions || "");
+                            setIsEditingPersonalization(false);
+                          }}
+                          className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  )}
                 </motion.div>
               )}
 
