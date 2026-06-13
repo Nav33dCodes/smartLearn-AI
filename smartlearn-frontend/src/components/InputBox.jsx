@@ -347,23 +347,23 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
                     <button
                       type="button"
                       onClick={() => { fileInputRef.current?.click(); setShowPlusMenu(false); }}
-                      className="flex items-center justify-between px-3 py-2.5 text-[13px] hover:bg-zinc-900 rounded-xl transition-colors text-zinc-400 hover:text-zinc-200"
+                      className="flex items-center justify-between px-3 py-2 text-left transition-colors duration-200 group hover:bg-white/5 rounded-lg"
                       disabled={uploadPdfMutation.isPending || !activeChatId}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <FileText size={16} className="text-zinc-500" />
-                        <span className="font-bold">Upload Document</span>
+                      <div className="flex items-center gap-2">
+                        <FileText size={14} className="text-zinc-500 group-hover:text-zinc-300" />
+                        <span className="text-[13px] tracking-wide text-zinc-400 group-hover:text-zinc-100">Upload Document</span>
                       </div>
                     </button>
                     
                     <button
                       type="button"
                       onClick={() => { imageInputRef.current?.click(); setShowPlusMenu(false); }}
-                      className="flex items-center justify-between px-3 py-2.5 text-[13px] hover:bg-zinc-900 rounded-xl transition-colors text-zinc-400 hover:text-zinc-200"
+                      className="flex items-center justify-between px-3 py-2 text-left transition-colors duration-200 group hover:bg-white/5 rounded-lg"
                     >
-                      <div className="flex items-center gap-2.5">
-                        <ImageIcon size={16} className="text-zinc-500" />
-                        <span className="font-bold">Upload Image</span>
+                      <div className="flex items-center gap-2">
+                        <ImageIcon size={14} className="text-zinc-500 group-hover:text-zinc-300" />
+                        <span className="text-[13px] tracking-wide text-zinc-400 group-hover:text-zinc-100">Upload Image</span>
                       </div>
                     </button>
                     
@@ -372,25 +372,25 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
                     <button
                       type="button"
                       onClick={() => { setSearchWeb("auto"); setShowPlusMenu(false); }}
-                      className={`flex items-center justify-between px-3 py-2.5 text-[13px] hover:bg-zinc-900 rounded-xl transition-colors ${searchWeb === "auto" ? "bg-blue-500/10 text-zinc-200" : "text-zinc-400 hover:text-zinc-200"}`}
+                      className="flex items-center justify-between px-3 py-2 text-left transition-colors duration-200 group hover:bg-white/5 rounded-lg"
                     >
-                      <div className="flex items-center gap-2.5">
-                        <Globe size={16} className={searchWeb === "auto" ? "text-blue-400" : "text-zinc-500"} /> 
-                        <span className="font-bold">Web Search</span>
+                      <div className="flex items-center gap-2">
+                        <Globe size={14} className={searchWeb === "auto" ? "text-zinc-300" : "text-zinc-500 group-hover:text-zinc-300"} /> 
+                        <span className={`text-[13px] tracking-wide ${searchWeb === "auto" ? "font-medium text-zinc-100" : "text-zinc-400 group-hover:text-zinc-100"}`}>Web Search</span>
                       </div>
-                      {searchWeb === "auto" && <Check size={14} className="text-blue-400" />}
+                      {searchWeb === "auto" && <Check size={14} className="text-zinc-300 shrink-0" />}
                     </button>
                     
                     <button
                       type="button"
                       onClick={() => { setSearchWeb("off"); setShowPlusMenu(false); }}
-                      className={`flex items-center justify-between px-3 py-2.5 text-[13px] hover:bg-zinc-900 rounded-xl transition-colors ${searchWeb === "off" ? "bg-zinc-800 text-zinc-200" : "text-zinc-400 hover:text-zinc-200"}`}
+                      className="flex items-center justify-between px-3 py-2 text-left transition-colors duration-200 group hover:bg-white/5 rounded-lg"
                     >
-                      <div className="flex items-center gap-2.5">
-                        <X size={16} className={searchWeb === "off" ? "text-zinc-400" : "text-zinc-600"} /> 
-                        <span className="font-bold">No Web</span>
+                      <div className="flex items-center gap-2">
+                        <X size={14} className={searchWeb === "off" ? "text-zinc-300" : "text-zinc-500 group-hover:text-zinc-300"} /> 
+                        <span className={`text-[13px] tracking-wide ${searchWeb === "off" ? "font-medium text-zinc-100" : "text-zinc-400 group-hover:text-zinc-100"}`}>No Web</span>
                       </div>
-                      {searchWeb === "off" && <Check size={14} className="text-zinc-400" />}
+                      {searchWeb === "off" && <Check size={14} className="text-zinc-300 shrink-0" />}
                     </button>
                   </motion.div>
                 )}
