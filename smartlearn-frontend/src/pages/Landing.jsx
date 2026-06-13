@@ -117,31 +117,31 @@ export default function Landing() {
   ];
 
   return (
-    <div className="dark min-h-screen bg-black text-zinc-100 font-sans selection:bg-red-500/30 overflow-x-hidden pt-20">
+    <div className="dark min-h-screen bg-[#000000] text-zinc-100 font-sans selection:bg-white/20 overflow-x-hidden pt-20">
       
-      {/* Background Gradients (Optimized for performance) */}
+      {/* Background Gradients (Ultra Subtle OLED Mesh) */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-black" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ff00000a_1px,transparent_1px),linear-gradient(to_bottom,#ff00000a_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+        <div className="absolute inset-0 bg-[#000000]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
       </div>
 
       {/* Navigation Bar */}
-      <nav className="fixed top-0 z-50 w-full border-b border-red-500/10 bg-black/60 backdrop-blur-xl transition-all duration-300">
+      <nav className="fixed top-0 z-50 w-full border-b border-white/[0.04] bg-black/60 backdrop-blur-xl transition-all duration-300">
         <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
           <Link to="/" className="flex items-center gap-3 group">
-            <Logo size={28} />
-            <span className="text-xl font-bold tracking-tight text-zinc-100 group-hover:text-white transition-colors">SmartLearn</span>
+            <Logo size={24} className="text-zinc-100 group-hover:text-white transition-colors" />
+            <span className="text-xl font-semibold tracking-tight text-zinc-100 group-hover:text-white transition-colors">SmartLearn</span>
           </Link>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
+          <div className="hidden md:flex items-center gap-8 text-[13px] font-medium text-zinc-400 tracking-wide">
             <a href="#features" onClick={(e) => handleScroll(e, 'features')} className="hover:text-zinc-100 transition-colors cursor-pointer">Features</a>
             <a href="#pricing" onClick={(e) => handleScroll(e, 'pricing')} className="hover:text-zinc-100 transition-colors cursor-pointer">Pricing</a>
             <a href="#about" onClick={(e) => handleScroll(e, 'about')} className="hover:text-zinc-100 transition-colors cursor-pointer">About</a>
             <Link to="/releases" className="hover:text-zinc-100 transition-colors">Release Notes</Link>
           </div>
-          <div className="flex items-center gap-4">
-            <Link to="/login" className="text-sm font-medium text-zinc-300 hover:text-white transition-colors">Sign In</Link>
-            <Link to="/signup" className="text-sm font-medium bg-zinc-100 text-zinc-900 px-4 py-2 rounded-full hover:bg-white transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-              Get Started
+          <div className="flex items-center gap-5">
+            <Link to="/login" className="text-[13px] font-medium text-zinc-400 hover:text-white transition-colors tracking-wide">Log in</Link>
+            <Link to="/signup" className="text-[13px] font-medium bg-white text-black px-4 py-2 rounded-full hover:scale-105 transition-transform tracking-wide">
+              Sign Up
             </Link>
           </div>
         </div>
@@ -150,31 +150,31 @@ export default function Landing() {
       <main className="relative z-10">
         
         {/* Hero Section */}
-        <section className="pt-24 pb-20 px-4 text-center max-w-5xl mx-auto flex flex-col items-center">
+        <section className="pt-32 pb-24 px-4 text-center max-w-5xl mx-auto flex flex-col items-center">
           <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/30 border border-red-900/50 text-sm text-red-200 mb-8 backdrop-blur-sm"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08] text-xs text-zinc-300 mb-10 backdrop-blur-md shadow-sm"
           >
-            <Sparkles size={14} className="text-red-500" />
-            <span className="font-semibold tracking-wide pr-2">SmartLearn Generative UI is now live</span>
+            <Sparkles size={13} className="text-zinc-400" />
+            <span className="font-medium tracking-wide pr-1">SmartLearn Generative UI is now live</span>
           </motion.div>
           
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-5xl sm:text-7xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-400 mb-6 leading-[1.1]"
+            className="text-6xl sm:text-[84px] font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-200 to-zinc-500 mb-8 leading-[1.05]"
           >
-            Analyze Documents at the <br className="hidden sm:block" /> <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-red-800">Speed of Thought.</span>
+            Analyze Documents at the <br className="hidden sm:block" /> <span className="text-white">Speed of Thought.</span>
           </motion.h1>
           
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="text-lg sm:text-xl text-zinc-400 max-w-2xl mb-10 leading-relaxed"
+            className="text-lg sm:text-[21px] text-zinc-400 max-w-2xl mb-12 leading-relaxed tracking-tight"
           >
             Experience the next generation of contextual AI. Upload documents, query insights, and interact with your data using state-of-the-art RAG technology.
           </motion.p>
@@ -183,12 +183,12 @@ export default function Landing() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center gap-4 mt-6 relative z-20"
+            className="flex flex-col sm:flex-row items-center gap-4 mt-2 relative z-20"
           >
-            <Link to="/signup" className="w-full sm:w-auto flex items-center justify-center gap-2 bg-red-600 text-white px-8 py-3.5 rounded-full text-base font-bold hover:bg-red-500 transition-all shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:shadow-[0_0_30px_rgba(220,38,38,0.5)] hover:scale-[1.02]">
-              Start for Free <ArrowRight size={18} />
+            <Link to="/signup" className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white text-black px-8 py-3.5 rounded-full text-[15px] font-semibold hover:scale-105 transition-all shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)]">
+              Start Building Free <ArrowRight size={16} />
             </Link>
-            <a href="#features" onClick={(e) => handleScroll(e, 'features')} className="w-full sm:w-auto flex items-center justify-center gap-2 bg-black/50 border border-red-900/30 text-red-100 px-8 py-3.5 rounded-full text-base font-bold hover:bg-red-950/50 hover:border-red-500/50 transition-all backdrop-blur-sm cursor-pointer">
+            <a href="#features" onClick={(e) => handleScroll(e, 'features')} className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#0a0a0a] border border-white/10 text-zinc-300 px-8 py-3.5 rounded-full text-[15px] font-medium hover:bg-white/5 transition-all backdrop-blur-sm cursor-pointer">
               Explore Features
             </a>
           </motion.div>
@@ -206,12 +206,12 @@ export default function Landing() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveHeroTab(idx)}
-                  className={`relative flex items-center gap-2 px-5 py-3 rounded-full text-sm font-medium transition-colors ${activeHeroTab === idx ? 'text-zinc-100' : 'text-zinc-400 hover:text-zinc-300'}`}
+                  className={`relative flex items-center gap-2 px-5 py-3 rounded-full text-[13px] font-semibold transition-colors ${activeHeroTab === idx ? 'text-black' : 'text-zinc-500 hover:text-zinc-300'}`}
                 >
                   {activeHeroTab === idx && (
                     <motion.div
                       layoutId="heroTabBubble"
-                      className="absolute inset-0 bg-zinc-800 border border-zinc-700 rounded-full -z-10 shadow-[0_0_15px_rgba(255,255,255,0.05)]"
+                      className="absolute inset-0 bg-white rounded-full -z-10"
                       transition={{ type: "spring", stiffness: 400, damping: 30 }}
                     />
                   )}
@@ -222,9 +222,9 @@ export default function Landing() {
             </div>
 
             {/* Tab Content Crossfade */}
-            <div className="relative min-h-[220px] bg-zinc-900/40 border border-zinc-800/60 rounded-[2rem] p-8 sm:p-12 text-left backdrop-blur-md overflow-hidden">
+            <div className="relative min-h-[220px] bg-[#0a0a0a] border border-white/[0.04] rounded-[2rem] p-8 sm:p-12 text-left overflow-hidden">
               {/* Subtle background glow based on active tab */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -z-10" />
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-[100px] -z-10" />
               
               <AnimatePresence mode="wait">
                 <motion.div
@@ -327,47 +327,47 @@ export default function Landing() {
             initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={itemVariants}
             className="flex flex-col items-center text-center max-w-5xl mx-auto"
           >
-            <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-zinc-100 mb-6">Visual Knowledge Architecture</h2>
-            <p className="text-zinc-400 text-lg md:text-xl max-w-3xl mb-12 leading-relaxed font-medium">
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tighter text-zinc-100 mb-6">Visual Knowledge Architecture</h2>
+            <p className="text-zinc-400 text-lg md:text-xl max-w-3xl mb-12 leading-relaxed tracking-tight">
               We completely abandoned standard file viewers. Our inference engine automatically extracts and plots your documents into a living, interactive Node Graph. Explore the unseen connections in your data.
             </p>
             
             {/* React Flow CSS Node Diagram */}
-            <div className="w-full relative mt-8 max-w-4xl mx-auto h-80 sm:h-[450px] border border-red-900/30 bg-black/60 rounded-3xl overflow-hidden flex items-center justify-center shadow-[0_0_50px_rgba(220,38,38,0.05)]">
-               <div className="absolute inset-0 bg-[linear-gradient(to_right,#ff000010_1px,transparent_1px),linear-gradient(to_bottom,#ff000010_1px,transparent_1px)] bg-[size:32px_32px]" />
+            <div className="w-full relative mt-8 max-w-4xl mx-auto h-80 sm:h-[450px] border border-white/[0.04] bg-[#000000] rounded-3xl overflow-hidden flex items-center justify-center shadow-[0_0_50px_rgba(255,255,255,0.02)]">
+               <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:32px_32px]" />
                
                {/* Animated Connection Line */}
                <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
-                 <path d="M 30% 50% C 50% 50%, 50% 50%, 70% 50%" stroke="rgba(220,38,38,0.6)" strokeWidth="3" fill="none" strokeDasharray="8,8" className="animate-[dash_20s_linear_infinite]" />
+                 <path d="M 30% 50% C 50% 50%, 50% 50%, 70% 50%" stroke="rgba(255,255,255,0.15)" strokeWidth="2" fill="none" strokeDasharray="8,8" className="animate-[dash_20s_linear_infinite]" />
                  <style>{`@keyframes dash { to { stroke-dashoffset: -1000; } }`}</style>
                </svg>
 
                {/* Source Node */}
-               <div className="absolute left-[20%] sm:left-[25%] top-1/2 -translate-y-1/2 -translate-x-1/2 w-40 sm:w-56 bg-[#0a0a0a] border-2 border-red-900/60 rounded-2xl p-5 shadow-[0_0_30px_rgba(220,38,38,0.1)] z-10 hover:border-red-500 transition-colors cursor-pointer group">
+               <div className="absolute left-[20%] sm:left-[25%] top-1/2 -translate-y-1/2 -translate-x-1/2 w-40 sm:w-56 bg-[#0a0a0a] border border-white/10 rounded-2xl p-5 shadow-2xl z-10 hover:border-white/20 transition-colors cursor-pointer group">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-red-950/50 rounded-lg text-red-500 group-hover:bg-red-900 transition-colors">
-                       <Database size={18} />
+                    <div className="p-2 bg-white/5 rounded-lg text-zinc-300 group-hover:bg-white/10 transition-colors">
+                       <Database size={16} />
                     </div>
-                    <span className="text-sm font-black text-zinc-200 tracking-wider">KNOWLEDGE</span>
+                    <span className="text-[11px] font-bold text-zinc-100 tracking-widest">KNOWLEDGE</span>
                   </div>
-                  <div className="h-2 w-full bg-red-950 rounded-full mb-3" />
-                  <div className="h-2 w-2/3 bg-red-950 rounded-full" />
+                  <div className="h-1.5 w-full bg-white/5 rounded-full mb-3" />
+                  <div className="h-1.5 w-2/3 bg-white/5 rounded-full" />
                   {/* Right Handle */}
-                  <div className="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-4 bg-black border-2 border-red-500 rounded-full shadow-[0_0_10px_rgba(220,38,38,0.5)]" />
+                  <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-black border-2 border-zinc-500 rounded-full" />
                </div>
 
                {/* Target Node */}
-               <div className="absolute left-[80%] sm:left-[75%] top-1/2 -translate-y-1/2 -translate-x-1/2 w-40 sm:w-56 bg-[#0a0a0a] border-2 border-red-900/60 rounded-2xl p-5 shadow-[0_0_30px_rgba(220,38,38,0.1)] z-10 hover:border-red-500 transition-colors cursor-pointer group">
+               <div className="absolute left-[80%] sm:left-[75%] top-1/2 -translate-y-1/2 -translate-x-1/2 w-40 sm:w-56 bg-[#0a0a0a] border border-white/10 rounded-2xl p-5 shadow-2xl z-10 hover:border-white/20 transition-colors cursor-pointer group">
                   {/* Left Handle */}
-                  <div className="absolute top-1/2 -left-2 -translate-y-1/2 w-4 h-4 bg-black border-2 border-red-500 rounded-full shadow-[0_0_10px_rgba(220,38,38,0.5)]" />
+                  <div className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-3 h-3 bg-black border-2 border-zinc-500 rounded-full" />
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-red-950/50 rounded-lg text-red-500 group-hover:bg-red-900 transition-colors">
-                       <BrainCircuit size={18} />
+                    <div className="p-2 bg-white/5 rounded-lg text-zinc-300 group-hover:bg-white/10 transition-colors">
+                       <BrainCircuit size={16} />
                     </div>
-                    <span className="text-sm font-black text-zinc-200 tracking-wider">INFERENCE</span>
+                    <span className="text-[11px] font-bold text-zinc-100 tracking-widest">INFERENCE</span>
                   </div>
-                  <div className="h-2 w-full bg-red-950 rounded-full mb-3" />
-                  <div className="h-2 w-3/4 bg-red-950 rounded-full" />
+                  <div className="h-1.5 w-full bg-white/5 rounded-full mb-3" />
+                  <div className="h-1.5 w-3/4 bg-white/5 rounded-full" />
                </div>
             </div>
           </motion.div>
@@ -375,7 +375,7 @@ export default function Landing() {
         </section>
 
         {/* Advanced Capabilities List */}
-        <section className="py-24 px-6 border-t border-zinc-800/50 bg-zinc-950/30">
+        <section className="py-24 px-6 border-t border-white/[0.02] bg-[#000000]">
           <div className="max-w-7xl mx-auto">
             <div className="mb-16">
               <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-zinc-100 mb-4">Enterprise-Grade Architecture</h2>
@@ -384,7 +384,7 @@ export default function Landing() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative">
               {/* Background Node Connection Lines */}
-              <div className="hidden lg:block absolute top-1/2 left-0 w-full h-[2px] bg-red-900/20 -z-10 -translate-y-1/2" />
+              <div className="hidden lg:block absolute top-1/2 left-0 w-full h-[1px] bg-white/[0.04] -z-10 -translate-y-1/2" />
               
               {[
                 { title: 'Multimodal Vision', desc: 'Upload images instantly. Our powerful browser-side compression engine perfectly analyzes visual data with zero API token bloat.' },
@@ -396,14 +396,14 @@ export default function Landing() {
                 { title: 'Global Edge Caching', desc: 'Powered by Upstash Redis, your sessions and frequent queries are cached globally for sub-millisecond retrieval.' },
                 { title: 'Format Agnostic', desc: 'Upload PDFs, Word documents, Markdown, or raw text files. Our pipeline processes them flawlessly.' }
               ].map((feat, i) => (
-                <div key={i} className="relative flex flex-col bg-[#0a0a0a] border-2 border-red-900/30 rounded-xl p-6 hover:border-red-500 transition-all duration-300 group shadow-lg">
+                <div key={i} className="relative flex flex-col bg-[#050505] border border-white/[0.04] rounded-xl p-6 hover:border-white/20 transition-all duration-300 group shadow-sm">
                   {/* Top Handle */}
-                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black border-2 border-red-800 rounded-full group-hover:border-red-400 transition-colors" />
+                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black border-2 border-zinc-700 rounded-full group-hover:bg-white group-hover:border-white transition-colors" />
                   {/* Bottom Handle */}
-                  <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black border-2 border-red-800 rounded-full group-hover:border-red-400 transition-colors" />
+                  <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black border-2 border-zinc-700 rounded-full group-hover:bg-white group-hover:border-white transition-colors" />
                   
-                  <h4 className="text-lg font-black text-zinc-100 mb-3">{feat.title}</h4>
-                  <p className="text-sm text-zinc-400 leading-relaxed font-medium">{feat.desc}</p>
+                  <h4 className="text-lg font-bold text-zinc-100 mb-3 tracking-wide">{feat.title}</h4>
+                  <p className="text-[13px] text-zinc-400 leading-relaxed font-medium tracking-wide">{feat.desc}</p>
                 </div>
               ))}
             </div>
@@ -411,12 +411,12 @@ export default function Landing() {
         </section>
 
         {/* About Section */}
-        <section id="about" className="py-32 px-6 bg-black border-t border-red-900/30 relative">
+        <section id="about" className="py-32 px-6 bg-[#000000] border-t border-white/[0.02] relative">
           <div className="max-w-6xl mx-auto relative z-10">
             {/* The Mission Statement */}
             <div className="text-center mb-24 max-w-4xl mx-auto">
-              <h2 className="text-sm font-black text-red-500 tracking-widest uppercase mb-6">The Mission</h2>
-              <p className="text-3xl sm:text-5xl font-black tracking-tight text-zinc-100 leading-[1.2]">
+              <h2 className="text-xs font-bold text-zinc-500 tracking-[0.3em] uppercase mb-6">The Mission</h2>
+              <p className="text-3xl sm:text-5xl font-bold tracking-tighter text-zinc-100 leading-[1.15]">
                 We are engineering the cognitive architecture of tomorrow. SmartLearn AI is built for pioneers who demand uncompromising speed and intelligence.
               </p>
             </div>
@@ -424,22 +424,22 @@ export default function Landing() {
             {/* Leadership Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {/* Sanan Malik */}
-              <div className="bg-[#0a0a0a] border-2 border-red-900/30 rounded-3xl p-8 sm:p-10 flex flex-col justify-between group hover:border-red-500 transition-colors relative overflow-hidden">
+              <div className="bg-[#050505] border border-white/[0.04] rounded-3xl p-8 sm:p-10 flex flex-col justify-between group hover:border-white/20 transition-colors relative overflow-hidden">
                 <div className="relative z-10">
-                  <h3 className="text-2xl font-black text-zinc-100 mb-1">Sanan Malik</h3>
-                  <p className="text-red-500 font-bold mb-6 text-sm tracking-wide">CEO & VISIONARY</p>
-                  <p className="text-zinc-400 text-base leading-relaxed font-medium">
+                  <h3 className="text-2xl font-bold tracking-tight text-zinc-100 mb-2">Sanan Malik</h3>
+                  <p className="text-zinc-500 font-semibold mb-6 text-xs tracking-[0.2em]">CEO & VISIONARY</p>
+                  <p className="text-zinc-400 text-sm leading-relaxed font-medium">
                     Driving the strategic vision to make SmartLearn AI the absolute pinnacle of educational and research technology globally.
                   </p>
                 </div>
               </div>
 
               {/* Naveed Ahmed */}
-              <div className="bg-[#0a0a0a] border-2 border-red-900/30 rounded-3xl p-8 sm:p-10 flex flex-col justify-between group hover:border-red-500 transition-colors relative overflow-hidden">
+              <div className="bg-[#050505] border border-white/[0.04] rounded-3xl p-8 sm:p-10 flex flex-col justify-between group hover:border-white/20 transition-colors relative overflow-hidden">
                 <div className="relative z-10">
-                  <h3 className="text-2xl font-black text-zinc-100 mb-1">Naveed Ahmed</h3>
-                  <p className="text-red-500 font-bold mb-6 text-sm tracking-wide">LEAD ARCHITECT & DEVELOPER</p>
-                  <p className="text-zinc-400 text-base leading-relaxed font-medium">
+                  <h3 className="text-2xl font-bold tracking-tight text-zinc-100 mb-2">Naveed Ahmed</h3>
+                  <p className="text-zinc-500 font-semibold mb-6 text-xs tracking-[0.2em]">LEAD ARCHITECT & DEVELOPER</p>
+                  <p className="text-zinc-400 text-sm leading-relaxed font-medium">
                     Engineering the core infrastructure, RAG pipelines, and hyper-optimized UI/UX to deliver a 60fps, zero-latency experience.
                   </p>
                 </div>
@@ -449,77 +449,77 @@ export default function Landing() {
         </section>
 
         {/* Pricing Section */}
-        <section id="pricing" className="py-24 px-6 max-w-7xl mx-auto">
-          <div className="text-center mb-20 relative">
-             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-sm text-red-500 mb-6 font-bold">
-                <Sparkles size={14} />
+        <section id="pricing" className="py-32 px-6 max-w-7xl mx-auto">
+          <div className="text-center mb-24 relative">
+             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08] text-xs text-zinc-300 mb-8 font-semibold">
+                <Sparkles size={13} />
                 <span className="tracking-wide">Early Access Phase</span>
              </div>
-             <h2 className="text-4xl sm:text-6xl font-black tracking-tight text-zinc-100 mb-6">Built for the future. <br className="hidden sm:block" /> Free for the pioneers.</h2>
-             <p className="text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-medium">
+             <h2 className="text-5xl sm:text-[72px] font-bold tracking-tighter text-zinc-100 mb-8 leading-[1.05]">Built for the future. <br className="hidden sm:block" /> Free for the pioneers.</h2>
+             <p className="text-zinc-400 text-lg md:text-[21px] max-w-2xl mx-auto leading-relaxed tracking-tight">
                During our exclusive Public Beta, all users get unprecedented access to SmartLearn's core engine for free. Our ultimate research tier is currently being forged.
              </p>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
             {/* Public Beta Plan */}
-            <div className="bg-[#0a0a0a] border-2 border-red-900/50 rounded-3xl p-8 sm:p-10 flex flex-col hover:border-red-500 transition-colors shadow-[0_0_30px_rgba(220,38,38,0.05)]">
-              <h3 className="text-xl font-bold text-zinc-300 mb-2">Public Beta</h3>
+            <div className="bg-[#050505] border border-white/10 rounded-3xl p-8 sm:p-10 flex flex-col hover:border-white/30 transition-all duration-300 shadow-2xl relative group">
+              <h3 className="text-2xl font-bold text-zinc-100 mb-2">Public Beta</h3>
               <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-4xl font-black text-white">$0</span>
-                <span className="text-zinc-500 text-sm font-bold">/ forever</span>
+                <span className="text-5xl font-bold tracking-tighter text-white">$0</span>
+                <span className="text-zinc-500 text-[15px] font-medium ml-2">/ forever</span>
               </div>
-              <p className="text-zinc-400 text-sm mb-8 leading-relaxed font-medium">
+              <p className="text-zinc-400 text-[15px] mb-10 leading-relaxed tracking-tight">
                 Our way of saying thank you. Secure your pioneer account now and get foundational access forever.
               </p>
               
-              <ul className="space-y-4 mb-8 flex-1">
+              <ul className="space-y-4 mb-10 flex-1">
                 {[
                   'Unlimited Documents',
                   'Advanced Node Graph',
                   'Gemini 2.5 Access',
                   'Basic Speech-to-Text'
                 ].map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-zinc-300 font-medium">
-                    <CheckCircle2 size={16} className="text-red-500" />
+                  <li key={i} className="flex items-center gap-3 text-[15px] text-zinc-300 font-medium tracking-wide">
+                    <CheckCircle2 size={18} className="text-white" />
                     {feature}
                   </li>
                 ))}
               </ul>
               
-              <Link to="/signup" className="w-full py-3.5 px-4 rounded-xl font-bold text-center border-2 border-red-900/50 text-red-100 hover:bg-red-600 hover:border-red-600 hover:text-white transition-all">
+              <Link to="/signup" className="w-full py-4 px-4 rounded-xl font-semibold text-center bg-white text-black hover:scale-[1.02] transition-transform shadow-[0_0_30px_rgba(255,255,255,0.15)]">
                 Create Free Account
               </Link>
             </div>
 
             {/* Research Tier */}
-            <div className="bg-red-600 rounded-3xl p-8 sm:p-10 flex flex-col relative overflow-hidden shadow-[0_0_50px_rgba(220,38,38,0.2)]">
-              <div className="absolute top-0 right-0 p-8 opacity-20 pointer-events-none mix-blend-overlay">
+            <div className="bg-gradient-to-br from-[#111111] to-[#000000] border border-white/[0.04] rounded-3xl p-8 sm:p-10 flex flex-col relative overflow-hidden shadow-2xl">
+              <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none mix-blend-overlay">
                 <Lock size={120} />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2 relative z-10">Research Tier</h3>
+              <h3 className="text-2xl font-bold text-white mb-2 relative z-10">Research Tier</h3>
               <div className="flex items-baseline gap-1 mb-6 relative z-10">
-                <span className="text-4xl font-black text-white">TBA</span>
+                <span className="text-5xl font-bold tracking-tighter text-white">TBA</span>
               </div>
-              <p className="text-red-200 text-sm mb-8 leading-relaxed font-medium relative z-10">
+              <p className="text-zinc-400 text-[15px] mb-10 leading-relaxed tracking-tight relative z-10">
                 The ultimate engine for academics and power users. Join the waitlist.
               </p>
               
-              <ul className="space-y-4 mb-8 flex-1 relative z-10">
+              <ul className="space-y-4 mb-10 flex-1 relative z-10">
                 {[
                   'Intelligent 4-Engine Fallback',
                   'Priority Global Edge Caching',
                   'Unlimited Multi-Modal Audio',
                   'Export to PDF & Markdown'
                 ].map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-red-50 font-medium">
-                    <CheckCircle2 size={16} className="text-red-300" />
+                  <li key={i} className="flex items-center gap-3 text-[15px] text-zinc-500 font-medium tracking-wide">
+                    <CheckCircle2 size={18} className="text-zinc-600" />
                     {feature}
                   </li>
                 ))}
               </ul>
               
-              <button className="w-full py-3.5 px-4 rounded-xl font-bold text-center bg-white text-red-600 hover:bg-red-50 transition-colors relative z-10">
+              <button className="w-full py-4 px-4 rounded-xl font-semibold text-center border border-white/10 text-zinc-300 hover:bg-white/5 transition-colors relative z-10">
                 Join the Waitlist
               </button>
             </div>
@@ -584,12 +584,12 @@ export default function Landing() {
 
         {/* CTA Section */}
         <section className="py-32 px-6">
-          <div className="max-w-4xl mx-auto text-center bg-zinc-900/30 border border-zinc-800/50 rounded-[3rem] p-12 sm:p-20 relative overflow-hidden backdrop-blur-md">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent pointer-events-none" />
-            <h2 className="text-4xl sm:text-5xl font-bold text-zinc-100 mb-6 relative z-10">Ready to unlock your data?</h2>
-            <p className="text-xl text-zinc-400 mb-10 relative z-10 max-w-2xl mx-auto">Join developers and researchers using SmartLearn AI to extract maximum value from their documents.</p>
+          <div className="max-w-4xl mx-auto text-center bg-[#050505] border border-white/[0.04] rounded-[3rem] p-12 sm:p-20 relative overflow-hidden shadow-2xl">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/[0.03] via-transparent to-transparent pointer-events-none" />
+            <h2 className="text-4xl sm:text-6xl font-bold tracking-tighter text-zinc-100 mb-6 relative z-10 leading-[1.1]">Ready to unlock your data?</h2>
+            <p className="text-[19px] tracking-tight text-zinc-400 mb-10 relative z-10 max-w-2xl mx-auto leading-relaxed">Join developers and researchers using SmartLearn AI to extract maximum value from their documents.</p>
             <div className="relative z-10">
-               <Link to="/signup" className="inline-flex items-center justify-center gap-2 bg-zinc-100 text-zinc-900 px-8 py-4 rounded-full text-lg font-medium hover:bg-white transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-[1.02]">
+               <Link to="/signup" className="inline-flex items-center justify-center gap-2 bg-white text-black px-8 py-4 rounded-full text-lg font-semibold hover:scale-105 transition-all shadow-[0_0_30px_-10px_rgba(255,255,255,0.4)]">
                 Create Free Account
               </Link>
             </div>
