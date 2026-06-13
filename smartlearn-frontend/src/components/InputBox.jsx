@@ -441,11 +441,12 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
 
                   <button
                     type="button"
-                    className="h-8 w-8 rounded-full text-zinc-400 dark:text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center justify-center shrink-0"
+                    className="h-8 w-8 rounded-full bg-gradient-to-b from-zinc-800 to-zinc-950 dark:from-zinc-100 dark:to-zinc-300 text-white dark:text-black hover:scale-105 shadow-sm hover:shadow-[0_4px_15px_-3px_rgba(0,0,0,0.2)] dark:hover:shadow-[0_4px_15px_-3px_rgba(255,255,255,0.3)] transition-all flex items-center justify-center shrink-0 group relative"
                     onClick={() => setIsVoiceModeActive && setIsVoiceModeActive(true)}
                     title="Advanced Voice Mode"
                   >
-                    <BrainCircuit size={17} strokeWidth={2} />
+                    <Headphones size={15} strokeWidth={2.5} />
+                    <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.2)_0%,transparent_100%)] dark:bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.1)_0%,transparent_100%)]" />
                   </button>
                 </>
               )}
