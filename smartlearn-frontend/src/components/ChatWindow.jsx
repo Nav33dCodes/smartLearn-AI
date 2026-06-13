@@ -241,7 +241,7 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
                       </>
                     );
                   })()}
-                      <div className="flex items-center mt-3 opacity-0 group-hover:opacity-100 transition-opacity gap-1 pl-1">
+                      <div className="flex items-center mt-2 opacity-0 group-hover:opacity-100 transition-opacity gap-1 pl-1">
                         <button
                           onClick={() => {
                             const textToCopy = (msg.content || "").includes("<!-- SOURCES_JSON: ") 
@@ -250,44 +250,43 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
                             navigator.clipboard.writeText(textToCopy);
                             import("sonner").then(m => m.toast.success("Copied to clipboard"));
                           }}
-                      className="p-1.5 text-muted-foreground hover:text-primary border border-transparent hover:border-primary rounded-md transition-all duration-300"
-                      title="Copy"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                    </button>
-                      
-                    <button
-                      onClick={() => {
-                        setActiveSourceIndex(prev => prev === index ? null : index);
-                      }}
-                      className={`p-1.5 rounded-md transition-all duration-300 flex items-center gap-1.5 border ${activeSourceIndex === index ? 'bg-primary/10 text-primary border-primary/20' : 'text-muted-foreground hover:text-primary border-transparent hover:border-primary'}`}
-                      title="Toggle Context & Sources"
-                    >
-                      <BookOpen size={14} />
-                      <span className="text-xs font-medium">Context</span>
-                    </button>
+                          className="p-1.5 text-zinc-500 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-all duration-200"
+                          title="Copy"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                        </button>
+                        
+                        <button
+                          onClick={() => {
+                            setActiveSourceIndex(prev => prev === index ? null : index);
+                          }}
+                          className={`px-2 py-1.5 rounded-md transition-all duration-200 flex items-center gap-1.5 ${activeSourceIndex === index ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200' : 'text-zinc-500 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                          title="Toggle Context & Sources"
+                        >
+                          <BookOpen size={14} />
+                          <span className="text-[11px] font-medium tracking-wide">Context</span>
+                        </button>
 
-                    {isLast && !loading && (
-                      <button
-                        onClick={regenerateMessage}
-                        className="p-1.5 text-muted-foreground hover:text-primary border border-transparent hover:border-primary rounded-md transition-all duration-300"
-                        title="Regenerate"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                      </button>
-                    )}
-                  </div>
-                  
-                  {msg.timestamp && (
-                    <div className="text-[11px] text-muted-foreground/50 mt-1 pl-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      {formatRelativeTime(msg.timestamp)}
+                        {isLast && !loading && (
+                          <button
+                            onClick={regenerateMessage}
+                            className="p-1.5 text-zinc-500 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-all duration-200"
+                            title="Regenerate"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                          </button>
+                        )}
+                        
+                        {msg.timestamp && (
+                          <div className="text-[10px] text-zinc-400 dark:text-zinc-600 font-medium ml-2 tracking-wide">
+                            {formatRelativeTime(msg.timestamp)}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
-                  
+                  </div>
                 </div>
-              </div>
-            </div>
-          )}
+              )}
         </motion.div>
           );
         })}

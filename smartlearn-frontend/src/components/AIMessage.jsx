@@ -363,14 +363,16 @@ function AIMessage({ content, isGenerating }) {
         </ReactMarkdown>
       </div>
       
-      <div className="mt-3 flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="mt-2 flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
         <button 
           onClick={toggleSpeech}
           disabled={isFetchingTTS}
-          className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 text-xs font-medium transition-colors p-1 -ml-1 rounded hover:bg-muted disabled:opacity-50"
+          className="px-2 py-1.5 text-zinc-500 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-all duration-200 flex items-center gap-1.5 disabled:opacity-50"
         >
-          {isFetchingTTS ? <Loader2 size={14} className="animate-spin text-primary" /> : isPlaying ? <Square size={14} className="fill-current text-primary" /> : <Volume2 size={14} />}
-          {isFetchingTTS ? "Loading voice..." : isPlaying ? "Stop playing" : "Read aloud"}
+          {isFetchingTTS ? <Loader2 size={14} className="animate-spin text-zinc-400" /> : isPlaying ? <Square size={14} className="fill-current text-zinc-400" /> : <Volume2 size={14} />}
+          <span className="text-[11px] font-medium tracking-wide">
+            {isFetchingTTS ? "Loading voice..." : isPlaying ? "Stop playing" : "Read aloud"}
+          </span>
         </button>
       </div>
     </div>
