@@ -28,13 +28,13 @@ export default function YouTubeRecommendations({ userQuery, shouldFetch }) {
       );
     }
     return (
-      <div className="mt-8 flex flex-col items-center justify-center text-center px-4">
-        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
-          <MonitorPlay className="text-muted-foreground opacity-50" size={24} />
+      <div className="mt-2 flex flex-col items-center justify-center text-center px-4 py-8 bg-[#111111]/50 border border-white/5 border-dashed rounded-2xl shadow-inner group transition-colors hover:bg-[#111111]/80">
+        <div className="w-12 h-12 bg-gradient-to-br from-zinc-800 to-zinc-900 border border-[#222] shadow-[0_2px_10px_rgba(0,0,0,0.5)] rounded-full flex items-center justify-center mb-4 transition-transform group-hover:scale-105 duration-300">
+          <MonitorPlay className="text-zinc-500" size={18} strokeWidth={1.5} />
         </div>
-        <h4 className="text-sm font-semibold text-foreground mb-1">No video sources needed</h4>
-        <p className="text-xs text-muted-foreground leading-relaxed">
-          The AI determined that this specific response is straightforward and does not require supplementary video tutorials.
+        <h4 className="text-[13px] font-medium text-zinc-300 mb-1.5 tracking-tight">No videos required</h4>
+        <p className="text-[11px] text-zinc-500/80 leading-relaxed max-w-[200px]">
+          This response is straightforward and doesn't require supplemental tutorials.
         </p>
       </div>
     );

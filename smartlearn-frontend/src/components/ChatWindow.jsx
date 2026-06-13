@@ -353,13 +353,13 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
                       try {
                         const domain = new URL(url).hostname.replace('www.', '');
                         return (
-                          <a key={i} href={url} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 rounded-xl transition-all group">
-                            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-                              <img src={`https://www.google.com/s2/favicons?domain=${domain}&sz=32`} className="w-4 h-4" alt={domain} />
+                          <a key={i} href={url} target="_blank" rel="noreferrer" className="flex items-center gap-3.5 p-3.5 bg-[#111111]/30 hover:bg-[#111111]/80 border border-white/5 hover:border-[#222] rounded-2xl transition-all duration-300 group shadow-sm hover:shadow-md">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900 border border-[#222] shadow-[0_2px_10px_rgba(0,0,0,0.5)] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-300">
+                              <img src={`https://www.google.com/s2/favicons?domain=${domain}&sz=32`} className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100 transition-opacity duration-300" alt={domain} />
                             </div>
-                            <div className="flex flex-col min-w-0 flex-1">
-                              <span className="text-[13px] font-semibold text-zinc-200 truncate group-hover:text-primary transition-colors">{domain}</span>
-                              <span className="text-[11px] text-zinc-500 truncate">{url}</span>
+                            <div className="flex flex-col min-w-0 flex-1 gap-0.5">
+                              <span className="text-[13px] font-medium text-zinc-300 truncate group-hover:text-zinc-100 transition-colors tracking-tight">{domain}</span>
+                              <span className="text-[11px] text-zinc-600 truncate group-hover:text-zinc-400 transition-colors">{url}</span>
                             </div>
                           </a>
                         );
