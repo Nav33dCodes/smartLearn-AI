@@ -68,7 +68,7 @@ def get_premium_template(title: str, content_html: str, show_warning: bool = Fal
                 letter-spacing: -0.5px;
             }}
             .logo span {{
-                color: #4f46e5;
+                color: #ff3131;
                 margin-left: 4px;
             }}
             .title {{
@@ -96,7 +96,10 @@ def get_premium_template(title: str, content_html: str, show_warning: bool = Fal
     </head>
     <body>
         <div class="container">
-            <div class="logo">SmartLearn<span>AI</span></div>
+            <div class="logo">
+                <img src="https://smartlearn-ai-production.up.railway.app/images/logo.svg" alt="Logo" width="28" height="28" style="margin-right: 10px;">
+                SmartLearn<span>AI</span>
+            </div>
             <h1 class="title">{title}</h1>
             {content_html}
             {warning_block}
@@ -115,8 +118,8 @@ def send_welcome_email(to_email: str, name: str):
     <p class="text">Hi {name},</p>
     <p class="text">Welcome to the future of learning. We're thrilled to have you onboard.</p>
     <p class="text">SmartLearn AI is designed to help you digest information faster, understand complex topics effortlessly, and unlock your true learning potential using advanced retrieval-augmented generation.</p>
-    <div style="margin: 32px 0;">
-        <a href="https://smartlearn-ai-production.up.railway.app" style="background-color: #111111; color: #ffffff; font-weight: 600; font-size: 14px; text-decoration: none; padding: 12px 24px; border-radius: 6px; display: inline-block;">Get Started Now</a>
+    <div style="margin: 36px 0;">
+        <a href="https://smartlearn-ai-production.up.railway.app" style="background-color: #ff3131; color: #ffffff; font-weight: 600; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 8px; display: inline-block; box-shadow: 0 4px 12px rgba(255, 49, 49, 0.25);">Get Started Now</a>
     </div>
     <p class="text" style="color: #666666; font-size: 14px;">If you have any questions or need assistance, simply reply to this email. We're here to help.</p>
     """
@@ -128,8 +131,8 @@ def send_otp_email(to_email: str, otp: str):
     content = f"""
     <p class="text">We received a request to reset the password associated with your account.</p>
     <p class="text">Please use the verification code below to securely reset your password:</p>
-    <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 24px; text-align: center; margin: 32px 0;">
-        <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #111111;">{otp}</div>
+    <div style="background-color: #fff5f5; border: 1px solid #fee2e2; border-radius: 8px; padding: 28px; text-align: center; margin: 36px 0;">
+        <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 34px; font-weight: 700; letter-spacing: 12px; color: #ff3131;">{otp}</div>
     </div>
     <p class="text" style="font-size: 14px; color: #666666;">This code is valid for 15 minutes.</p>
     """
@@ -142,8 +145,8 @@ def send_password_reset_success_email(to_email: str):
     content = """
     <p class="text">This email confirms that the password for your SmartLearn AI account has been successfully changed.</p>
     <p class="text">You can now log in to your account using your new password.</p>
-    <div style="margin: 32px 0;">
-        <a href="https://smartlearn-ai-production.up.railway.app/login" style="background-color: #111111; color: #ffffff; font-weight: 600; font-size: 14px; text-decoration: none; padding: 12px 24px; border-radius: 6px; display: inline-block;">Log In to Account</a>
+    <div style="margin: 36px 0;">
+        <a href="https://smartlearn-ai-production.up.railway.app/login" style="background-color: #ff3131; color: #ffffff; font-weight: 600; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 8px; display: inline-block; box-shadow: 0 4px 12px rgba(255, 49, 49, 0.25);">Log In to Account</a>
     </div>
     """
     warning = "Security Notice: If you did not authorize this change, please contact our support team immediately."
@@ -155,8 +158,8 @@ def send_verification_email(to_email: str, name: str, otp: str):
     content = f"""
     <p class="text">Hi {name},</p>
     <p class="text">Thank you for signing up. To complete your registration and activate your account, please use the verification code below:</p>
-    <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 24px; text-align: center; margin: 32px 0;">
-        <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #4f46e5;">{otp}</div>
+    <div style="background-color: #fff5f5; border: 1px solid #fee2e2; border-radius: 8px; padding: 28px; text-align: center; margin: 36px 0;">
+        <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 34px; font-weight: 700; letter-spacing: 12px; color: #ff3131;">{otp}</div>
     </div>
     <p class="text" style="font-size: 14px; color: #666666;">This code is valid for 15 minutes.</p>
     """
@@ -169,8 +172,8 @@ def send_delete_account_otp_email(to_email: str, otp: str):
     content = f"""
     <p class="text">We received a request to permanently delete your account and all associated data. <strong>This action is irreversible.</strong></p>
     <p class="text">If you wish to proceed, please use the verification code below:</p>
-    <div style="background-color: #fef2f2; border: 1px solid #fee2e2; border-radius: 6px; padding: 24px; text-align: center; margin: 32px 0;">
-        <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #dc2626;">{otp}</div>
+    <div style="background-color: #fff5f5; border: 1px solid #fee2e2; border-radius: 8px; padding: 28px; text-align: center; margin: 36px 0;">
+        <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 34px; font-weight: 700; letter-spacing: 12px; color: #dc2626;">{otp}</div>
     </div>
     <p class="text" style="font-size: 14px; color: #666666;">This code is valid for 15 minutes.</p>
     """
