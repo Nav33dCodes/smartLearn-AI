@@ -40,12 +40,11 @@ export default function ModelSelector({ selectedModelId, onModelSelect }) {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex items-center gap-2 text-[12px] font-bold text-zinc-300 hover:text-white bg-[#0a0a0a] border border-white/10 rounded-full px-3 py-1.5 transition-all hover:bg-white/5 cursor-pointer shadow-sm"
+        className="flex items-center gap-1.5 text-[12px] font-medium text-zinc-400 hover:text-zinc-100 transition-colors cursor-pointer"
         title="Select AI Engine"
       >
-        <SelectedIcon size={14} className="text-red-500" />
         <span className="tracking-wide">{selectedModel.name}</span>
-        <ChevronDown size={14} className="opacity-50 ml-1" />
+        <ChevronDown size={12} className="opacity-50" />
       </button>
 
       <AnimatePresence>
@@ -63,7 +62,6 @@ export default function ModelSelector({ selectedModelId, onModelSelect }) {
               className="absolute bottom-full right-0 mb-2 w-[220px] bg-[#0a0a0a] border border-white/10 shadow-2xl rounded-2xl overflow-hidden p-1.5 z-50 origin-bottom-right"
             >
             {MODELS.map((model) => {
-              const Icon = model.icon;
               const isSelected = model.id === selectedModel.id;
               
               return (
@@ -73,17 +71,12 @@ export default function ModelSelector({ selectedModelId, onModelSelect }) {
                     onModelSelect(model.id);
                     setIsOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-colors duration-200 group ${
-                    isSelected ? 'bg-red-500/10' : 'hover:bg-zinc-900'
-                  }`}
+                  className="w-full flex items-center justify-between px-3 py-2 text-left transition-colors duration-200 group hover:bg-white/5 rounded-lg"
                 >
-                  <div className="flex items-center gap-2.5">
-                    <Icon size={16} className={isSelected ? 'text-red-500' : 'text-zinc-500 group-hover:text-zinc-300'} />
-                    <span className={`font-bold text-[13px] tracking-wide ${isSelected ? 'text-zinc-100' : 'text-zinc-400 group-hover:text-zinc-300'}`}>
-                      {model.name}
-                    </span>
-                  </div>
-                  {isSelected && <Check size={14} className="text-red-500 shrink-0" />}
+                  <span className={`text-[13px] tracking-wide ${isSelected ? 'font-medium text-zinc-100' : 'text-zinc-500 group-hover:text-zinc-300'}`}>
+                    {model.name}
+                  </span>
+                  {isSelected && <Check size={14} className="text-zinc-300 shrink-0" />}
                 </button>
               );
             })}
