@@ -28,6 +28,16 @@ const releases = [
           "Sleek Action Row: AI message action buttons (Copy, Context, Read Aloud, Regenerate) are now ultra-minimalist 'ghost' buttons that fade in smoothly.",
           "Floating Glass Menu: Redesigned the User Settings popup with a stunning backdrop-blur floating canvas, soft drop shadows, and a sleek Rocket icon."
         ]
+      },
+      {
+        title: "Micro-Interactions & Global Aesthetics",
+        description: "Eradicated all basic components and replaced them with industry-leading, hyper-premium designs.",
+        bullets: [
+          "Vercel-Style Feature Cards: Upgraded the 'New Chat' prompt suggestions from basic pills to glowing, grid-aligned feature cards with descriptive text and scale-on-hover physics.",
+          "Inverted OLED Toasts: Completely replaced default notifications with ultra-sleek, perfectly rounded borderless pills that float down from the top-center and invert colors against your theme.",
+          "Monochromatic AI Avatars: Transformed the AI chat logo into a stark, ultra-minimalist `rounded-[10px]` square, matching the aesthetics of tools like Cursor and Linear.",
+          "Global Vanishing Scrollbars: Engineered a customized, ultra-thin webkit scrollbar system that blends flawlessly into both light and dark modes."
+        ]
       }
     ]
   },
