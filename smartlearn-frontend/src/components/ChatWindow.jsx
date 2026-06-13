@@ -182,8 +182,8 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
               })() : (
                 <div className="flex w-full group">
                   <div className="flex w-full justify-start gap-4">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0 border border-primary/20 mt-1 shadow-[0_0_12px_-3px_var(--color-primary)] relative group-hover:shadow-[0_0_16px_-3px_var(--color-primary)] transition-shadow duration-500">
-                      <Logo size={16} className="text-primary" />
+                    <div className="w-8 h-8 rounded-[10px] bg-zinc-100 dark:bg-[#111111] flex items-center justify-center shrink-0 border border-black/5 dark:border-white/10 mt-1 shadow-sm relative group-hover:border-black/10 dark:group-hover:border-white/20 transition-colors duration-300">
+                      <Logo size={16} className="text-zinc-800 dark:text-zinc-200" />
                     </div>
                     <div className="flex flex-col gap-1 flex-1 min-w-0">
                       
@@ -293,8 +293,8 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
 
         {loading && messages[messages.length - 1]?.role === "user" && (
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="flex w-full justify-start gap-4">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0 border border-primary/20 mb-3 mt-1 shadow-[0_0_12px_-3px_var(--color-primary)] animate-pulse">
-              <Logo size={16} className="text-primary" />
+            <div className="w-8 h-8 rounded-[10px] bg-zinc-100 dark:bg-[#111111] flex items-center justify-center shrink-0 border border-black/5 dark:border-white/10 mb-3 mt-1 shadow-sm relative">
+              <Logo size={16} className="text-zinc-800 dark:text-zinc-200 animate-pulse" />
             </div>
             
             {streamStatus ? (
