@@ -99,12 +99,16 @@ export default function VoiceMode({
           
           const res = await api.post('/api/voice', formData);
           
-          if (res.data?.text && res.data.text.trim()) {
-            setTranscribedText(res.data.text);
+          let text = res.data?.text?.trim() || "";
+          const lowerText = text.toLowerCase().replace(/[^a-z]/g, '');
+          const hallucinations = ["thankyou", "thankyouforwatching", "you", "ami", "m", "a", ""];
+          
+          if (text && !hallucinations.includes(lowerText)) {
+            setTranscribedText(text);
             setPhase("generating");
-            sendMessage(res.data.text);
+            sendMessage(text);
           } else {
-            // Nothing heard, start again
+            // Nothing heard or hallucination detected, start again
             setPhase("idle");
             setTimeout(() => startListening(), 500);
           }

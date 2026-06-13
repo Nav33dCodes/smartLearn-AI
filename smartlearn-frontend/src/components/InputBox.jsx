@@ -453,7 +453,7 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
                     onClick={() => setIsVoiceModeActive && setIsVoiceModeActive(true)}
                     title="Advanced Voice Mode"
                   >
-                    <Headphones size={18} />
+                    <BrainCircuit size={18} />
                   </Button>
                 </>
               )}
