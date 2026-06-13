@@ -530,13 +530,13 @@ function ChatDashboard() {
         {/* The Right-Hand Artifact Canvas Panel (Smooth Transition Wrapper) */}
         {!isMobile && (
           <div className={`shrink-0 h-full transition-all duration-300 ease-in-out bg-[#0d0d0d] ${activeArtifact ? 'w-1/2 border-l border-white/5' : 'w-0 border-transparent overflow-hidden'}`}>
-            {activeArtifact && <ArtifactCanvas />}
+            {activeArtifact && <ArtifactCanvas activeChatId={activeChatId} />}
           </div>
         )}
         {/* Mobile Artifact Overlay (Full screen) */}
         {activeArtifact && isMobile && (
           <div className="absolute inset-0 z-50">
-            <ArtifactCanvas />
+            <ArtifactCanvas activeChatId={activeChatId} />
           </div>
         )}
 

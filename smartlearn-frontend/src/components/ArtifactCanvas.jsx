@@ -8,7 +8,7 @@ import QuizBlock from "./QuizBlock";
 import FlashcardBlock from "./FlashcardBlock";
 import MindMapBlock from "./MindMapBlock";
 
-export default function ArtifactCanvas() {
+export default function ArtifactCanvas({ activeChatId }) {
   const { activeArtifact, setActiveArtifact } = useArtifacts();
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [viewMode, setViewMode] = useState("preview"); // "code" | "preview" | "split"
@@ -54,7 +54,7 @@ export default function ArtifactCanvas() {
       case "mindmap":
         return (
           <div className="h-full w-full p-4 relative">
-            <MindMapBlock data={content} />
+            <MindMapBlock data={content} activeChatId={activeChatId} />
           </div>
         );
       default:

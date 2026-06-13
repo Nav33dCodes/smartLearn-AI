@@ -383,3 +383,31 @@ def generate_chat_title(message: str) -> str:
         return title if title else message[:30]
     except Exception:
         return message[:30]
+
+# ────────────────────────────────────────────────────
+# MIND MAP NODE EXPANSION
+# ────────────────────────────────────────────────────
+def generate_node_expansion(parent_node: str, history: List[Dict], model_id: str = DEFAULT_MODEL) -> str:
+    """Generates a JSON response containing 3 new sub-nodes expanding the parent node."""
+    system_prompt = """You are an advanced knowledge graph expander. 
+The user will provide a parent concept. Your job is to output exactly 3 sub-concepts that logically expand on that concept.
+Output strictly in JSON format matching this schema:
+{
+  "nodes": [
+    {"id": "<unique_string_id>", "label": "<sub_concept_name>"}
+  ],
+  "edges": [
+    {"source": "<parent_node_id_from_user>", "target": "<unique_string_id>"}
+  ]
+}
+Return NOTHING BUT valid JSON. Do not include markdown blocks like ```json.
+"""
+    
+    prompt = f"Expand on this concept. The parent node ID is '{parent_node}'. Create 3 new child nodes. The source ID for your edges MUST be exactly '{parent_node}'."
+    
+    try:
+        response = get_llm_response(prompt, model_id=model_id, history=history, system_prompt=system_prompt)
+        response = response.strip().replace("```json", "").replace("```", "").strip()
+        return response
+    except Exception as e:
+        return f'{{"error": "{str(e)}"}}'

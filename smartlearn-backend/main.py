@@ -205,6 +205,11 @@ class RenameRequest(BaseModel):
 class PinRequest(BaseModel):
     is_pinned: bool
 
+class ExpandNodeRequest(BaseModel):
+    parent_node: str
+    chat_id: str
+    model: Optional[str] = "groq:llama-3.1-8b-instant"
+
 
 # ────────────────────────────────────────────────────
 # HEALTH
@@ -439,6 +444,31 @@ async def get_chat_messages(chat_id: str, current_user: User = Depends(get_curre
         logger.error(f"❌ get_chat_messages error: {e}")
         return {"messages": []}
 
+
+# ────────────────────────────────────────────────────
+# EXPAND MIND MAP NODE
+# ────────────────────────────────────────────────────
+@app.post("/expand-node")
+def expand_node(data: ExpandNodeRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    full_chat_id = get_full_chat_id(current_user.id, data.chat_id)
+    
+    chats = db.query(Chat).filter(Chat.chat_id == full_chat_id, Chat.user_id == current_user.id).order_by(Chat.id.asc()).all()
+    history = []
+    for c in chats:
+        history.append({"role": "user", "content": c.message})
+        if c.response:
+            history.append({"role": "assistant", "content": c.response})
+            
+    from services.llm import generate_node_expansion
+    import json
+    
+    new_json = generate_node_expansion(data.parent_node, history, data.model)
+    
+    try:
+        return json.loads(new_json)
+    except Exception as e:
+        logger.error(f"Failed to parse node expansion JSON: {e} \nData: {new_json}")
+        raise HTTPException(status_code=500, detail="Failed to generate valid mind map expansion.")
 
 # ────────────────────────────────────────────────────
 # RENAME CHAT
