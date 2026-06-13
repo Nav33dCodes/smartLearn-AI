@@ -399,37 +399,6 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
             </div>
             
             <div className="flex items-center gap-1.5">
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className={`h-10 w-10 sm:h-8 sm:w-8 rounded-lg transition-all focus-ring hover:-translate-y-[1px] ${isRecording ? 'text-destructive bg-destructive/10 hover:bg-destructive/20 hover:text-destructive' : 'text-muted-foreground hover:bg-muted'}`}
-                onClick={toggleRecording}
-                title={isRecording ? "Stop recording" : "Use microphone"}
-              >
-                {isRecording ? (
-                  <motion.div
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ repeat: Infinity, duration: 1.5 }}
-                  >
-                    <Mic size={18} className="fill-current" />
-                  </motion.div>
-                ) : (
-                  <Mic size={18} />
-                )}
-              </Button>
-
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-10 w-10 sm:h-8 sm:w-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-primary transition-all focus-ring hover:-translate-y-[1px]"
-                onClick={() => setIsVoiceModeActive && setIsVoiceModeActive(true)}
-                title="Advanced Voice Mode"
-              >
-                <Headphones size={18} />
-              </Button>
-
               {loading ? (
                 <Button
                   onClick={stopGeneration}
@@ -440,20 +409,53 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
                 >
                   <Square size={14} className="fill-current" />
                 </Button>
-              ) : (
+              ) : (input.trim() || attachedFiles.length > 0 || attachedImage) ? (
                 <Button
                   onClick={handleSend}
-                  disabled={(!input.trim() && attachedFiles.length === 0 && !attachedImage) || attachedFiles.some(f => f.status === "uploading")}
+                  disabled={attachedFiles.some(f => f.status === "uploading")}
                   size="icon"
                   className={`h-10 w-10 sm:h-8 sm:w-8 rounded-lg transition-all ${
-                    (input.trim() || attachedFiles.length > 0 || attachedImage) && !attachedFiles.some(f => f.status === "uploading")
-                      ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                    !attachedFiles.some(f => f.status === "uploading")
+                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:-translate-y-[1px]' 
                       : 'bg-muted text-muted-foreground opacity-50'
                   }`}
                   title="Send message (Cmd/Ctrl + Enter)"
                 >
                   <ArrowUp size={18} />
                 </Button>
+              ) : (
+                <>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className={`h-10 w-10 sm:h-8 sm:w-8 rounded-lg transition-all focus-ring hover:-translate-y-[1px] ${isRecording ? 'text-destructive bg-destructive/10 hover:bg-destructive/20 hover:text-destructive' : 'text-muted-foreground hover:bg-muted'}`}
+                    onClick={toggleRecording}
+                    title={isRecording ? "Stop recording" : "Use microphone"}
+                  >
+                    {isRecording ? (
+                      <motion.div
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ repeat: Infinity, duration: 1.5 }}
+                      >
+                        <Mic size={18} className="fill-current" />
+                      </motion.div>
+                    ) : (
+                      <Mic size={18} />
+                    )}
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-10 w-10 sm:h-8 sm:w-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-primary transition-all focus-ring hover:-translate-y-[1px]"
+                    onClick={() => setIsVoiceModeActive && setIsVoiceModeActive(true)}
+                    title="Advanced Voice Mode"
+                  >
+                    <Headphones size={18} />
+                  </Button>
+                </>
               )}
             </div>
           </div>
