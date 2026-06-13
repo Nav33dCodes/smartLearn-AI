@@ -193,61 +193,99 @@ export default function Landing() {
             </a>
           </motion.div>
 
-          {/* Dynamic "Use-Case" Release Note Tabs */}
+          {/* Stunning Browser UI Mockup */}
           <motion.div 
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="w-full max-w-4xl mt-24 mb-8"
+            transition={{ duration: 0.9, delay: 0.4 }}
+            className="w-full max-w-5xl mt-20 relative z-20"
           >
-            {/* Tab Navigation */}
-            <div className="flex flex-wrap justify-center gap-2 mb-8 relative z-10">
-              {heroTabs.map((tab, idx) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveHeroTab(idx)}
-                  className={`relative flex items-center gap-2 px-5 py-3 rounded-full text-[13px] font-semibold transition-colors ${activeHeroTab === idx ? 'text-black' : 'text-zinc-500 hover:text-zinc-300'}`}
-                >
-                  {activeHeroTab === idx && (
-                    <motion.div
-                      layoutId="heroTabBubble"
-                      className="absolute inset-0 bg-white rounded-full -z-10"
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    />
-                  )}
-                  {tab.icon}
-                  {tab.title}
-                </button>
-              ))}
-            </div>
-
-            {/* Tab Content Crossfade */}
-            <div className="relative min-h-[220px] bg-[#0a0a0a] border border-white/[0.04] rounded-[2rem] p-8 sm:p-12 text-left overflow-hidden">
-              {/* Subtle background glow based on active tab */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-[100px] -z-10" />
+            {/* Massive Glowing Behind the Mockup */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-white/[0.03] blur-[120px] rounded-full pointer-events-none" />
+            
+            {/* The Window Container */}
+            <div 
+              className="relative rounded-2xl bg-[#0a0a0a] border border-white/[0.06] shadow-[0_0_80px_rgba(255,255,255,0.03)] overflow-hidden flex flex-col group hover:border-white/10 transition-all duration-700 ease-out"
+              style={{ transform: "perspective(2000px) rotateX(4deg)", transformOrigin: "bottom" }}
+            >
               
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeHeroTab}
-                  initial={{ opacity: 0, x: 10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex flex-col h-full justify-center"
-                >
-                  <h3 className="text-2xl sm:text-3xl font-bold text-zinc-100 mb-3 tracking-tight">
-                    {heroTabs[activeHeroTab].description}
-                  </h3>
-                  <div className="space-y-4 mt-6">
-                    {heroTabs[activeHeroTab].bullets.map((bullet, i) => (
-                      <div key={i} className="flex items-start gap-3 text-zinc-400">
-                        <CheckCircle2 size={20} className="text-primary shrink-0 mt-0.5" />
-                        <p className="text-base leading-relaxed">{bullet}</p>
-                      </div>
-                    ))}
+              {/* Window Header (MacOS style) */}
+              <div className="h-10 w-full bg-[#111] border-b border-white/[0.04] flex items-center px-4 gap-2 relative z-10">
+                <div className="w-2.5 h-2.5 rounded-full bg-zinc-700/50" />
+                <div className="w-2.5 h-2.5 rounded-full bg-zinc-700/50" />
+                <div className="w-2.5 h-2.5 rounded-full bg-zinc-700/50" />
+                <div className="mx-auto flex items-center gap-2 px-4 py-1 rounded-md bg-white/[0.03] border border-white/[0.02]">
+                  <Lock size={10} className="text-zinc-500" />
+                  <span className="text-[10px] font-mono text-zinc-500">app.smartlearn.ai</span>
+                </div>
+              </div>
+
+              {/* Window Body (Mock Chat Interface) */}
+              <div className="h-[450px] sm:h-[550px] w-full bg-[#000] flex relative z-10">
+                {/* Sidebar Mock */}
+                <div className="hidden sm:flex w-64 border-r border-white/[0.04] bg-[#050505] p-4 flex-col gap-4 shrink-0">
+                  <div className="h-8 w-full rounded-md bg-white/[0.03]" />
+                  <div className="space-y-3 mt-4">
+                     <div className="h-3 w-3/4 rounded bg-white/[0.02]" />
+                     <div className="h-3 w-1/2 rounded bg-white/[0.02]" />
+                     <div className="h-3 w-5/6 rounded bg-white/[0.02]" />
                   </div>
-                </motion.div>
-              </AnimatePresence>
+                  <div className="space-y-3 mt-8">
+                     <div className="text-[10px] font-bold text-zinc-700 tracking-wider">RECENT CHATS</div>
+                     <div className="h-6 w-full rounded bg-white/[0.02]" />
+                     <div className="h-6 w-full rounded bg-white/[0.02]" />
+                  </div>
+                </div>
+
+                {/* Main Chat Area Mock */}
+                <div className="flex-1 flex flex-col p-6 sm:p-10 relative overflow-hidden">
+                  <div className="flex-1 flex flex-col gap-6 w-full max-w-3xl mx-auto">
+                    {/* User Message */}
+                    <div className="self-end max-w-[80%] bg-zinc-900 border border-white/[0.04] p-3.5 rounded-2xl rounded-tr-sm">
+                      <p className="text-[13px] text-zinc-200">Analyze this document and build a React chart.</p>
+                    </div>
+
+                    {/* AI Message */}
+                    <div className="self-start w-full max-w-[85%]">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-7 h-7 rounded bg-white text-black flex items-center justify-center">
+                          <Logo size={16} />
+                        </div>
+                        <span className="text-[13px] font-bold text-zinc-200 tracking-tight">SmartLearn AI</span>
+                      </div>
+                      <div className="bg-[#050505] border border-white/[0.04] rounded-2xl p-5 shadow-sm">
+                         <div className="h-3 w-full rounded bg-white/[0.03] mb-3" />
+                         <div className="h-3 w-4/5 rounded bg-white/[0.03] mb-5" />
+                         {/* Mock Code Block */}
+                         <div className="w-full h-36 rounded-lg bg-[#000] border border-white/[0.05] p-4 font-mono text-[11px] leading-relaxed text-zinc-500 flex flex-col relative overflow-hidden group-hover:border-white/10 transition-colors">
+                           <div className="absolute top-0 right-0 p-2 opacity-50"><Code2 size={12}/></div>
+                           <span><span className="text-blue-400">import</span> {'{ LineChart }'} <span className="text-blue-400">from</span> 'recharts';</span>
+                           <span className="mt-2"><span className="text-purple-400">export default function</span> Chart() {'{'}</span>
+                           <span className="ml-4 text-zinc-400 mt-1">return ( </span>
+                           <span className="ml-8 text-green-400">{'<LineChart data={data}>'}</span>
+                           <span className="ml-12 text-zinc-500">...</span>
+                           <span className="ml-8 text-green-400">{'</LineChart>'}</span>
+                           <span className="ml-4 text-zinc-400">)</span>
+                           <span>{'}'}</span>
+                         </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Input Box Mock */}
+                  <div className="absolute bottom-6 left-6 right-6 flex justify-center">
+                    <div className="h-14 w-full max-w-3xl bg-[#0a0a0a] border border-white/[0.08] rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.03)] flex items-center px-4 justify-between group-hover:border-white/[0.15] transition-colors">
+                      <span className="text-[13px] text-zinc-500">Ask a question or upload a file...</span>
+                      <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center">
+                         <ArrowRight size={14} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Fade out bottom of UI */}
+              <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-black to-transparent z-20 pointer-events-none" />
             </div>
           </motion.div>
           
@@ -256,7 +294,7 @@ export default function Landing() {
 
 
         {/* Tech Stack / Integration Strip */}
-        <section className="py-16 border-y border-zinc-800/50 bg-zinc-950/30 backdrop-blur-sm relative z-10 overflow-hidden">
+        <section className="py-16 border-y border-white/[0.04] bg-[#000000] relative z-10 overflow-hidden">
           <style>
             {`
               @keyframes marquee {
@@ -276,8 +314,8 @@ export default function Landing() {
           
           <div className="max-w-full overflow-hidden relative">
             {/* Gradient masks for smooth fading on edges */}
-            <div className="absolute inset-y-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-zinc-950 to-transparent z-20 pointer-events-none" />
-            <div className="absolute inset-y-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-zinc-950 to-transparent z-20 pointer-events-none" />
+            <div className="absolute inset-y-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-[#000000] to-transparent z-20 pointer-events-none" />
+            <div className="absolute inset-y-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-[#000000] to-transparent z-20 pointer-events-none" />
             
             <p className="text-center text-sm font-medium text-zinc-500 uppercase tracking-[0.2em] mb-16 relative z-30">
               Powered by the industry's most advanced infrastructure
@@ -308,7 +346,7 @@ export default function Landing() {
                     <img 
                       src={`/images/logos/${tech.file}.svg`} 
                       alt={`${tech.name} Logo`} 
-                      className="w-full h-full object-contain relative z-10 transition-all duration-500 group-hover/icon:scale-[1.15] filter grayscale opacity-50 group-hover/icon:grayscale-0 group-hover/icon:opacity-100" 
+                      className="w-full h-full object-contain relative z-10 transition-all duration-500 group-hover/icon:scale-[1.15] filter grayscale opacity-40 group-hover/icon:grayscale-0 group-hover/icon:opacity-100" 
                       onError={(e) => { e.target.style.display='none'; }} 
                     />
                   </div>
@@ -321,128 +359,109 @@ export default function Landing() {
 
 
 
-        {/* Features Section - Node Visualizer */}
-        <section id="features" className="py-24 px-6 max-w-7xl mx-auto">
-          <motion.div 
-            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={itemVariants}
-            className="flex flex-col items-center text-center max-w-5xl mx-auto"
-          >
-            <h2 className="text-3xl sm:text-5xl font-black tracking-tighter text-zinc-100 mb-6">Visual Knowledge Architecture</h2>
-            <p className="text-zinc-400 text-lg md:text-xl max-w-3xl mb-12 leading-relaxed tracking-tight">
-              We completely abandoned standard file viewers. Our inference engine automatically extracts and plots your documents into a living, interactive Node Graph. Explore the unseen connections in your data.
-            </p>
-            
-            {/* React Flow CSS Node Diagram */}
-            <div className="w-full relative mt-8 max-w-4xl mx-auto h-80 sm:h-[450px] border border-white/[0.04] bg-[#000000] rounded-3xl overflow-hidden flex items-center justify-center shadow-[0_0_50px_rgba(255,255,255,0.02)]">
-               <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:32px_32px]" />
-               
-               {/* Animated Connection Line */}
-               <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
-                 <path d="M 30% 50% C 50% 50%, 50% 50%, 70% 50%" stroke="rgba(255,255,255,0.15)" strokeWidth="2" fill="none" strokeDasharray="8,8" className="animate-[dash_20s_linear_infinite]" />
-                 <style>{`@keyframes dash { to { stroke-dashoffset: -1000; } }`}</style>
-               </svg>
+        {/* Features Section - Bento Grid */}
+        <section id="features" className="py-32 px-6 max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl sm:text-6xl font-bold tracking-tighter text-zinc-100 mb-6">Unrivaled capabilities.</h2>
+            <p className="text-lg text-zinc-400 max-w-2xl mx-auto">Everything you need to analyze, compute, and learn, built into one seamless architecture.</p>
+          </div>
 
-               {/* Source Node */}
-               <div className="absolute left-[20%] sm:left-[25%] top-1/2 -translate-y-1/2 -translate-x-1/2 w-40 sm:w-56 bg-[#0a0a0a] border border-white/10 rounded-2xl p-5 shadow-2xl z-10 hover:border-white/20 transition-colors cursor-pointer group">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-white/5 rounded-lg text-zinc-300 group-hover:bg-white/10 transition-colors">
-                       <Database size={16} />
-                    </div>
-                    <span className="text-[11px] font-bold text-zinc-100 tracking-widest">KNOWLEDGE</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-white/5 rounded-full mb-3" />
-                  <div className="h-1.5 w-2/3 bg-white/5 rounded-full" />
-                  {/* Right Handle */}
-                  <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-black border-2 border-zinc-500 rounded-full" />
-               </div>
-
-               {/* Target Node */}
-               <div className="absolute left-[80%] sm:left-[75%] top-1/2 -translate-y-1/2 -translate-x-1/2 w-40 sm:w-56 bg-[#0a0a0a] border border-white/10 rounded-2xl p-5 shadow-2xl z-10 hover:border-white/20 transition-colors cursor-pointer group">
-                  {/* Left Handle */}
-                  <div className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-3 h-3 bg-black border-2 border-zinc-500 rounded-full" />
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-white/5 rounded-lg text-zinc-300 group-hover:bg-white/10 transition-colors">
-                       <BrainCircuit size={16} />
-                    </div>
-                    <span className="text-[11px] font-bold text-zinc-100 tracking-widest">INFERENCE</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-white/5 rounded-full mb-3" />
-                  <div className="h-1.5 w-3/4 bg-white/5 rounded-full" />
-               </div>
-            </div>
-          </motion.div>
-
-        </section>
-
-        {/* Advanced Capabilities List */}
-        <section className="py-24 px-6 border-t border-white/[0.02] bg-[#000000]">
-          <div className="max-w-7xl mx-auto">
-            <div className="mb-16">
-              <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-zinc-100 mb-4">Enterprise-Grade Architecture</h2>
-              <p className="text-zinc-400 text-lg">Built from the ground up for speed, reliability, and security.</p>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative">
-              {/* Background Node Connection Lines */}
-              <div className="hidden lg:block absolute top-1/2 left-0 w-full h-[1px] bg-white/[0.04] -z-10 -translate-y-1/2" />
-              
-              {[
-                { title: 'Multimodal Vision', desc: 'Upload images instantly. Our powerful browser-side compression engine perfectly analyzes visual data with zero API token bloat.' },
-                { title: 'Live Sandpack IDE', desc: 'Instantly run, edit, and preview React and JavaScript applications right inside the chat window.' },
-                { title: 'Personalization Engine', desc: 'Define your exact AI Persona, Tone, and Custom Instructions to tailor the entire learning experience.' },
-                { title: 'Textbook Math Rendering', desc: 'Beautifully formats complex physics and calculus equations using native KaTeX integration.' },
-                { title: 'Real-time Voice AI', desc: 'Speak naturally to your AI tutor and have your audio instantly transcribed.' },
-                { title: 'Multi-Model Fallback', desc: 'Automatically routes queries between Gemini 2.5, Claude, and Groq to guarantee 100% uptime.' },
-                { title: 'Global Edge Caching', desc: 'Powered by Upstash Redis, your sessions and frequent queries are cached globally for sub-millisecond retrieval.' },
-                { title: 'Format Agnostic', desc: 'Upload PDFs, Word documents, Markdown, or raw text files. Our pipeline processes them flawlessly.' }
-              ].map((feat, i) => (
-                <div key={i} className="relative flex flex-col bg-[#050505] border border-white/[0.04] rounded-xl p-6 hover:border-white/20 transition-all duration-300 group shadow-sm">
-                  {/* Top Handle */}
-                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black border-2 border-zinc-700 rounded-full group-hover:bg-white group-hover:border-white transition-colors" />
-                  {/* Bottom Handle */}
-                  <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black border-2 border-zinc-700 rounded-full group-hover:bg-white group-hover:border-white transition-colors" />
-                  
-                  <h4 className="text-lg font-bold text-zinc-100 mb-3 tracking-wide">{feat.title}</h4>
-                  <p className="text-[13px] text-zinc-400 leading-relaxed font-medium tracking-wide">{feat.desc}</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto auto-rows-[280px]">
+            {/* Bento 1: Generative UI (Spans 2 columns) */}
+            <div className="md:col-span-2 relative bg-[#050505] border border-white/[0.04] rounded-3xl p-8 overflow-hidden group hover:border-white/10 transition-colors">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/[0.02] rounded-full blur-[80px] -z-10 group-hover:bg-white/[0.04] transition-colors" />
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center mb-6">
+                  <Code2 size={24} className="text-zinc-300" />
                 </div>
-              ))}
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">Live Generative UI</h3>
+                  <p className="text-zinc-400 font-medium text-sm leading-relaxed max-w-md">Instantly generate, run, and preview React code inside the chat. SmartLearn builds fully interactive dashboards on the fly.</p>
+                </div>
+                {/* Decorative UI element */}
+                <div className="absolute right-[-10%] bottom-[-10%] w-[60%] h-[70%] bg-black border border-white/10 rounded-tl-2xl shadow-2xl p-5 flex flex-col gap-3 opacity-50 group-hover:opacity-100 group-hover:-translate-y-2 group-hover:-translate-x-2 transition-all duration-500">
+                  <div className="h-3 w-1/3 bg-white/20 rounded" />
+                  <div className="h-24 w-full bg-white/5 rounded mt-2 border border-white/10" />
+                </div>
+              </div>
+            </div>
+
+            {/* Bento 2: Multimodal (Spans 1 column) */}
+            <div className="md:col-span-1 relative bg-[#050505] border border-white/[0.04] rounded-3xl p-8 overflow-hidden group hover:border-white/10 transition-colors">
+              <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/[0.02] to-transparent -z-10" />
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center mb-6">
+                  <ImageIcon size={24} className="text-zinc-300" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">Native Vision</h3>
+                  <p className="text-zinc-400 font-medium text-sm leading-relaxed">Upload images instantly. Our powerful compression engine perfectly analyzes visual data with zero latency.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bento 3: Voice Mode (Spans 1 column) */}
+            <div className="md:col-span-1 relative bg-[#050505] border border-white/[0.04] rounded-3xl p-8 overflow-hidden group hover:border-white/10 transition-colors">
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center mb-6">
+                  <BrainCircuit size={24} className="text-zinc-300" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">Voice Mode</h3>
+                  <p className="text-zinc-400 font-medium text-sm leading-relaxed relative z-20">Immersive, hands-free voice conversations with our advanced sound-reactive AI orb.</p>
+                </div>
+              </div>
+              {/* Decorative Orb */}
+              <div className="absolute bottom-[-20%] right-[-20%] w-48 h-48 rounded-full bg-white/[0.03] border border-white/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-700">
+                <div className="w-24 h-24 rounded-full bg-white/[0.05] blur-md" />
+              </div>
+            </div>
+
+            {/* Bento 4: Multi-Model Fallback (Spans 2 columns) */}
+            <div className="md:col-span-2 relative bg-[#050505] border border-white/[0.04] rounded-3xl p-8 overflow-hidden group hover:border-white/10 transition-colors">
+              <div className="relative z-10 h-full flex flex-col justify-between w-full md:w-1/2">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center mb-6">
+                  <Network size={24} className="text-zinc-300" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">Multi-Engine Fallback</h3>
+                  <p className="text-zinc-400 font-medium text-sm leading-relaxed">Never see a downtime error again. The router seamlessly cascades queries between Gemini 2.5, Claude, and Groq.</p>
+                </div>
+              </div>
+              {/* Decorative Router Nodes */}
+              <div className="absolute right-0 top-0 w-1/2 h-full hidden md:flex items-center justify-center opacity-40 group-hover:opacity-100 transition-opacity">
+                <div className="w-full max-w-[200px] flex flex-col gap-3">
+                  <div className="h-8 w-full bg-black border border-white/10 rounded-lg flex items-center px-3 gap-2 shadow-lg">
+                    <div className="w-2 h-2 rounded-full bg-green-500" /> <span className="text-[10px] text-zinc-400 font-mono">Gemini 2.5 (Active)</span>
+                  </div>
+                  <div className="h-8 w-full bg-black border border-white/10 rounded-lg flex items-center px-3 gap-2 ml-4">
+                    <div className="w-2 h-2 rounded-full bg-zinc-700" /> <span className="text-[10px] text-zinc-600 font-mono">Claude 3.5 (Standby)</span>
+                  </div>
+                  <div className="h-8 w-full bg-black border border-white/10 rounded-lg flex items-center px-3 gap-2 ml-8">
+                    <div className="w-2 h-2 rounded-full bg-zinc-700" /> <span className="text-[10px] text-zinc-600 font-mono">Groq Llama (Standby)</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
         {/* About Section */}
         <section id="about" className="py-32 px-6 bg-[#000000] border-t border-white/[0.02] relative">
-          <div className="max-w-6xl mx-auto relative z-10">
-            {/* The Mission Statement */}
-            <div className="text-center mb-24 max-w-4xl mx-auto">
-              <h2 className="text-xs font-bold text-zinc-500 tracking-[0.3em] uppercase mb-6">The Mission</h2>
-              <p className="text-3xl sm:text-5xl font-bold tracking-tighter text-zinc-100 leading-[1.15]">
-                We are engineering the cognitive architecture of tomorrow. SmartLearn AI is built for pioneers who demand uncompromising speed and intelligence.
-              </p>
-            </div>
-
-            {/* Leadership Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              {/* Sanan Malik */}
-              <div className="bg-[#050505] border border-white/[0.04] rounded-3xl p-8 sm:p-10 flex flex-col justify-between group hover:border-white/20 transition-colors relative overflow-hidden">
-                <div className="relative z-10">
-                  <h3 className="text-2xl font-bold tracking-tight text-zinc-100 mb-2">Sanan Malik</h3>
-                  <p className="text-zinc-500 font-semibold mb-6 text-xs tracking-[0.2em]">CEO & VISIONARY</p>
-                  <p className="text-zinc-400 text-sm leading-relaxed font-medium">
-                    Driving the strategic vision to make SmartLearn AI the absolute pinnacle of educational and research technology globally.
-                  </p>
-                </div>
+          <div className="max-w-4xl mx-auto relative z-10 text-center">
+            <h2 className="text-xs font-bold text-zinc-500 tracking-[0.3em] uppercase mb-8">The Mission</h2>
+            <p className="text-4xl sm:text-6xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-200 to-zinc-600 leading-[1.1] mb-20">
+              We are engineering the cognitive architecture of tomorrow. Built for pioneers who demand uncompromising speed.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-12 sm:gap-24 border-t border-white/[0.04] pt-16">
+              <div className="text-center group cursor-default">
+                <h3 className="text-2xl font-bold tracking-tight text-zinc-300 group-hover:text-white transition-colors mb-1">Sanan Malik</h3>
+                <p className="text-zinc-600 font-medium text-xs tracking-[0.2em]">VISIONARY & CEO</p>
               </div>
-
-              {/* Naveed Ahmed */}
-              <div className="bg-[#050505] border border-white/[0.04] rounded-3xl p-8 sm:p-10 flex flex-col justify-between group hover:border-white/20 transition-colors relative overflow-hidden">
-                <div className="relative z-10">
-                  <h3 className="text-2xl font-bold tracking-tight text-zinc-100 mb-2">Naveed Ahmed</h3>
-                  <p className="text-zinc-500 font-semibold mb-6 text-xs tracking-[0.2em]">LEAD ARCHITECT & DEVELOPER</p>
-                  <p className="text-zinc-400 text-sm leading-relaxed font-medium">
-                    Engineering the core infrastructure, RAG pipelines, and hyper-optimized UI/UX to deliver a 60fps, zero-latency experience.
-                  </p>
-                </div>
+              <div className="text-center group cursor-default">
+                <h3 className="text-2xl font-bold tracking-tight text-zinc-300 group-hover:text-white transition-colors mb-1">Naveed Ahmed</h3>
+                <p className="text-zinc-600 font-medium text-xs tracking-[0.2em]">LEAD ARCHITECT</p>
               </div>
             </div>
           </div>
