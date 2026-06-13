@@ -61,16 +61,16 @@ export default function ForgotPassword() {
 
   return (
     <div className="dark min-h-screen flex items-center justify-center bg-[#000000] px-4 py-8 relative overflow-hidden font-sans tracking-tight">
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-white/[0.03] blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-white/[0.02] blur-[120px] pointer-events-none" />
+      <div className="absolute top-[10%] left-[20%] w-[50%] h-[50%] rounded-full bg-white/[0.02] blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-[10%] right-[20%] w-[50%] h-[50%] rounded-full bg-white/[0.01] blur-[150px] pointer-events-none" />
       
-      <div className="w-full max-w-md bg-[#050505] backdrop-blur-xl border border-white/[0.04] rounded-3xl shadow-2xl p-8 relative z-10">
-        <Link to="/login" className="absolute top-6 left-6 text-zinc-400 hover:text-zinc-100 transition-colors">
-          <ArrowLeft size={20} />
+      <div className="w-full max-w-sm relative z-10">
+        <Link to="/login" className="absolute -top-16 left-0 flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-sm font-medium">
+          <ArrowLeft size={16} /> Back to login
         </Link>
         
-        <div className="text-center mb-8 mt-4">
-          <h1 className="text-4xl font-bold text-white mb-3 tracking-tighter">Reset Password</h1>
+        <div className="text-center mb-10 mt-4">
+          <h1 className="text-5xl font-bold bg-gradient-to-br from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent mb-4 tracking-tighter pb-1">Reset Password</h1>
           <p className="text-zinc-400 text-[15px] leading-relaxed">
             {step === 1 ? "Enter your email to receive a code" : "Enter the OTP and your new password"}
           </p>

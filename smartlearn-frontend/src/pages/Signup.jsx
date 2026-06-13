@@ -3,7 +3,7 @@ import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
-import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Eye, EyeOff, Brain, Zap, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../lib/axios';
 import Logo from '../components/Logo';
@@ -87,9 +87,9 @@ export default function Signup() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-white/[0.03] via-transparent to-transparent pointer-events-none" />
         
         <div className="relative z-10">
-          <div className="flex items-center gap-3">
-            <Logo size={28} />
-            <span className="text-xl font-semibold tracking-tight text-zinc-100">SmartLearn</span>
+          <div className="flex items-center gap-4">
+            <Logo size={42} />
+            <span className="text-3xl font-bold tracking-tighter text-white">SmartLearn</span>
           </div>
         </div>
         
@@ -99,15 +99,40 @@ export default function Signup() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="relative z-10 max-w-lg"
         >
-          <div className="mb-6 text-zinc-500">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className="opacity-50">
-              <path d="M14.017 21L16.41 14.286C16.63 13.528 16.74 12.793 16.74 12.08C16.74 10.74 16.353 9.71 15.58 8.99C14.806 8.27 13.796 7.91 12.55 7.91C12.023 7.91 11.476 7.99 10.91 8.15L11.55 4.67C12.35 4.456 13.196 4.35 14.09 4.35C16.29 4.35 18.006 4.966 19.24 6.2C20.473 7.433 21.09 9.176 21.09 11.43C21.09 12.63 20.89 13.84 20.49 15.06L17.51 24H14.017ZM3.81699 21L6.20999 14.286C6.42999 13.528 6.53999 12.793 6.53999 12.08C6.53999 10.74 6.15332 9.71 5.37999 8.99C4.60665 8.27 3.59665 7.91 2.34999 7.91C1.82332 7.91 1.27665 7.99 0.709986 8.15L1.34999 4.67C2.14999 4.456 2.99665 4.35 3.88999 4.35C6.08999 4.35 7.80665 4.966 9.03999 6.2C10.2733 7.433 10.89 9.176 10.89 11.43C10.89 12.63 10.69 13.84 10.29 15.06L7.30999 24H3.81699Z" />
-            </svg>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-medium text-zinc-100 leading-snug mb-6 font-serif">
-            "Education is the passport to the future, for tomorrow belongs to those who prepare for it today."
+          <h2 className="text-4xl sm:text-5xl font-bold text-white leading-[1.1] mb-8 tracking-tighter">
+            Elevate your document analysis with Enterprise AI.
           </h2>
-          <p className="text-zinc-400 text-lg">— Malcolm X</p>
+          <div className="space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center shrink-0">
+                <Brain className="text-white w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-zinc-100 font-semibold text-[15px] tracking-tight mb-0.5">Advanced RAG Architecture</h4>
+                <p className="text-zinc-500 text-[14px]">Context-aware semantic document retrieval.</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center shrink-0">
+                <Zap className="text-white w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-zinc-100 font-semibold text-[15px] tracking-tight mb-0.5">Ultra-Low Latency Inference</h4>
+                <p className="text-zinc-500 text-[14px]">Powered by frontier models and LPU engines.</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center shrink-0">
+                <ShieldCheck className="text-white w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-zinc-100 font-semibold text-[15px] tracking-tight mb-0.5">Zero-Knowledge Security</h4>
+                <p className="text-zinc-500 text-[14px]">Military-grade encryption with zero training data retention.</p>
+              </div>
+            </div>
+          </div>
         </motion.div>
         
         <div className="relative z-10">
