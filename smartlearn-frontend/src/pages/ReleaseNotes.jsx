@@ -2,6 +2,21 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 14, 2026 — Infinite Generative UI / v0 Clone (Phase 11)",
+    features: [
+      {
+        title: "Infinite Generative UI",
+        description: "SmartLearn has officially evolved from a chatbot into an instantaneous Generative App Builder.",
+        bullets: [
+          "Zero-Latency Rendering: We bypassed slow bundlers by dynamically injecting the Tailwind Play CDN under the hood, enabling instant UI renders the millisecond the AI finishes typing.",
+          "Expert UI Engine: The AI now utilizes a specialized 'Expert UI Engineer' system prompt, strictly enforcing the creation of unified, fully-functioning React components instead of fragmented code snippets.",
+          "Auto-Injected Libraries: The virtual environment now silently pre-loads essential modern UI libraries including `lucide-react`, `recharts`, and `framer-motion`.",
+          "Peer-Dependency Fixes: Hardcoded hidden peer dependencies (like `react-is`) to ensure complex libraries like Recharts compile flawlessly inside the Sandpack iframe without manual user intervention."
+        ]
+      }
+    ]
+  },
+  {
     date: "June 14, 2026 — Supercharged Visual Knowledge Graphs & Critical Fixes (Phase 10)",
     features: [
       {
