@@ -4,21 +4,21 @@ import Logo from '../components/Logo';
 
 export default function Privacy() {
   return (
-    <div className="dark min-h-screen bg-black text-zinc-300 selection:bg-primary/30 selection:text-white font-sans">
-      <div className="max-w-4xl mx-auto px-6 py-20 sm:py-32">
+    <div className="dark min-h-screen bg-[#000000] text-zinc-400 selection:bg-white/20 selection:text-white font-sans tracking-tight">
+      <div className="max-w-3xl mx-auto px-6 py-24 sm:py-32">
         
         {/* Header */}
-        <div className="mb-16 border-b border-zinc-800 pb-12">
+        <div className="mb-16 border-b border-white/[0.04] pb-12">
           <div className="flex items-center gap-3 mb-8">
-            <Logo size={40} className="text-white" />
+            <Logo size={32} className="text-white" />
           </div>
-          <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-zinc-100 mb-6">
+          <h1 className="text-5xl sm:text-7xl font-bold tracking-tighter text-white mb-8 leading-none">
             Privacy Policy
           </h1>
-          <div className="flex items-center gap-4 text-sm text-zinc-500 font-mono">
-            <span>EFFECTIVE DATE: JUNE 11, 2026</span>
-            <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
-            <span>VERSION 2.4.0</span>
+          <div className="flex items-center gap-4 text-xs text-zinc-500 font-medium tracking-widest uppercase">
+            <span>Effective: June 11, 2026</span>
+            <span className="w-1 h-1 rounded-full bg-white/20"></span>
+            <span>v2.4.0</span>
           </div>
         </div>
 
@@ -33,16 +33,16 @@ export default function Privacy() {
         </section>
 
         {/* Key Pillars */}
-        <section className="mb-20 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
-             <Shield className="text-primary mb-4" size={28} />
-             <h3 className="text-xl font-bold text-zinc-100 mb-2">Zero Training Policy</h3>
-             <p className="text-sm leading-relaxed text-zinc-400">Your uploaded documents are never used to train our foundational models. Your data remains strictly your own.</p>
+        <section className="mb-24 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-[#050505] border border-white/[0.04] rounded-3xl p-8 hover:border-white/10 transition-colors shadow-2xl">
+             <Shield className="text-white mb-6" size={24} />
+             <h3 className="text-xl font-bold text-zinc-100 mb-3 tracking-tight">Zero Training Policy</h3>
+             <p className="text-[15px] leading-relaxed text-zinc-500">Your uploaded documents are never used to train our foundational models. Your data remains strictly your own.</p>
           </div>
-          <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
-             <Lock className="text-primary mb-4" size={28} />
-             <h3 className="text-xl font-bold text-zinc-100 mb-2">Enterprise Encryption</h3>
-             <p className="text-sm leading-relaxed text-zinc-400">All data is encrypted in transit via TLS 1.3 and at rest using AES-256 military-grade encryption standards.</p>
+          <div className="bg-[#050505] border border-white/[0.04] rounded-3xl p-8 hover:border-white/10 transition-colors shadow-2xl">
+             <Lock className="text-white mb-6" size={24} />
+             <h3 className="text-xl font-bold text-zinc-100 mb-3 tracking-tight">Enterprise Encryption</h3>
+             <p className="text-[15px] leading-relaxed text-zinc-500">All data is encrypted in transit via TLS 1.3 and at rest using AES-256 military-grade encryption standards.</p>
           </div>
         </section>
 
@@ -81,22 +81,22 @@ export default function Privacy() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-zinc-100 mb-6 flex items-center gap-3">
-              <Eye className="text-zinc-500" size={24} />
+            <h2 className="text-2xl font-bold tracking-tight text-zinc-100 mb-6 flex items-center gap-4 border-b border-white/[0.04] pb-4">
+              <Eye className="text-zinc-600" size={20} />
               3. Third-Party Subprocessors
             </h2>
-            <p className="leading-relaxed mb-4">
+            <p className="leading-relaxed mb-6 text-[15px] text-zinc-400">
               To deliver our advanced AI capabilities, we interface with highly vetted frontier model APIs (e.g., Anthropic, OpenAI, Groq). Our data processing agreements (DPAs) with these providers legally enforce the following:
             </p>
-            <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-6">
-              <ul className="space-y-4 font-mono text-sm">
-                <li className="flex items-start gap-3">
-                  <span className="text-primary mt-0.5">→</span>
-                  <span><strong>Zero Data Retention:</strong> APIs do not retain your inputs beyond 30 days for abuse monitoring.</span>
+            <div className="bg-[#050505] border border-white/[0.04] rounded-2xl p-6 shadow-sm">
+              <ul className="space-y-4 text-[14px]">
+                <li className="flex items-start gap-4">
+                  <span className="text-white mt-0.5">→</span>
+                  <span className="text-zinc-400"><strong className="text-zinc-200">Zero Data Retention:</strong> APIs do not retain your inputs beyond 30 days for abuse monitoring.</span>
                 </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-primary mt-0.5">→</span>
-                  <span><strong>Zero Model Training:</strong> Your prompts and documents are strictly excluded from their training pipelines.</span>
+                <li className="flex items-start gap-4">
+                  <span className="text-white mt-0.5">→</span>
+                  <span className="text-zinc-400"><strong className="text-zinc-200">Zero Model Training:</strong> Your prompts and documents are strictly excluded from their training pipelines.</span>
                 </li>
               </ul>
             </div>
@@ -114,9 +114,9 @@ export default function Privacy() {
         </div>
 
         {/* Footer */}
-        <div className="mt-24 pt-12 border-t border-zinc-900 text-center text-sm text-zinc-600">
+        <div className="mt-32 pt-12 border-t border-white/[0.04] flex flex-col sm:flex-row items-center justify-between gap-4 text-[13px] text-zinc-600 font-medium">
           <p>© {new Date().getFullYear()} SmartLearn AI Inc. All rights reserved.</p>
-          <p className="mt-2">For urgent privacy inquiries, please contact legal@smartlearn-ai.com</p>
+          <p>For urgent inquiries: <span className="text-zinc-400 hover:text-white transition-colors cursor-pointer">legal@smartlearn-ai.com</span></p>
         </div>
       </div>
     </div>

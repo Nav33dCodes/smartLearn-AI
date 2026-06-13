@@ -81,10 +81,10 @@ export default function Signup() {
   };
 
   return (
-    <div className="dark min-h-screen flex bg-[#0a0a0a] font-sans text-zinc-100">
+    <div className="dark min-h-screen flex bg-[#000000] font-sans text-zinc-100 tracking-tight">
       {/* Left Side: Professional Quote Section */}
-      <div className="hidden lg:flex w-1/2 relative flex-col justify-between p-16 overflow-hidden bg-zinc-900/30 border-r border-zinc-800/50">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-zinc-800/20 via-zinc-950 to-zinc-950 pointer-events-none" />
+      <div className="hidden lg:flex w-1/2 relative flex-col justify-between p-16 overflow-hidden bg-[#050505] border-r border-white/[0.04]">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-white/[0.03] via-transparent to-transparent pointer-events-none" />
         
         <div className="relative z-10">
           <div className="flex items-center gap-3">
@@ -122,11 +122,11 @@ export default function Signup() {
             <Logo size={36} />
           </div>
           
-          <div className="mb-8">
-            <h1 className="text-3xl font-semibold text-zinc-100 mb-2 tracking-tight">
+          <div className="mb-10">
+            <h1 className="text-4xl font-bold text-white mb-3 tracking-tighter">
               {isVerifying ? "Verify your email" : "Create an account"}
             </h1>
-            <p className="text-zinc-400">
+            <p className="text-zinc-400 text-[15px] leading-relaxed">
               {isVerifying 
                 ? `We sent a verification code to ${email}.`
                 : "Join SmartLearn to start analyzing your documents."}
@@ -150,37 +150,37 @@ export default function Signup() {
           {!isVerifying ? (
             <form onSubmit={handleSignup} className="flex flex-col gap-5">
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">Full Name</label>
+                <label className="block text-[13px] font-semibold text-zinc-300 mb-2 tracking-wide uppercase">Full Name</label>
                 <input 
                   type="text" 
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-100 focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400 transition-all outline-none"
+                  className="w-full bg-[#0a0a0a] border border-white/[0.06] rounded-xl px-4 py-3.5 text-[15px] text-zinc-100 focus:border-white/20 focus:ring-0 shadow-[0_0_15px_rgba(255,255,255,0.02)] focus:shadow-[0_0_20px_rgba(255,255,255,0.08)] transition-all outline-none"
                   placeholder="John Doe"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">Email</label>
+                <label className="block text-[13px] font-semibold text-zinc-300 mb-2 tracking-wide uppercase">Email</label>
                 <input 
                   type="email" 
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-100 focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400 transition-all outline-none"
+                  className="w-full bg-[#0a0a0a] border border-white/[0.06] rounded-xl px-4 py-3.5 text-[15px] text-zinc-100 focus:border-white/20 focus:ring-0 shadow-[0_0_15px_rgba(255,255,255,0.02)] focus:shadow-[0_0_20px_rgba(255,255,255,0.08)] transition-all outline-none"
                   placeholder="you@example.com"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">Password</label>
+                <label className="block text-[13px] font-semibold text-zinc-300 mb-2 tracking-wide uppercase">Password</label>
                 <div className="relative">
                   <input 
                     type={showPassword ? "text" : "password"} 
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-100 focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400 transition-all outline-none pr-10"
+                    className="w-full bg-[#0a0a0a] border border-white/[0.06] rounded-xl px-4 py-3.5 text-[15px] text-zinc-100 focus:border-white/20 focus:ring-0 shadow-[0_0_15px_rgba(255,255,255,0.02)] focus:shadow-[0_0_20px_rgba(255,255,255,0.08)] transition-all outline-none pr-10"
                     placeholder="••••••••"
                     required
                   />
@@ -195,13 +195,13 @@ export default function Signup() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">Confirm Password</label>
+                <label className="block text-[13px] font-semibold text-zinc-300 mb-2 tracking-wide uppercase">Confirm Password</label>
                 <div className="relative">
                   <input 
                     type={showConfirmPassword ? "text" : "password"} 
                     value={confirmPassword}
                     onChange={e => setConfirmPassword(e.target.value)}
-                    className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-100 focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400 transition-all outline-none pr-10"
+                    className="w-full bg-[#0a0a0a] border border-white/[0.06] rounded-xl px-4 py-3.5 text-[15px] text-zinc-100 focus:border-white/20 focus:ring-0 shadow-[0_0_15px_rgba(255,255,255,0.02)] focus:shadow-[0_0_20px_rgba(255,255,255,0.08)] transition-all outline-none pr-10"
                     placeholder="••••••••"
                     required
                   />
@@ -215,7 +215,7 @@ export default function Signup() {
                 </div>
               </div>
               
-              <Button type="submit" disabled={isLoading} className="w-full mt-4 h-11 text-base font-medium rounded-lg bg-zinc-100 text-zinc-900 hover:bg-zinc-300 transition-colors">
+              <Button type="submit" disabled={isLoading} className="w-full mt-6 py-6 text-base font-semibold rounded-xl bg-white text-black hover:bg-zinc-100 hover:scale-[1.02] transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)]">
                 {isLoading ? <Loader2 className="animate-spin mr-2 h-5 w-5" /> : 'Create Account'}
               </Button>
             </form>
@@ -227,19 +227,19 @@ export default function Signup() {
               className="flex flex-col gap-5"
             >
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">Verification Code</label>
+                <label className="block text-[13px] font-semibold text-zinc-300 mb-2 tracking-wide uppercase">Verification Code</label>
                 <input 
                   type="text" 
                   value={otp}
                   onChange={e => setOtp(e.target.value)}
-                  className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-3 text-center text-2xl tracking-[0.5em] font-mono text-zinc-100 focus:ring-1 focus:ring-zinc-400 focus:border-zinc-400 transition-all outline-none"
+                  className="w-full bg-[#0a0a0a] border border-white/[0.06] rounded-xl px-4 py-4 text-center text-3xl tracking-[0.4em] font-mono text-zinc-100 focus:border-white/20 focus:ring-0 shadow-[0_0_15px_rgba(255,255,255,0.02)] focus:shadow-[0_0_20px_rgba(255,255,255,0.08)] transition-all outline-none"
                   placeholder="000000"
                   maxLength={6}
                   required
                 />
               </div>
               
-              <Button type="submit" disabled={isLoading} className="w-full mt-4 h-11 text-base font-medium rounded-lg bg-zinc-100 text-zinc-900 hover:bg-zinc-300 transition-colors">
+              <Button type="submit" disabled={isLoading} className="w-full mt-6 py-6 text-base font-semibold rounded-xl bg-white text-black hover:bg-zinc-100 hover:scale-[1.02] transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)]">
                 {isLoading ? <Loader2 className="animate-spin mr-2 h-5 w-5" /> : 'Verify & Continue'}
               </Button>
 

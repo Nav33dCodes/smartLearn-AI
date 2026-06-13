@@ -60,18 +60,18 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="dark min-h-screen flex items-center justify-center bg-zinc-950 px-4 py-8 relative overflow-hidden font-sans">
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/20 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-primary/10 blur-[120px] pointer-events-none" />
+    <div className="dark min-h-screen flex items-center justify-center bg-[#000000] px-4 py-8 relative overflow-hidden font-sans tracking-tight">
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-white/[0.03] blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-white/[0.02] blur-[120px] pointer-events-none" />
       
-      <div className="w-full max-w-md bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/50 rounded-3xl shadow-2xl p-8 relative z-10">
+      <div className="w-full max-w-md bg-[#050505] backdrop-blur-xl border border-white/[0.04] rounded-3xl shadow-2xl p-8 relative z-10">
         <Link to="/login" className="absolute top-6 left-6 text-zinc-400 hover:text-zinc-100 transition-colors">
           <ArrowLeft size={20} />
         </Link>
         
         <div className="text-center mb-8 mt-4">
-          <h1 className="text-3xl font-bold text-zinc-100 mb-2 tracking-tight">Reset Password</h1>
-          <p className="text-zinc-400 text-sm">
+          <h1 className="text-4xl font-bold text-white mb-3 tracking-tighter">Reset Password</h1>
+          <p className="text-zinc-400 text-[15px] leading-relaxed">
             {step === 1 ? "Enter your email to receive a code" : "Enter the OTP and your new password"}
           </p>
         </div>
@@ -79,30 +79,30 @@ export default function ForgotPassword() {
         {step === 1 ? (
           <form onSubmit={handleRequestOtp} className="flex flex-col gap-5">
             <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-1.5">Email Address</label>
+              <label className="block text-[13px] font-semibold text-zinc-300 mb-2 tracking-wide uppercase">Email Address</label>
               <input 
                 type="email" 
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="w-full bg-zinc-950/50 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-zinc-100 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none"
+                className="w-full bg-[#0a0a0a] border border-white/[0.06] rounded-xl px-4 py-3.5 text-[15px] text-zinc-100 focus:border-white/20 focus:ring-0 shadow-[0_0_15px_rgba(255,255,255,0.02)] focus:shadow-[0_0_20px_rgba(255,255,255,0.08)] transition-all outline-none"
                 placeholder="you@example.com"
                 required
               />
             </div>
             
-            <Button type="submit" disabled={isLoading} className="w-full mt-3 h-12 text-base font-semibold rounded-xl">
+            <Button type="submit" disabled={isLoading} className="w-full mt-6 py-6 text-base font-semibold rounded-xl bg-white text-black hover:bg-zinc-100 hover:scale-[1.02] transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)]">
               {isLoading ? <Loader2 className="animate-spin mr-2 h-5 w-5" /> : 'Send OTP Code'}
             </Button>
           </form>
         ) : (
           <form onSubmit={handleVerifyAndReset} className="flex flex-col gap-4">
             <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-1.5">6-Digit OTP Code</label>
+              <label className="block text-[13px] font-semibold text-zinc-300 mb-2 tracking-wide uppercase">6-Digit OTP Code</label>
               <input 
                 type="text" 
                 value={otp}
                 onChange={e => setOtp(e.target.value)}
-                className="w-full bg-zinc-950/50 border border-zinc-800 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none text-center tracking-[0.5em] font-mono text-xl text-zinc-100"
+                className="w-full bg-[#0a0a0a] border border-white/[0.06] rounded-xl px-4 py-4 focus:border-white/20 focus:ring-0 shadow-[0_0_15px_rgba(255,255,255,0.02)] focus:shadow-[0_0_20px_rgba(255,255,255,0.08)] transition-all outline-none text-center tracking-[0.4em] font-mono text-3xl text-zinc-100"
                 placeholder="000000"
                 maxLength={6}
                 required
@@ -110,13 +110,13 @@ export default function ForgotPassword() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-1.5">New Password</label>
+              <label className="block text-[13px] font-semibold text-zinc-300 mb-2 tracking-wide uppercase">New Password</label>
               <div className="relative">
                 <input 
                   type={showPassword ? "text" : "password"} 
                   value={newPassword}
                   onChange={e => setNewPassword(e.target.value)}
-                  className="w-full bg-zinc-950/50 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-zinc-100 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none pr-10"
+                  className="w-full bg-[#0a0a0a] border border-white/[0.06] rounded-xl px-4 py-3.5 text-[15px] text-zinc-100 focus:border-white/20 focus:ring-0 shadow-[0_0_15px_rgba(255,255,255,0.02)] focus:shadow-[0_0_20px_rgba(255,255,255,0.08)] transition-all outline-none pr-10"
                   placeholder="••••••••"
                   required
                 />
@@ -131,13 +131,13 @@ export default function ForgotPassword() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-1.5">Confirm New Password</label>
+              <label className="block text-[13px] font-semibold text-zinc-300 mb-2 tracking-wide uppercase">Confirm New Password</label>
               <div className="relative">
                 <input 
                   type={showConfirmPassword ? "text" : "password"} 
                   value={confirmPassword}
                   onChange={e => setConfirmPassword(e.target.value)}
-                  className="w-full bg-zinc-950/50 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-zinc-100 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none pr-10"
+                  className="w-full bg-[#0a0a0a] border border-white/[0.06] rounded-xl px-4 py-3.5 text-[15px] text-zinc-100 focus:border-white/20 focus:ring-0 shadow-[0_0_15px_rgba(255,255,255,0.02)] focus:shadow-[0_0_20px_rgba(255,255,255,0.08)] transition-all outline-none pr-10"
                   placeholder="••••••••"
                   required
                 />
@@ -151,7 +151,7 @@ export default function ForgotPassword() {
               </div>
             </div>
             
-            <Button type="submit" disabled={isLoading} className="w-full mt-3 h-12 text-base font-semibold rounded-xl">
+            <Button type="submit" disabled={isLoading} className="w-full mt-6 py-6 text-base font-semibold rounded-xl bg-white text-black hover:bg-zinc-100 hover:scale-[1.02] transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)]">
               {isLoading ? <Loader2 className="animate-spin mr-2 h-5 w-5" /> : 'Reset Password'}
             </Button>
           </form>
