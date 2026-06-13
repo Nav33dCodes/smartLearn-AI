@@ -24,7 +24,9 @@ SmartLearn AI transcends traditional chatbot interfaces by offering a suite of i
 - **Visual Knowledge Architecture:** Automatically extracts complex relationships from uploaded documents and plots them into a living, interactive node graph utilizing React Flow.
 - **Premium Data Tables & Structural Rendering:** Engineered custom Markdown processing to produce OLED-style glassmorphic tables with intelligent regex-based colored pill badges for analytical metrics. Native KaTeX integration ensures textbook-quality formatting for advanced calculus and physics equations.
 - **Dynamic UI Mechanics:** Features an intelligent auto-scroll locking algorithm that detects manual scroll velocity to gracefully detach during live streams, paired with sleek, morphing control buttons to mirror top-tier production environments.
-- **Secure Account Management:** Enterprise-grade account deletion and data purging flow, heavily secured by a time-sensitive OTP (One-Time Password) email verification pipeline.
+- **Advanced Voice Mode Engine:** A hyper-realistic, hands-free conversational interface featuring a full-screen dynamic glowing orb. Built with auto-listen mechanics, phase-state orchestration (Listening, Processing, Speaking), and aggressive Whisper audio filters to neutralize background noise hallucinations.
+- **Perplexity-Style Web Search:** Deep integration with the Tavily API for real-time web extraction. Results are presented in an interactive horizontal carousel of source cards—complete with favicons and site metadata—persistently saved to PostgreSQL.
+- **Enterprise SMTP & Authentication:** A completely overhauled automated email engine featuring official SmartLearn Red branding, dynamic logo injection, and glassmorphic OTP verification boxes, ensuring maximum security during password resets and account purging.
 
 ## Technical Stack
 
@@ -121,8 +123,11 @@ Create a `.env` file using the following industry-standard template:
 # ────────────────────────────────────────────────────
 # CORE INFRASTRUCTURE & AUTHENTICATION
 # ────────────────────────────────────────────────────
-# Allowed origins for CORS (comma-separated)
+# Allowed origins for CORS (Set to your Vercel URL in production)
 ALLOWED_ORIGINS="http://localhost:5173,http://localhost:3000"
+
+# URL used to dynamically route emails back to your React app
+FRONTEND_URL="http://localhost:5173"
 
 # Secret key for encrypting JWT tokens and session data
 JWT_SECRET="your_jwt_secret_here"
@@ -169,6 +174,16 @@ The backend initializes on `http://127.0.0.1:8000`.
 ```bash
 cd smartlearn-frontend
 npm install
+```
+
+To ensure the frontend correctly routes API traffic to the backend, create a `.env` file in the `smartlearn-frontend/` directory:
+```env
+# ────────────────────────────────────────────────────
+# VITE API CONFIGURATION (VERCEL DEPLOYMENT)
+# ────────────────────────────────────────────────────
+# Local dev: http://localhost:8000
+# Production: Your Railway Backend URL (e.g. https://smartlearn.up.railway.app)
+VITE_API_URL=http://localhost:8000
 ```
 
 Start the Vite development server:
