@@ -2,6 +2,33 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 14, 2026 — Supercharged Visual Knowledge Graphs & Critical Fixes (Phase 10)",
+    features: [
+      {
+        title: "Supercharged Visual Knowledge Graphs",
+        description: "Transformed static mind map generation into a powerful, interactive visual research tool.",
+        bullets: [
+          "Expandable Nodes: Hover over any node and click '+ Expand' to instantly fetch 3 new sub-concepts branching off the selected node.",
+          "Background Expansion API: A dedicated backend endpoint dynamically fetches expansions seamlessly without cluttering the chat timeline.",
+          "Dynamic Auto-Layout: The graph instantly recalculates its layout when new nodes are injected, smoothly adjusting branches to prevent overlapping.",
+          "Custom Interactive UI: Overhauled React Flow nodes with a sleek dark-mode aesthetic and primary-color accents."
+        ]
+      },
+      {
+        title: "Critical System & UI Bug Fixes",
+        description: "Resolved several high-priority edge cases ensuring flawless stream processing, consistent DB states, and solid UI alignments.",
+        bullets: [
+          "Token Stream Flush: Fixed an edge case where empty LLM tokens evaluated to false, preventing blank assistant bubbles.",
+          "Safe Stream Abortion: Rapidly clicking 'Regenerate' or triggering it while streaming now safely aborts the active stream, preventing concurrent race conditions.",
+          "Model Validation Loop: Eliminated an infinite React re-render loop inside the model validation logic by migrating to lazy initialization.",
+          "Server Message Timestamps: Injected Javascript-compatible Unix timestamps into all backend endpoints to fix missing UI timestamps on page load.",
+          "DB Session Isolation: Eradicated mixed Sync/Async database session conflicts by introducing a fully isolated async dependency.",
+          "OpenRouter API Guard: The OpenRouter client no longer erroneously attempts to boot using the Groq API key fallback."
+        ]
+      }
+    ]
+  },
+  {
     date: "June 13, 2026 — Premium Email Engine & Architecture (Phase 9)",
     features: [
       {
