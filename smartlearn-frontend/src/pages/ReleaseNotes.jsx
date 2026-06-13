@@ -2,6 +2,31 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 13, 2026 — Premium Email Engine & Architecture (Phase 9)",
+    features: [
+      {
+        title: "Industry-Level Email Templates",
+        description: "Completely overhauled the automated SMTP email engine (Welcome, Password Reset, Verification) to perfectly align with the premium SmartLearn aesthetic.",
+        bullets: [
+          "Official Brand Synchronization: Transitioned the default Indigo UI over to the signature SmartLearn Red (#ff3131).",
+          "Dynamic Logo Integration: The official SmartLearn SVG logo is now dynamically injected into the header of every outgoing email, loaded securely from your live domain.",
+          "Premium Action Buttons: Call-to-action buttons now feature modern rounded corners and a vibrant red, glowing drop-shadow.",
+          "Upgraded OTP Displays: One-Time Password verification codes are now presented inside a soft red box with bold, spaced-out monospace typography for effortless readability."
+        ]
+      },
+      {
+        title: "Enterprise Environment Architecture",
+        description: "Eradicated all hardcoded URLs and migrated the entire monorepo to an industry-standard Environment Variable architecture.",
+        bullets: [
+          "Zero-Config Local Dev: The backend CORS settings and frontend API calls now intelligently fallback to localhost, allowing seamless out-of-the-box development for new engineers.",
+          "VITE_API_URL Routing: The React frontend now strictly uses Vite's secure env injection to dynamically route API traffic to production without needing to change any code.",
+          "Dynamic Email Redirection: The backend now reads FRONTEND_URL from your environment, guaranteeing that all links inside your automated emails instantly point to your real Vercel domain.",
+          "Deployment Cheat Sheets: Injected .env.example files directly into both codebases to act as permanent, self-documenting Deployment Guides for Railway and Vercel."
+        ]
+      }
+    ]
+  },
+  {
     date: "June 13, 2026 — Advanced Voice Mode & Web Search UI (Phase 8)",
     features: [
       {
