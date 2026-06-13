@@ -130,10 +130,10 @@ function Sidebar({
             >
               <div
                 onClick={() => { if (editingChatId !== chat.id) handleSelectChat(chat.id) }}
-                className={`group flex items-center justify-between px-2.5 py-1.5 rounded-lg cursor-pointer mb-[2px] transition-colors ${
+                className={`group flex items-center justify-between px-4 py-2 rounded-full cursor-pointer mb-1 transition-all duration-300 ${
                   String(chat.id) === String(activeChatId) && currentView !== "chats"
-                    ? 'bg-black/5 dark:bg-white/5 text-foreground font-medium' 
-                    : 'text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground'
+                    ? 'bg-zinc-900/5 dark:bg-[#111111] text-zinc-900 dark:text-zinc-100 font-medium' 
+                    : 'text-zinc-500 dark:text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-zinc-100'
                 }`}
               >
                 <div className="flex items-center gap-2 overflow-hidden flex-1">
@@ -241,25 +241,25 @@ function Sidebar({
           marginLeft: sidebarOpen || isMobile ? 0 : -260
         }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className={`flex flex-col h-full bg-card/60 backdrop-blur-2xl border-r border-border/40 shadow-2xl z-50 ${isMobile ? 'fixed' : 'relative'}`}
+        className={`flex flex-col h-full bg-[#fcfcfd] dark:bg-[#000000] border-r border-black/5 dark:border-white/5 shadow-2xl z-50 ${isMobile ? 'fixed' : 'relative'}`}
       >
-        <div className="flex flex-col p-3 gap-1">
-          <div className="flex items-center justify-between mb-2 px-1">
+        <div className="flex flex-col p-4 gap-2">
+          <div className="flex items-center justify-between mb-6 px-1">
             <Link to="/app" className="flex items-center gap-3 group cursor-pointer hover:opacity-80 transition-opacity">
               <Logo size={28} />
-              <span className="font-semibold text-foreground tracking-tight text-xl">SmartLearn</span>
+              <span className="font-bold text-transparent bg-clip-text bg-gradient-to-br from-zinc-900 to-zinc-500 dark:from-zinc-100 dark:to-zinc-500 tracking-tighter text-xl">SmartLearn</span>
             </Link>
-            <button className="h-8 w-8 text-muted-foreground/70 hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-colors flex items-center justify-center" onClick={() => setSidebarOpen(false)}>
+            <button className="h-8 w-8 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors flex items-center justify-center" onClick={() => setSidebarOpen(false)}>
               <PanelLeftClose size={16} />
             </button>
           </div>
 
           <button 
             onClick={createNewChat}
-            className="w-full flex items-center gap-2 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 text-foreground transition-colors rounded-lg h-9 px-3 border-transparent"
+            className="w-full flex items-center gap-3 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-white text-white dark:text-zinc-900 transition-all duration-300 rounded-full h-11 px-4 font-semibold shadow-md active:scale-[0.98] group"
           >
-            <Plus size={16} className="text-muted-foreground" />
-            <span className="font-medium text-[14px]">New chat</span>
+            <Plus size={18} className="text-zinc-400 dark:text-zinc-500 group-hover:rotate-90 transition-transform duration-300" />
+            <span className="text-[14px]">New Chat</span>
           </button>
           
           <button 
@@ -267,20 +267,20 @@ function Sidebar({
               setCurrentView("chats");
               if (isMobile) setSidebarOpen(false);
             }}
-            className={`w-full flex items-center gap-2 hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded-lg h-9 px-3 border-transparent ${currentView === "chats" ? "bg-black/5 dark:bg-white/5 text-foreground font-semibold" : "text-muted-foreground"}`}
+            className={`w-full flex items-center gap-3 hover:bg-black/5 dark:hover:bg-[#111111] transition-all duration-300 rounded-full h-10 px-4 mt-1 border border-transparent ${currentView === "chats" ? "bg-black/5 dark:bg-white/10 text-zinc-900 dark:text-zinc-100 font-semibold shadow-sm" : "text-zinc-500 dark:text-zinc-400"}`}
           >
-            <Database size={16} className={currentView === "chats" ? "text-foreground" : "text-muted-foreground"} />
+            <Database size={16} className={currentView === "chats" ? "text-zinc-900 dark:text-zinc-100" : "text-zinc-400 dark:text-zinc-500"} />
             <span className="font-medium text-[14px]">Chats</span>
           </button>
         </div>
 
-        <div className="px-3 pb-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground/70" />
+        <div className="px-4 pb-4">
+          <div className="relative group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 dark:text-zinc-500 group-focus-within:text-zinc-900 dark:group-focus-within:text-zinc-100 transition-colors" />
             <Input 
               type="text"
               placeholder="Search..."
-              className="pl-9 bg-muted/40 border-transparent hover:bg-muted/60 focus:bg-background focus:border-ring focus:ring-1 h-10 text-sm rounded-xl transition-all shadow-none"
+              className="pl-9 bg-transparent border border-black/10 dark:border-white/10 hover:border-black/20 dark:hover:border-white/20 focus:bg-white dark:focus:bg-[#0a0a0a] focus:border-zinc-300 dark:focus:border-[#444444] h-10 text-sm rounded-full transition-all duration-300 w-full outline-none shadow-none text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:ring-0"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -363,10 +363,10 @@ function Sidebar({
 
               <div 
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center justify-between p-2 rounded-2xl cursor-pointer bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-300 border border-black/5 dark:border-white/5 shadow-sm group"
+                className="flex items-center justify-between p-1.5 pl-2 pr-3 rounded-full cursor-pointer bg-transparent hover:bg-black/5 dark:hover:bg-[#111111] transition-colors border border-transparent group"
               >
                 <div className="flex items-center gap-3 overflow-hidden">
-                  <div className="h-9 w-9 rounded-full bg-gradient-to-br from-zinc-200 to-zinc-300 dark:from-zinc-700 dark:to-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200 font-bold text-sm shrink-0 overflow-hidden ring-2 ring-background shadow-inner transition-transform duration-300 group-hover:scale-105">
+                  <div className="h-8 w-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-zinc-900 dark:text-zinc-100 font-semibold text-sm shrink-0 overflow-hidden shadow-sm">
                     {user?.avatar ? (
                       <img src={user.avatar} alt="Avatar" className="h-full w-full object-cover" />
                     ) : (
@@ -374,11 +374,11 @@ function Sidebar({
                     )}
                   </div>
                   <div className="flex flex-col justify-center">
-                    <span className="text-[14px] font-semibold text-zinc-900 dark:text-zinc-100 truncate max-w-[130px] tracking-tight">{user.name}</span>
+                    <span className="text-[14px] font-medium text-zinc-900 dark:text-zinc-100 truncate max-w-[140px] tracking-tight">{user.name}</span>
                   </div>
                 </div>
-                <div className="text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-200 transition-colors pr-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+                <div className="text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
                 </div>
               </div>
             </div>
