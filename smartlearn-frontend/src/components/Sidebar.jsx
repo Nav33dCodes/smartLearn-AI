@@ -319,42 +319,42 @@ function Sidebar({
 
         <div className="mt-auto flex flex-col">
           {user && (
-            <div className="relative p-2 border-t border-border/50" ref={userMenuRef}>
+            <div className="relative p-2 border-t border-black/5 dark:border-[#222]" ref={userMenuRef}>
               <AnimatePresence>
                 {showUserMenu && (
                   <motion.div
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute bottom-full left-2 right-2 mb-2 bg-card border border-border shadow-xl rounded-2xl overflow-hidden z-50 flex flex-col p-1.5"
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    className="absolute bottom-full left-2 right-2 mb-2 bg-[#fcfcfd]/90 dark:bg-[#111111]/90 backdrop-blur-2xl border border-black/10 dark:border-[#222] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] dark:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.8)] rounded-2xl overflow-hidden z-50 flex flex-col p-1.5"
                   >
                     <button
                       onClick={() => { setIsSettingsOpen(true); setShowUserMenu(false); }}
-                      className="flex items-center gap-3 px-3 py-2.5 text-sm hover:bg-muted rounded-xl transition-colors text-foreground text-left"
+                      className="flex items-center gap-3 px-2.5 py-2 text-[13px] hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors duration-200 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 text-left group"
                     >
-                      <Settings size={16} className="text-muted-foreground" />
+                      <Settings size={15} className="text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors duration-200" />
                       <span className="font-medium">Settings</span>
                     </button>
                     
                     <button
                       onClick={() => { window.open('/releases', '_blank'); setShowUserMenu(false); }}
-                      className="flex items-center justify-between px-3 py-2.5 text-sm hover:bg-muted rounded-xl transition-colors text-foreground text-left"
+                      className="flex items-center justify-between px-2.5 py-2 text-[13px] hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors duration-200 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 text-left group"
                     >
                       <div className="flex items-center gap-3">
-                        <Sparkles size={16} className="text-muted-foreground" />
+                        <Sparkles size={15} className="text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors duration-200" />
                         <span className="font-medium">Release notes</span>
                       </div>
-                      <ExternalLink size={14} className="text-muted-foreground opacity-50" />
+                      <ExternalLink size={13} className="text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors duration-200" />
                     </button>
 
-                    <div className="h-px bg-border my-1.5 mx-2" />
+                    <div className="h-[1px] bg-black/5 dark:bg-[#222] my-1 mx-2" />
                     
                     <button
                       onClick={(e) => { e.stopPropagation(); setShowLogoutModal(true); setShowUserMenu(false); }}
-                      className="flex items-center gap-3 px-3 py-2.5 text-sm hover:bg-destructive/10 text-destructive rounded-xl transition-colors text-left"
+                      className="flex items-center gap-3 px-2.5 py-2 text-[13px] hover:bg-red-500/10 text-red-600 dark:text-red-500 rounded-lg transition-colors duration-200 text-left group"
                     >
-                      <LogOut size={16} />
+                      <LogOut size={15} className="text-red-600/70 dark:text-red-500/70 group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors duration-200" />
                       <span className="font-medium">Log out</span>
                     </button>
                   </motion.div>
