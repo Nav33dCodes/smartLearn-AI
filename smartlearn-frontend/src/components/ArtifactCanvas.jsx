@@ -41,13 +41,13 @@ export default function ArtifactCanvas() {
         );
       case "quiz":
         return (
-          <div className="h-full w-full overflow-y-auto p-6 scrollbar-thin">
+          <div className="h-full w-full p-6">
             <QuizBlock data={content} />
           </div>
         );
       case "flashcards":
         return (
-          <div className="h-full w-full overflow-y-auto p-6 scrollbar-thin">
+          <div className="h-full w-full p-6">
             <FlashcardBlock data={content} />
           </div>
         );
@@ -120,7 +120,7 @@ export default function ArtifactCanvas() {
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-hidden relative">
+      <div className="flex-1 overflow-y-auto relative min-h-0 scrollbar-thin">
         {renderContent()}
       </div>
     </div>
