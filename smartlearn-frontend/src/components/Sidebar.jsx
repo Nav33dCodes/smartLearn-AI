@@ -363,17 +363,22 @@ function Sidebar({
 
               <div 
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center justify-between p-2 rounded-xl cursor-pointer hover:bg-muted/60 transition-colors border border-transparent hover:border-border/50"
+                className="flex items-center justify-between p-2 rounded-2xl cursor-pointer bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-300 border border-black/5 dark:border-white/5 shadow-sm group"
               >
                 <div className="flex items-center gap-3 overflow-hidden">
-                  <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0 overflow-hidden ring-1 ring-primary/20">
+                  <div className="h-9 w-9 rounded-full bg-gradient-to-br from-zinc-200 to-zinc-300 dark:from-zinc-700 dark:to-zinc-800 flex items-center justify-center text-zinc-800 dark:text-zinc-200 font-bold text-sm shrink-0 overflow-hidden ring-2 ring-background shadow-inner transition-transform duration-300 group-hover:scale-105">
                     {user?.avatar ? (
                       <img src={user.avatar} alt="Avatar" className="h-full w-full object-cover" />
                     ) : (
                       user.name ? user.name.charAt(0).toUpperCase() : "U"
                     )}
                   </div>
-                  <span className="text-[15px] font-medium text-foreground truncate max-w-[150px] tracking-tight">{user.name}</span>
+                  <div className="flex flex-col justify-center">
+                    <span className="text-[14px] font-semibold text-zinc-900 dark:text-zinc-100 truncate max-w-[130px] tracking-tight">{user.name}</span>
+                  </div>
+                </div>
+                <div className="text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-200 transition-colors pr-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
                 </div>
               </div>
             </div>
