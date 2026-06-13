@@ -4,7 +4,7 @@ load_dotenv()
 from sqlalchemy import create_engine, Column, Integer, Text, DateTime, func, Boolean, ForeignKey, Index
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -66,8 +66,8 @@ class User(Base):
     occupation = Column(Text, default="")
     style_tone = Column(Text, default="")
     custom_instructions = Column(Text, default="")
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
 
 class OTP(Base):
@@ -77,7 +77,7 @@ class OTP(Base):
     email = Column(Text, index=True, nullable=False)
     otp_hash = Column(Text, nullable=False)
     is_used = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     expires_at = Column(DateTime, nullable=False)
 
 
@@ -92,7 +92,7 @@ class Chat(Base):
     chat_id    = Column(Text, index=True)
     message    = Column(Text)
     response   = Column(Text)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 class ChatMetadata(Base):

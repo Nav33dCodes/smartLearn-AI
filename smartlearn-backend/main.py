@@ -5,6 +5,8 @@ import gc
 import os
 import uuid
 import time
+import anyio
+import anyio.to_thread
 from datetime import datetime, timezone
 from typing import Optional
 from contextlib import asynccontextmanager
@@ -32,6 +34,38 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
 security = HTTPBearer()
+
+# ── FIX: Increase Threadpool for Synchronous SSE Streaming
+# Prevents /chat endpoint from blocking all FastAPI workers under load.
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    anyio.to_thread.current_default_thread_limiter().total_tokens = 500
+    logger.info("=== SmartLearn AI starting up ===")
+    try:
+        db = SessionLocal()
+        db.execute(text("SELECT 1"))
+        try:
+            db.execute(text("ALTER TABLE chat_metadata ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT FALSE"))
+            db.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS nickname TEXT DEFAULT ''"))
+            db.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS occupation TEXT DEFAULT ''"))
+            db.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS style_tone TEXT DEFAULT ''"))
+            db.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_instructions TEXT DEFAULT ''"))
+        except Exception:
+            pass
+        db.commit()
+        db.close()
+        logger.info("✅ Database connected OK")
+    except Exception as e:
+        logger.error(f"❌ DATABASE FAILED: {e}")
+    try:
+        from services.rag import get_model
+        get_model()
+        logger.info("✅ Sentence transformer model loaded OK")
+    except Exception as e:
+        logger.error(f"❌ MODEL LOAD FAILED: {e}")
+    logger.info("=== Startup complete ===")
+    yield
+    logger.info("=== SmartLearn AI shutting down ===")
 
 class CachedUser:
     def __init__(self, id, name, email, avatar, nickname="", occupation="", style_tone="", custom_instructions=""):
