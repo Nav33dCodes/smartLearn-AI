@@ -256,9 +256,16 @@ def export_user_data(db: Session = Depends(get_db), current_user: User = Depends
 
 @router.delete("/user/chats")
 def delete_all_chats(db: Session = Depends(get_db), current_user: User = Depends(get_current_user_auth)):
+    from services.redis_client import delete_cache
+    chats = db.query(ChatMetadata).filter(ChatMetadata.user_id == current_user.id).all()
+    for chat in chats:
+        delete_cache(f"chat_messages:{chat.chat_id}")
+    
     db.query(Chat).filter(Chat.user_id == current_user.id).delete()
     db.query(ChatMetadata).filter(ChatMetadata.user_id == current_user.id).delete()
     db.commit()
+    
+    delete_cache(f"user_chats:{current_user.id}")
     return {"message": "All chats deleted successfully"}
 
 @router.post("/user/delete-request")
@@ -305,12 +312,17 @@ def delete_account(req: DeleteAccountRequest, db: Session = Depends(get_db), cur
     if not verify_and_clear_otp(current_user.email, req.otp):
         raise HTTPException(status_code=400, detail="Invalid or expired OTP")
     
-    # Delete everything
+    from services.redis_client import delete_cache
+    chats = db.query(ChatMetadata).filter(ChatMetadata.user_id == current_user.id).all()
+    for chat in chats:
+        delete_cache(f"chat_messages:{chat.chat_id}")
+        
     db.query(Chat).filter(Chat.user_id == current_user.id).delete()
     db.query(ChatMetadata).filter(ChatMetadata.user_id == current_user.id).delete()
     db.delete(current_user)
     db.commit()
-    from services.redis_client import delete_cache
+    
     delete_cache(f"user_profile:{current_user.id}")
+    delete_cache(f"user_chats:{current_user.id}")
     
     return {"message": "Account deleted successfully"}

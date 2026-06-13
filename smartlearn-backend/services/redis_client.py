@@ -15,10 +15,10 @@ _redis_client = None
 
 if REDIS_URL:
     try:
+        # Use a connection pool that handles forks automatically. 
+        # Do NOT ping() here, as it forces the socket to open before Uvicorn workers fork, causing cross-process socket corruption.
         _redis_client = redis.Redis.from_url(REDIS_URL, decode_responses=True)
-        # Test connection
-        _redis_client.ping()
-        logger.info("✅ Redis connected successfully.")
+        logger.info("✅ Redis client initialized (lazy connection).")
     except Exception as e:
         logger.warning(f"⚠️ Redis connection failed: {e}. Falling back to in-memory cache.")
         _redis_client = None

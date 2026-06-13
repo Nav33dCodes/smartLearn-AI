@@ -29,7 +29,8 @@ async def transcribe_audio(file_bytes: bytes, filename: str) -> str:
 
     except Exception as e:
         logger.error(f"Groq transcription error: {e}")
-        return ""
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")
 
 async def generate_speech(text: str, voice: str = "en-US-JennyNeural") -> bytes:
     """
