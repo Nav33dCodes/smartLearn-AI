@@ -39,6 +39,20 @@ export default function Landing() {
   
   const heroTabs = [
     {
+      id: 'voice',
+      icon: <BrainCircuit size={18} />,
+      title: "Advanced Voice Mode",
+      description: "Hands-Free Conversations",
+      bullets: ["Hyper-realistic Edge TTS Audio generation", "Immersive full-screen sound-reactive orb UI", "Auto-listen flow for continuous conversation"]
+    },
+    {
+      id: 'websearch',
+      icon: <Globe size={18} />,
+      title: "Real-Time Web Search",
+      description: "Perplexity-Style Browsing",
+      bullets: ["Instant web scraping via Tavily Search API", "Beautiful horizontal interactive sources carousel", "Fact-check hallucinations with real citations"]
+    },
+    {
       id: 'vision',
       icon: <ImageIcon size={18} />,
       title: "Native Vision",
@@ -144,7 +158,7 @@ export default function Landing() {
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/30 border border-red-900/50 text-sm text-red-200 mb-8 backdrop-blur-sm"
           >
             <Sparkles size={14} className="text-red-500" />
-            <span className="font-semibold tracking-wide">SmartLearn v2.0 is now live</span>
+            <span className="font-semibold tracking-wide">SmartLearn Voice Mode is now live</span>
             <span className="w-px h-3 bg-red-900/50 mx-1" />
             <Link to="/releases" className="text-red-400 hover:text-red-300 flex items-center gap-1 font-bold transition-colors">
               Read more <ArrowRight size={12} />

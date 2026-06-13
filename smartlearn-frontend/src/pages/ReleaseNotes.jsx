@@ -2,6 +2,38 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 13, 2026 — Advanced Voice Mode & Web Search UI (Phase 8)",
+    features: [
+      {
+        title: "Advanced Voice Mode (Full-Screen Glowing Orb)",
+        description: "Experience hands-free, hyper-realistic voice conversations with SmartLearn AI.",
+        bullets: [
+          "Immersive UI: A full-screen dark blur overlay with a beautiful, sound-reactive glowing orb.",
+          "4-Phase Orchestration: The orb dynamically changes colors to indicate Listening (Red), Processing (Blue), and Speaking (White pulsing).",
+          "Auto-Listen Flow: Once activated, the AI automatically listens to your voice and replies continuously without needing to click any buttons.",
+          "Whisper Hallucination Filter: Aggressively filters out static background noise to prevent the AI from hallucinating 'Thank you' or other common artifacts."
+        ]
+      },
+      {
+        title: "Perplexity-Style Web Search Carousel",
+        description: "Real-time web browsing results are now beautifully visualized directly inside the chat.",
+        bullets: [
+          "Interactive Source Cards: A sleek, horizontally scrolling carousel displaying the favicon, website title, and domain for every source the AI used to answer your question.",
+          "Persistent State: Integrated directly into the Postgres backend using hidden HTML injection to ensure your web search sources survive page reloads and cross-device syncing without requiring heavy database schema migrations.",
+          "Windows Compatibility: Built with native desktop horizontal scrolling support in mind, removing strict touch-only hidden scrollbars."
+        ]
+      },
+      {
+        title: "ChatGPT-Style Dynamic Input Box",
+        description: "The chat input bar has been completely re-engineered to be incredibly intuitive and dynamic.",
+        bullets: [
+          "Dynamic Action Buttons: When the input is empty, you'll see the Mic and Voice Mode icons. The exact millisecond you start typing, they instantly disappear and are replaced by the solid Send button.",
+          "Premium Aesthetics: Upgraded to use sleek, matching icons like the 'BrainCircuit' to maintain the premium, high-tech aesthetic of SmartLearn."
+        ]
+      }
+    ]
+  },
+  {
     date: "June 13, 2026 — Personalization Engine & Sandpack IDE (Phase 7)",
     features: [
       {
