@@ -1,6 +1,6 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useState } from "react";
 import { useArtifacts } from "../context/ArtifactContext";
-import { X, Play, BrainCircuit, Layers, Network } from "lucide-react";
+import { X, Play, BrainCircuit, Layers, Network, Maximize2, Minimize2, Code, Eye, Square } from "lucide-react";
 
 // Lazy load heavy components
 const SandpackBlock = React.lazy(() => import("./SandpackBlock"));
@@ -10,6 +10,8 @@ import MindMapBlock from "./MindMapBlock";
 
 export default function ArtifactCanvas() {
   const { activeArtifact, setActiveArtifact } = useArtifacts();
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [viewMode, setViewMode] = useState("preview"); // "code" | "preview" | "split"
 
   if (!activeArtifact) return null;
 
@@ -32,27 +34,27 @@ export default function ArtifactCanvas() {
       case "sandpack":
         return (
           <Suspense fallback={<div className="flex h-full items-center justify-center text-zinc-500 animate-pulse">Booting IDE Engine...</div>}>
-            <div className="h-full w-full overflow-hidden p-4">
-              <SandpackBlock code={content} language={language || "javascript"} />
+            <div className="h-full w-full overflow-hidden p-0">
+              <SandpackBlock code={content} language={language || "javascript"} viewMode={viewMode} />
             </div>
           </Suspense>
         );
       case "quiz":
         return (
           <div className="h-full w-full overflow-y-auto p-6 scrollbar-thin">
-            <QuizBlock content={content} />
+            <QuizBlock data={content} />
           </div>
         );
       case "flashcards":
         return (
           <div className="h-full w-full overflow-y-auto p-6 scrollbar-thin">
-            <FlashcardBlock content={content} />
+            <FlashcardBlock data={content} />
           </div>
         );
       case "mindmap":
         return (
           <div className="h-full w-full p-4 relative">
-            <MindMapBlock content={content} />
+            <MindMapBlock data={content} />
           </div>
         );
       default:
@@ -65,7 +67,9 @@ export default function ArtifactCanvas() {
   };
 
   return (
-    <div className="flex h-full w-full flex-col bg-[#0d0d0d] shadow-2xl relative overflow-hidden animate-in fade-in slide-in-from-right-8 duration-300">
+    <div className={`flex flex-col bg-[#0d0d0d] shadow-2xl relative overflow-hidden animate-in fade-in slide-in-from-right-8 duration-300 transition-all ${
+      isFullScreen ? "fixed inset-0 z-[100]" : "h-full w-full"
+    }`}>
       {/* Header */}
       <div className="flex h-14 items-center justify-between border-b border-white/5 bg-[#09090b]/80 px-4 backdrop-blur-md shrink-0">
         <div className="flex items-center gap-3">
@@ -74,13 +78,45 @@ export default function ArtifactCanvas() {
           </div>
           <h3 className="text-sm font-semibold text-zinc-100">{title}</h3>
         </div>
-        <button 
-          onClick={handleClose}
-          className="rounded-lg p-2 text-zinc-400 hover:bg-white/5 hover:text-white transition-colors"
-          title="Close Canvas"
-        >
-          <X size={18} />
-        </button>
+        
+        {/* Center Toggles */}
+        {type === "sandpack" && (
+          <div className="flex items-center bg-[#18181b] p-1 rounded-lg border border-white/5">
+            <button
+              onClick={() => setViewMode("code")}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${viewMode === "code" ? "bg-[#27272a] text-white shadow-sm" : "text-zinc-400 hover:text-white"}`}
+            >
+              <Code size={14} /> Code
+            </button>
+            <button
+              onClick={() => setViewMode("preview")}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${viewMode === "preview" ? "bg-[#27272a] text-white shadow-sm" : "text-zinc-400 hover:text-white"}`}
+            >
+              <Eye size={14} /> Execution
+            </button>
+          </div>
+        )}
+
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => setIsFullScreen(!isFullScreen)}
+            className="rounded-lg p-2 text-zinc-400 hover:bg-white/5 hover:text-white transition-colors"
+            title={isFullScreen ? "Exit Full Screen" : "Full Screen"}
+          >
+            {isFullScreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+          </button>
+          
+          <div className="w-px h-4 bg-white/10 mx-1"></div>
+
+          <button 
+            onClick={handleClose}
+            className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors border border-transparent hover:border-red-500/20"
+            title="Stop Execution & Close"
+          >
+            <Square size={12} className="fill-current" />
+            Stop Execution
+          </button>
+        </div>
       </div>
 
       {/* Content Area */}

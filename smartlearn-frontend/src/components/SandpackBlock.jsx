@@ -1,7 +1,7 @@
 import React from 'react';
 import { Sandpack } from "@codesandbox/sandpack-react";
 
-export default function SandpackBlock({ code, language }) {
+export default function SandpackBlock({ code, language, viewMode = "preview" }) {
   // Infer template based on language or hints in the code
   let template = "vanilla";
   if (language === 'react' || language === 'jsx' || code.includes('import React')) {
@@ -19,7 +19,7 @@ export default function SandpackBlock({ code, language }) {
   else if (template === "vue") mainFile = "/src/App.vue";
 
   return (
-    <div className="w-full rounded-2xl overflow-hidden shadow-2xl my-6 border border-white/10 bg-[#09090b]">
+    <div className="w-full h-full bg-[#09090b]">
       <Sandpack
         template={template}
         theme="dark"
@@ -27,11 +27,12 @@ export default function SandpackBlock({ code, language }) {
           [mainFile]: code
         }}
         options={{
-          showNavigator: true,
+          showNavigator: viewMode === "preview",
           showTabs: true,
           closableTabs: false,
-          editorHeight: 500,
+          editorHeight: "100vh",
           wrapContent: true,
+          layout: viewMode === "code" ? "editor" : "preview"
         }}
       />
     </div>
