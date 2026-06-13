@@ -291,6 +291,10 @@ def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_user: Use
         finally:
             complete = "".join(full_response)
             if complete.strip():
+                if 'urls' in locals() and urls:
+                    import json as _json
+                    hidden_data = _json.dumps(urls)
+                    complete += f"\n\n<!-- SOURCES_JSON: {hidden_data} -->"
                 background_tasks.add_task(save_to_db, current_user.id, chat_id, message, complete)
             yield f"data: {json.dumps({'done': True})}\n\n"
 

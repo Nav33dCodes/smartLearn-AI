@@ -150,10 +150,11 @@ def search_tavily(query: str):
         for r in results:
             content = r.get('content', '')
             url = r.get('url', '')
+            title = r.get('title', '')
             if content:
                 formatted_results.append(f"- **Source** ({url}):\n{content}")
-                if url and url not in urls:
-                    urls.append(url)
+                if url and not any(u.get('url') == url for u in urls):
+                    urls.append({"title": title, "url": url})
                 
         return "\n\n".join(formatted_results), urls
     except Exception as e:

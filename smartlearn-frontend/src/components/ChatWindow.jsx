@@ -187,27 +187,60 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
                     </div>
                     <div className="flex flex-col gap-1 flex-1 min-w-0">
                       
-                      {msg.sources && msg.sources.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mb-1 pt-1">
-                          {msg.sources.map((url, i) => {
-                            try {
-                              const domain = new URL(url).hostname.replace('www.', '');
-                              return (
-                                <a key={i} href={url} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-2.5 py-1 h-7 bg-muted/40 hover:bg-muted border border-border/60 rounded-full text-[11px] font-medium text-foreground/80 transition-colors cursor-pointer hover:border-primary/40 group/link">
-                                  <div className="w-4 h-4 rounded-full bg-background flex items-center justify-center shrink-0 shadow-sm border border-border/50 overflow-hidden">
-                                    <img src={`https://www.google.com/s2/favicons?domain=${domain}&sz=32`} className="w-3 h-3" alt={domain} />
-                                  </div>
-                                  <span className="truncate max-w-[120px] group-hover/link:text-primary transition-colors">{domain}</span>
-                                </a>
-                              );
-                            } catch (e) { return null; }
-                          })}
-                        </div>
-                      )}
+                      {(() => {
+                        let displayContent = msg.content || "";
+                        let msgSources = msg.sources || [];
+                        
+                        if (displayContent.includes("<!-- SOURCES_JSON: ")) {
+                           try {
+                              const parts = displayContent.split("<!-- SOURCES_JSON: ");
+                              displayContent = parts[0].trimEnd();
+                              const jsonStr = parts[1].split(" -->")[0];
+                              const parsedSources = JSON.parse(jsonStr);
+                              // Merge if necessary, or just override
+                              if (parsedSources && parsedSources.length > 0) {
+                                msgSources = parsedSources;
+                              }
+                           } catch (e) {}
+                        }
 
-                      <div className="text-foreground leading-relaxed text-base pt-1 relative">
-                        <AIMessage content={msg.content} isGenerating={isLast && loading} />
-                      </div>
+                        return (
+                          <>
+                            {msgSources && msgSources.length > 0 && (
+                              <div className="flex flex-col gap-2 mb-2 pt-1 w-full max-w-full overflow-hidden">
+                          <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider pl-1">
+                            <Globe size={12} className="text-primary/70" />
+                            <span>Sources</span>
+                          </div>
+                          <div className="flex overflow-x-auto snap-x gap-2 pb-3 -mx-2 px-2">
+                            {msgSources.map((source, i) => {
+                              try {
+                                const url = typeof source === 'string' ? source : source.url;
+                                const title = typeof source === 'string' ? '' : source.title;
+                                const domain = new URL(url).hostname.replace('www.', '');
+                                return (
+                                  <a key={i} href={url} target="_blank" rel="noreferrer" className="flex flex-col gap-1.5 shrink-0 w-[160px] h-[72px] bg-muted/30 border border-border/50 hover:bg-muted/80 hover:border-primary/30 rounded-xl p-2.5 transition-all duration-300 cursor-pointer group/card snap-start shadow-sm">
+                                    <div className="flex items-center gap-1.5 w-full">
+                                      <div className="w-4 h-4 rounded-full bg-background flex items-center justify-center shrink-0 shadow-sm border border-border/50 overflow-hidden">
+                                        <img src={`https://www.google.com/s2/favicons?domain=${domain}&sz=32`} className="w-3 h-3" alt={domain} />
+                                      </div>
+                                      <span className="truncate text-[10px] font-semibold text-muted-foreground group-hover/card:text-primary/80 transition-colors flex-1 uppercase tracking-wide">{domain}</span>
+                                    </div>
+                                    <span className="text-[12px] font-medium text-foreground/90 line-clamp-2 leading-snug group-hover/card:text-foreground transition-colors">{title || domain}</span>
+                                  </a>
+                                );
+                                } catch (e) { return null; }
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="text-foreground leading-relaxed text-base pt-1 relative">
+                          <AIMessage content={displayContent} isGenerating={isLast && loading} />
+                        </div>
+                      </>
+                    );
+                  })()}
                       <div className="flex items-center mt-3 opacity-0 group-hover:opacity-100 transition-opacity gap-1 pl-1">
                         <button
                           onClick={() => {

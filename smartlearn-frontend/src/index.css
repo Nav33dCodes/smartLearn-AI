@@ -45,7 +45,7 @@
   --card-foreground: #1f2023;
   --popover: #fcfcfd;
   --popover-foreground: #1f2023;
-  --primary: #2d2e32; 
+  --primary: #2d2e32;
   --primary-foreground: #ffffff;
   --secondary: #f0f0f2;
   --secondary-foreground: #1f2023;
@@ -95,6 +95,7 @@
 .mesh-bg {
   background-color: var(--background);
 }
+
 .dark .mesh-bg {
   background-color: var(--background);
 }
@@ -121,6 +122,7 @@ html {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 4px;
@@ -128,12 +130,14 @@ html {
 
 /* Fix browser autofill breaking dark mode */
 input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px #18181b inset !important; /* bg-zinc-900 */
-    -webkit-text-fill-color: #f4f4f5 !important; /* text-zinc-100 */
-    caret-color: #f4f4f5 !important;
+  -webkit-box-shadow: 0 0 0 30px #18181b inset !important;
+  /* bg-zinc-900 */
+  -webkit-text-fill-color: #f4f4f5 !important;
+  /* text-zinc-100 */
+  caret-color: #f4f4f5 !important;
 }
 
 /* Premium Focus Ring Utility */
@@ -145,12 +149,32 @@ input:-webkit-autofill:active {
 
 /* Skeleton Shimmer Animation */
 @keyframes shimmer {
-  0% { background-position: -1000px 0; }
-  100% { background-position: 1000px 0; }
+  0% {
+    background-position: -1000px 0;
+  }
+
+  100% {
+    background-position: 1000px 0;
+  }
 }
 
 .animate-shimmer {
   animation: shimmer 2.5s infinite linear;
   background: linear-gradient(to right, var(--muted) 4%, var(--border) 25%, var(--muted) 36%);
   background-size: 1000px 100%;
+}
+
+/* Web Sources Utilities */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.mask-edges {
+  mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent);
 }
