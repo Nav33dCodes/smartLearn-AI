@@ -35,6 +35,7 @@ const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
 function ChatDashboard() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { activeArtifact, isFullScreen } = useArtifacts();
   const { data: chatsData = [], isLoading: isChatsLoading } = useChats();
   const shareChatMutation = useShareChat();
   
@@ -356,7 +357,6 @@ function ChatDashboard() {
     setAbortController(null);
   };
 
-  const { activeArtifact } = useArtifacts();
 
   return (
     <div className="flex h-screen mesh-bg text-foreground overflow-hidden">
@@ -529,7 +529,13 @@ function ChatDashboard() {
         
         {/* The Right-Hand Artifact Canvas Panel (Smooth Transition Wrapper) */}
         {!isMobile && (
-          <div className={`shrink-0 h-full transition-all duration-300 ease-in-out bg-[#0d0d0d] ${activeArtifact ? 'w-1/2 border-l border-white/5' : 'w-0 border-transparent overflow-hidden'}`}>
+          <div className={`shrink-0 h-full transition-all duration-300 ease-in-out bg-[#0d0d0d] ${
+            !activeArtifact 
+              ? 'w-0 border-transparent overflow-hidden' 
+              : isFullScreen 
+                ? 'absolute inset-0 z-50 w-full' 
+                : 'relative w-1/2 border-l border-white/5'
+          }`}>
             {activeArtifact && <ArtifactCanvas activeChatId={activeChatId} />}
           </div>
         )}

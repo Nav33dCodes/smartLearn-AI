@@ -9,8 +9,7 @@ import FlashcardBlock from "./FlashcardBlock";
 import MindMapBlock from "./MindMapBlock";
 
 export default function ArtifactCanvas({ activeChatId }) {
-  const { activeArtifact, setActiveArtifact } = useArtifacts();
-  const [isFullScreen, setIsFullScreen] = useState(false);
+  const { activeArtifact, setActiveArtifact, isFullScreen, setIsFullScreen } = useArtifacts();
   const [viewMode, setViewMode] = useState("preview"); // "code" | "preview" | "split"
 
   if (!activeArtifact) return null;
@@ -67,9 +66,7 @@ export default function ArtifactCanvas({ activeChatId }) {
   };
 
   return (
-    <div className={`flex flex-col bg-[#0d0d0d] shadow-2xl relative overflow-hidden animate-in fade-in slide-in-from-right-8 duration-300 transition-all ${
-      isFullScreen ? "fixed inset-0 z-[100]" : "h-full w-full"
-    }`}>
+    <div className="flex flex-col bg-[#0d0d0d] shadow-2xl relative overflow-hidden animate-in fade-in slide-in-from-right-8 duration-300 transition-all h-full w-full">
       {/* Header */}
       <div className="flex h-14 items-center justify-between border-b border-white/5 bg-[#09090b]/80 px-4 backdrop-blur-md shrink-0">
         <div className="flex items-center gap-3">
@@ -100,10 +97,15 @@ export default function ArtifactCanvas({ activeChatId }) {
         <div className="flex items-center gap-2">
           <button 
             onClick={() => setIsFullScreen(!isFullScreen)}
-            className="rounded-lg p-2 text-zinc-400 hover:bg-white/5 hover:text-white transition-colors"
-            title={isFullScreen ? "Exit Full Screen" : "Full Screen"}
+            className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all border ${
+              isFullScreen 
+                ? "bg-primary/10 text-primary border-primary/30 hover:bg-primary/20" 
+                : "bg-[#18181b] text-zinc-300 hover:bg-[#27272a] hover:text-white border-white/5"
+            }`}
+            title={isFullScreen ? "Exit Full Screen" : "Expand to Full Screen"}
           >
-            {isFullScreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+            {isFullScreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+            {isFullScreen ? "Exit Full Screen" : "Full Screen"}
           </button>
           
           <div className="w-px h-4 bg-white/10 mx-1"></div>

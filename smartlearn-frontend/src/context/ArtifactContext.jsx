@@ -3,11 +3,21 @@ import React, { createContext, useContext, useState } from 'react';
 const ArtifactContext = createContext();
 
 export function ArtifactProvider({ children }) {
-  // activeArtifact structure: { type: 'sandpack' | 'quiz' | 'mindmap' | 'flashcards', content: string, title: string, language?: string }
   const [activeArtifact, setActiveArtifact] = useState(null);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
+  const setArtifact = (artifact) => {
+    setActiveArtifact(artifact);
+    if (!artifact) setIsFullScreen(false);
+  };
 
   return (
-    <ArtifactContext.Provider value={{ activeArtifact, setActiveArtifact }}>
+    <ArtifactContext.Provider value={{ 
+      activeArtifact, 
+      setActiveArtifact: setArtifact,
+      isFullScreen,
+      setIsFullScreen
+    }}>
       {children}
     </ArtifactContext.Provider>
   );
