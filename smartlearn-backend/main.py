@@ -103,6 +103,33 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
     }, expire_seconds=3600)
     return user
 
+async def get_current_user_async(credentials: HTTPAuthorizationCredentials = Depends(security), db: AsyncSession = Depends(get_async_db)):
+    payload = verify_token(credentials.credentials, token_type="access")
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    user_id = payload.get("sub")
+    
+    from services.redis_client import get_cache, set_cache
+    cache_key = f"user_profile:{user_id}"
+    cached_user = get_cache(cache_key)
+    if cached_user:
+        return CachedUser(**cached_user)
+        
+    from sqlalchemy import select
+    result = await db.execute(select(User).filter(User.id == int(user_id)))
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+        
+    set_cache(cache_key, {
+        "id": user.id, "name": user.name, "email": user.email, "avatar": user.avatar,
+        "nickname": user.nickname or "",
+        "occupation": user.occupation or "",
+        "style_tone": user.style_tone or "",
+        "custom_instructions": user.custom_instructions or ""
+    }, expire_seconds=3600)
+    return user
+
 def get_full_chat_id(user_id: int, chat_id: str) -> str:
     prefix = f"{user_id}_"
     return str(chat_id) if str(chat_id).startswith(prefix) else f"{prefix}{chat_id}"
@@ -347,7 +374,7 @@ def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_user: Use
 # GET CHATS
 # ────────────────────────────────────────────────────
 @app.get("/chats")
-async def get_chats(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_async_db)):
+async def get_chats(current_user: User = Depends(get_current_user_async), db: AsyncSession = Depends(get_async_db)):
     cache_key = f"user_chats:{current_user.id}"
     cached_data = get_cache(cache_key)
     if cached_data:
@@ -388,7 +415,7 @@ async def get_chats(current_user: User = Depends(get_current_user), db: AsyncSes
 # GET CHAT MESSAGES
 # ────────────────────────────────────────────────────
 @app.get("/chat/{chat_id}/messages")
-async def get_chat_messages(chat_id: str, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_async_db)):
+async def get_chat_messages(chat_id: str, current_user: User = Depends(get_current_user_async), db: AsyncSession = Depends(get_async_db)):
     full_chat_id = get_full_chat_id(current_user.id, chat_id)
     cache_key = f"chat_messages:{full_chat_id}"
     cached_data = get_cache(cache_key)
@@ -400,8 +427,10 @@ async def get_chat_messages(chat_id: str, current_user: User = Depends(get_curre
         chats = result.scalars().all()
         messages = []
         for c in chats:
-            messages.append({"role": "user", "content": c.message})
-            messages.append({"role": "assistant", "content": c.response})
+            ts = int(c.created_at.timestamp() * 1000) if getattr(c, 'created_at', None) else None
+            messages.append({"role": "user", "content": c.message, "timestamp": ts})
+            if c.response:
+                messages.append({"role": "assistant", "content": c.response, "timestamp": ts})
             
         data = {"messages": messages}
         set_cache(cache_key, data)
@@ -548,8 +577,10 @@ def get_shared_chat(share_id: str, db: Session = Depends(get_db)):
     chats = db.query(Chat).filter(Chat.chat_id == metadata.chat_id).order_by(Chat.id.asc()).all()
     messages = []
     for c in chats:
-        messages.append({"role": "user", "content": c.message})
-        messages.append({"role": "assistant", "content": c.response})
+        ts = int(c.created_at.timestamp() * 1000) if getattr(c, 'created_at', None) else None
+        messages.append({"role": "user", "content": c.message, "timestamp": ts})
+        if c.response:
+            messages.append({"role": "assistant", "content": c.response, "timestamp": ts})
         
     return {"title": metadata.title, "messages": messages, "created_at": chats[0].created_at if chats else None}
 

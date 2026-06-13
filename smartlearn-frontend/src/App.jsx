@@ -62,7 +62,9 @@ function ChatDashboard() {
     return localStorage.getItem("sl_theme_color") || "#ff3131"; // default Red
   });
   const [selectedModelId, setSelectedModelId] = useState(() => {
-    return localStorage.getItem("sl_model") || "gemini:gemini-2.5-flash";
+    const saved = localStorage.getItem("sl_model");
+    if (saved && MODELS.some(m => m.id === saved)) return saved;
+    return "gemini:gemini-2.5-flash";
   });
   const [isMobile, setIsMobile] = useState(false);
 
@@ -97,12 +99,7 @@ function ChatDashboard() {
     localStorage.setItem("sl_model", selectedModelId);
   }, [selectedModelId]);
 
-  useEffect(() => {
-    // Clean up invalid models from local storage gracefully
-    if (!MODELS.some(m => m.id === selectedModelId)) {
-      setSelectedModelId("gemini:gemini-2.5-flash");
-    }
-  }, [selectedModelId]);
+
 
   // Dynamic Browser Tab Title
   useEffect(() => {
@@ -254,7 +251,7 @@ function ChatDashboard() {
               continue;
             }
             
-            if (parsed.token) {
+            if (typeof parsed.token === 'string') {
               setStreamStatus(null);
               accumulated += parsed.token;
               // Smooth frontend token reveal via requestAnimationFrame
@@ -335,6 +332,7 @@ function ChatDashboard() {
   };
 
   const regenerateMessage = () => {
+    if (loading) stopGeneration();
     if (activeMessages.length < 2) return;
     
     // Find the last user message

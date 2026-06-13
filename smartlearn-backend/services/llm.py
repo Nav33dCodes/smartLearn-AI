@@ -9,9 +9,9 @@ load_dotenv(override=True)
 
 # OpenRouter Client (with timeout)
 openrouter_client = None
-if os.getenv("OPENROUTER_API_KEY") or os.getenv("GROQ_API_KEY"):
+if os.getenv("OPENROUTER_API_KEY"):
     openrouter_client = OpenAI(
-        api_key=os.getenv("OPENROUTER_API_KEY", os.getenv("GROQ_API_KEY")),
+        api_key=os.getenv("OPENROUTER_API_KEY"),
         base_url="https://openrouter.ai/api/v1",
         timeout=15.0
     )
