@@ -424,7 +424,7 @@ export default function SettingsModal({
                         <div className="text-sm text-muted-foreground">Show past conversations in the sidebar</div>
                       </div>
                       <button onClick={toggleHistoryHidden} className={`w-9 h-5 rounded-full transition-colors relative ${!isHistoryHidden ? 'bg-primary' : 'bg-zinc-200 dark:bg-zinc-700'}`}>
-                        <span className={`block w-4 h-4 bg-white rounded-full absolute top-0.5 transition-transform ${!isHistoryHidden ? 'left-4.5 translate-x-4' : 'translate-x-0.5'}`} />
+                        <span className={`block w-4 h-4 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform ${!isHistoryHidden ? 'translate-x-4' : 'translate-x-0'}`} />
                       </button>
                     </div>
 
@@ -474,7 +474,7 @@ export default function SettingsModal({
                         <div className="text-sm text-muted-foreground">Permanently clear your entire history</div>
                       </div>
                       {!deleteChatsConfirm ? (
-                        <button onClick={() => setDeleteChatsConfirm(true)} className="px-3 py-1.5 text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 text-sm font-medium rounded-md transition-colors">
+                        <button onClick={() => setDeleteChatsConfirm(true)} className="px-3 py-1.5 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-500 hover:bg-red-100 dark:hover:bg-red-500/20 text-sm font-medium rounded-md transition-colors">
                           Delete all
                         </button>
                       ) : (
@@ -490,7 +490,7 @@ export default function SettingsModal({
                         <div className="text-sm font-medium text-red-600 dark:text-red-500">Delete account</div>
                         <div className="text-sm text-muted-foreground">Permanently delete your account and data</div>
                       </div>
-                      <button onClick={() => setActiveTab('delete_account')} className="px-3 py-1.5 text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 text-sm font-medium rounded-md transition-colors">
+                      <button onClick={() => setActiveTab('delete_account')} className="px-3 py-1.5 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-500 hover:bg-red-100 dark:hover:bg-red-500/20 text-sm font-medium rounded-md transition-colors">
                         Delete
                       </button>
                     </div>
