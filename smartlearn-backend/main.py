@@ -116,7 +116,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="SmartLearn AI", version="14.0.0", lifespan=lifespan)
 
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "https://smart-learn-ai-gules.vercel.app,http://localhost:5173,http://localhost:3000").split(",")
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000").split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[origin.strip() for origin in ALLOWED_ORIGINS if origin.strip()],
