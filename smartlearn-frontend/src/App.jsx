@@ -382,7 +382,7 @@ function ChatDashboard() {
 
       <div className="flex-1 flex flex-row h-full relative overflow-hidden bg-background">
         <main className={`flex flex-col relative h-full overflow-hidden transition-all duration-300 ease-in-out ${activeArtifact && !isMobile ? 'w-1/2 shrink-0' : 'w-full flex-1'}`}>
-          <header className="absolute top-0 left-0 right-0 h-14 px-4 flex items-center justify-between z-40 glass border-b border-border/50">
+          <header className="absolute top-0 left-0 right-0 h-14 px-4 flex items-center justify-between z-40 bg-white/70 dark:bg-[#000000]/70 backdrop-blur-md border-b border-black/5 dark:border-white/5 transition-colors duration-300">
           <div className="flex items-center gap-2">
             {(!sidebarOpen || isMobile) && (
               <button 
