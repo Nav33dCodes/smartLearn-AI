@@ -232,10 +232,10 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          className={`glass shadow-2xl rounded-[32px] border-b-4 border-t border-l border-r relative flex flex-col transition-all ${
+          className={`bg-[#fcfcfc] dark:bg-[#1a1a1a] shadow-[0_2px_10px_rgba(0,0,0,0.02)] dark:shadow-none rounded-[24px] border border-black/5 dark:border-white/10 relative flex flex-col transition-all duration-300 ${
             isDragging 
-              ? 'border-primary ring-2 ring-primary/20 bg-primary/5' 
-              : 'border-border/50 border-b-primary focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-transparent focus-within:border-b-primary hover:shadow-primary/5'
+              ? 'ring-2 ring-indigo-500/50 bg-indigo-500/5 dark:bg-indigo-500/10' 
+              : 'focus-within:border-black/10 dark:focus-within:border-white/20 focus-within:shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:focus-within:shadow-[0_8px_30px_rgba(0,0,0,0.3)]'
           }`}
         >
           {isDragging && (
@@ -324,16 +324,14 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
             
             <div className="flex items-center gap-2">
               <div className="relative" ref={plusMenuRef}>
-                <Button
+                <button
                   type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10 sm:h-8 sm:w-8 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-all focus-ring hover:-translate-y-[1px]"
+                  className="h-8 w-8 text-zinc-400 dark:text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-zinc-100 rounded-full transition-colors flex items-center justify-center shrink-0"
                   onClick={() => setShowPlusMenu(!showPlusMenu)}
                   title="Attachments and Options"
                 >
-                  <Plus size={20} className={showPlusMenu ? "rotate-45 transition-transform duration-300" : "transition-transform duration-300"} />
-                </Button>
+                  <Plus size={18} className={showPlusMenu ? "rotate-45 transition-transform duration-300" : "transition-transform duration-300"} strokeWidth={2.5} />
+                </button>
 
               <AnimatePresence>
                 {showPlusMenu && (
@@ -400,36 +398,32 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
             
             <div className="flex items-center gap-1.5">
               {loading ? (
-                <Button
+                <button
                   onClick={stopGeneration}
                   type="button"
-                  size="icon"
-                  className="h-10 w-10 sm:h-8 sm:w-8 rounded-lg bg-zinc-800 text-zinc-300 hover:bg-red-500/20 hover:text-red-500 transition-all focus-ring"
+                  className="h-8 w-8 rounded-full bg-zinc-800 dark:bg-zinc-200 text-zinc-300 dark:text-zinc-700 hover:bg-red-500/20 hover:text-red-500 dark:hover:bg-red-500/20 dark:hover:text-red-500 transition-all flex items-center justify-center shrink-0"
                   title="Stop generating"
                 >
-                  <Square size={14} className="fill-current" />
-                </Button>
+                  <Square size={12} className="fill-current" />
+                </button>
               ) : (input.trim() || attachedFiles.length > 0 || attachedImage) ? (
-                <Button
+                <button
                   onClick={handleSend}
                   disabled={attachedFiles.some(f => f.status === "uploading")}
-                  size="icon"
-                  className={`h-10 w-10 sm:h-8 sm:w-8 rounded-lg transition-all ${
+                  className={`h-8 w-8 rounded-full transition-all flex items-center justify-center shrink-0 ${
                     !attachedFiles.some(f => f.status === "uploading")
-                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:-translate-y-[1px]' 
-                      : 'bg-muted text-muted-foreground opacity-50'
+                      ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-black hover:scale-105 shadow-sm' 
+                      : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600 cursor-not-allowed'
                   }`}
                   title="Send message (Cmd/Ctrl + Enter)"
                 >
-                  <ArrowUp size={18} />
-                </Button>
+                  <ArrowUp size={16} strokeWidth={2.5} />
+                </button>
               ) : (
                 <>
-                  <Button
+                  <button
                     type="button"
-                    variant="ghost"
-                    size="icon"
-                    className={`h-10 w-10 sm:h-8 sm:w-8 rounded-lg transition-all focus-ring hover:-translate-y-[1px] ${isRecording ? 'text-destructive bg-destructive/10 hover:bg-destructive/20 hover:text-destructive' : 'text-muted-foreground hover:bg-muted'}`}
+                    className={`h-8 w-8 rounded-full transition-colors flex items-center justify-center shrink-0 ${isRecording ? 'text-red-500 bg-red-500/10 hover:bg-red-500/20' : 'text-zinc-400 dark:text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-zinc-100'}`}
                     onClick={toggleRecording}
                     title={isRecording ? "Stop recording" : "Use microphone"}
                   >
@@ -438,31 +432,29 @@ export default function InputBox({ input, setInput, sendMessage, loading, stopGe
                         animate={{ scale: [1, 1.2, 1] }}
                         transition={{ repeat: Infinity, duration: 1.5 }}
                       >
-                        <Mic size={18} className="fill-current" />
+                        <Mic size={17} className="fill-current" />
                       </motion.div>
                     ) : (
-                      <Mic size={18} />
+                      <Mic size={17} strokeWidth={2} />
                     )}
-                  </Button>
+                  </button>
 
-                  <Button
+                  <button
                     type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-10 w-10 sm:h-8 sm:w-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-primary transition-all focus-ring hover:-translate-y-[1px]"
+                    className="h-8 w-8 rounded-full text-zinc-400 dark:text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center justify-center shrink-0"
                     onClick={() => setIsVoiceModeActive && setIsVoiceModeActive(true)}
                     title="Advanced Voice Mode"
                   >
-                    <BrainCircuit size={18} />
-                  </Button>
+                    <BrainCircuit size={17} strokeWidth={2} />
+                  </button>
                 </>
               )}
             </div>
           </div>
         </div>
         
-        <div className="flex justify-between items-center mt-1.5 px-4 w-full">
-          <div className="text-center text-[11px] text-muted-foreground font-medium flex-1">
+        <div className="flex justify-between items-center mt-2 px-2 w-full">
+          <div className="text-center text-[11px] text-zinc-500 dark:text-zinc-500 font-medium flex-1 pl-2 tracking-tight">
             SmartLearn AI can make mistakes. Consider verifying important information.
           </div>
           <div className="flex-shrink-0 relative">
