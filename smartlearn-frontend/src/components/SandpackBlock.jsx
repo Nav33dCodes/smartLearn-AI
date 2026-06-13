@@ -1,5 +1,10 @@
 import React from 'react';
-import { Sandpack } from "@codesandbox/sandpack-react";
+import { 
+  SandpackProvider, 
+  SandpackLayout, 
+  SandpackCodeEditor, 
+  SandpackPreview 
+} from "@codesandbox/sandpack-react";
 
 export default function SandpackBlock({ code, language, viewMode = "preview" }) {
   // Infer template based on language or hints in the code
@@ -20,21 +25,30 @@ export default function SandpackBlock({ code, language, viewMode = "preview" }) 
 
   return (
     <div className="w-full h-full bg-[#09090b]">
-      <Sandpack
+      <SandpackProvider
         template={template}
         theme="dark"
         files={{
           [mainFile]: code
         }}
-        options={{
-          showNavigator: viewMode === "preview",
-          showTabs: true,
-          closableTabs: false,
-          editorHeight: "100vh",
-          wrapContent: true,
-          layout: viewMode === "code" ? "editor" : "preview"
-        }}
-      />
+      >
+        <SandpackLayout style={{ border: 'none', height: '100vh', background: 'transparent' }}>
+          {viewMode === "code" && (
+            <SandpackCodeEditor 
+              showTabs={true} 
+              showLineNumbers={true}
+              style={{ height: "100vh" }} 
+            />
+          )}
+          {viewMode === "preview" && (
+            <SandpackPreview 
+              showNavigator={true} 
+              showOpenInCodeSandbox={false}
+              style={{ height: "100vh", flexGrow: 1 }} 
+            />
+          )}
+        </SandpackLayout>
+      </SandpackProvider>
     </div>
   );
 }
