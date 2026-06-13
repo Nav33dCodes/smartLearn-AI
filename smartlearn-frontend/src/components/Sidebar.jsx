@@ -130,9 +130,9 @@ function Sidebar({
             >
               <div
                 onClick={() => { if (editingChatId !== chat.id) handleSelectChat(chat.id) }}
-                className={`group flex items-center justify-between px-4 py-2 rounded-full cursor-pointer mb-1 transition-all duration-300 ${
+                className={`group flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer mb-0.5 transition-all duration-300 ${
                   String(chat.id) === String(activeChatId) && currentView !== "chats"
-                    ? 'bg-zinc-900/5 dark:bg-[#111111] text-zinc-900 dark:text-zinc-100 font-medium' 
+                    ? 'bg-black/5 dark:bg-white/10 text-zinc-900 dark:text-zinc-100 font-medium shadow-sm' 
                     : 'text-zinc-500 dark:text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-zinc-100'
                 }`}
               >

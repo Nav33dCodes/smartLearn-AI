@@ -456,36 +456,53 @@ function ChatDashboard() {
                 setIsVoiceModeActive={setIsVoiceModeActive}
               />
 
-              <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-3xl mt-12 px-4">
                 <button 
                   onClick={() => {
                     setInput("Create a flashcard deck for: ");
                     setTimeout(() => textareaRef.current?.focus(), 50);
                   }}
-                  className="flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-zinc-100/50 dark:bg-zinc-900/50 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/80 border border-zinc-200/80 dark:border-white/5 text-sm font-medium transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 group backdrop-blur-sm"
+                  className="flex flex-col items-start gap-4 p-4 rounded-2xl bg-zinc-50/50 dark:bg-[#111111]/50 hover:bg-white dark:hover:bg-[#1a1a1a] border border-black/5 dark:border-white/5 transition-all duration-300 text-left group shadow-sm hover:shadow-md"
                 >
-                  <Layers size={15} className="text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-200 transition-colors duration-300" />
-                  <span className="text-zinc-600 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors duration-300 tracking-wide">Generate Flashcards</span>
+                  <div className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-300">
+                    <Layers size={14} className="text-zinc-600 dark:text-zinc-400 group-hover:text-primary transition-colors" />
+                  </div>
+                  <div>
+                    <h3 className="text-[13px] font-semibold text-zinc-900 dark:text-zinc-100 mb-1 tracking-wide">Generate Flashcards</h3>
+                    <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-500 leading-relaxed tracking-wide">Build a deck to memorize complex topics quickly</p>
+                  </div>
                 </button>
+
                 <button 
                   onClick={() => {
                     setInput("Give me a quick 3-question interactive quiz on: ");
                     setTimeout(() => textareaRef.current?.focus(), 50);
                   }}
-                  className="flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-zinc-100/50 dark:bg-zinc-900/50 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/80 border border-zinc-200/80 dark:border-white/5 text-sm font-medium transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 group backdrop-blur-sm"
+                  className="flex flex-col items-start gap-4 p-4 rounded-2xl bg-zinc-50/50 dark:bg-[#111111]/50 hover:bg-white dark:hover:bg-[#1a1a1a] border border-black/5 dark:border-white/5 transition-all duration-300 text-left group shadow-sm hover:shadow-md"
                 >
-                  <BrainCircuit size={15} className="text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-200 transition-colors duration-300" />
-                  <span className="text-zinc-600 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors duration-300 tracking-wide">Interactive Quiz</span>
+                  <div className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-300">
+                    <BrainCircuit size={14} className="text-zinc-600 dark:text-zinc-400 group-hover:text-primary transition-colors" />
+                  </div>
+                  <div>
+                    <h3 className="text-[13px] font-semibold text-zinc-900 dark:text-zinc-100 mb-1 tracking-wide">Interactive Quiz</h3>
+                    <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-500 leading-relaxed tracking-wide">Test your knowledge with multiple-choice questions</p>
+                  </div>
                 </button>
+
                 <button 
                   onClick={() => {
                     setInput("Draw a detailed mind map explaining: ");
                     setTimeout(() => textareaRef.current?.focus(), 50);
                   }}
-                  className="flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-zinc-100/50 dark:bg-zinc-900/50 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/80 border border-zinc-200/80 dark:border-white/5 text-sm font-medium transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 group backdrop-blur-sm"
+                  className="flex flex-col items-start gap-4 p-4 rounded-2xl bg-zinc-50/50 dark:bg-[#111111]/50 hover:bg-white dark:hover:bg-[#1a1a1a] border border-black/5 dark:border-white/5 transition-all duration-300 text-left group shadow-sm hover:shadow-md"
                 >
-                  <Network size={15} className="text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-200 transition-colors duration-300" />
-                  <span className="text-zinc-600 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors duration-300 tracking-wide">Create Mind Map</span>
+                  <div className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/10 transition-all duration-300">
+                    <Network size={14} className="text-zinc-600 dark:text-zinc-400 group-hover:text-primary transition-colors" />
+                  </div>
+                  <div>
+                    <h3 className="text-[13px] font-semibold text-zinc-900 dark:text-zinc-100 mb-1 tracking-wide">Create Mind Map</h3>
+                    <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-500 leading-relaxed tracking-wide">Visualize relationships and architectural structures</p>
+                  </div>
                 </button>
               </div>
             </div>
