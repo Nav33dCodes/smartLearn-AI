@@ -158,11 +158,7 @@ export default function Landing() {
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/30 border border-red-900/50 text-sm text-red-200 mb-8 backdrop-blur-sm"
           >
             <Sparkles size={14} className="text-red-500" />
-            <span className="font-semibold tracking-wide">SmartLearn Voice Mode is now live</span>
-            <span className="w-px h-3 bg-red-900/50 mx-1" />
-            <Link to="/releases" className="text-red-400 hover:text-red-300 flex items-center gap-1 font-bold transition-colors">
-              Read more <ArrowRight size={12} />
-            </Link>
+            <span className="font-semibold tracking-wide pr-2">SmartLearn Generative UI is now live</span>
           </motion.div>
           
           <motion.h1 
