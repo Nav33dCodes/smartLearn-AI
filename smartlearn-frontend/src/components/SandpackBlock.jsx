@@ -18,12 +18,12 @@ export default function SandpackBlock({ code, language, viewMode = "preview" }) 
   }
 
   // Determine main file based on template
-  let mainFile = "/index.js";
+  let mainFile = "/src/index.js";
   if (template === "react") mainFile = "/App.js";
   else if (template === "react-ts") mainFile = "/App.tsx";
   else if (template === "vue") mainFile = "/src/App.vue";
   else if (language === "html") mainFile = "/index.html";
-  else if (language === "css") mainFile = "/styles.css";
+  else if (language === "css") mainFile = "/src/styles.css";
 
   // Construct robust file system
   const files = {
@@ -31,9 +31,13 @@ export default function SandpackBlock({ code, language, viewMode = "preview" }) 
   };
 
   // If AI generates raw JS, ensure the HTML root exists and hide it from the user's tabs
-  if (template === "vanilla" && mainFile === "/index.js") {
+  if (template === "vanilla" && mainFile === "/src/index.js") {
     files["/index.html"] = {
-      code: `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8" />\n  <meta name="viewport" content="width=device-width, initial-scale=1.0" />\n  <title>App</title>\n</head>\n<body>\n  <div id="app"></div>\n  <script src="/index.js"></script>\n</body>\n</html>`,
+      code: `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8" />\n  <title>App</title>\n</head>\n<body>\n  <div id="app"></div>\n  <script src="/src/index.js"></script>\n</body>\n</html>`,
+      hidden: true
+    };
+    files["/src/styles.css"] = {
+      code: `body { font-family: sans-serif; }`,
       hidden: true
     };
   }
