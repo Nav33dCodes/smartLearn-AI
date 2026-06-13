@@ -38,6 +38,24 @@ const releases = [
           "Monochromatic AI Avatars: Transformed the AI chat logo into a stark, ultra-minimalist `rounded-[10px]` square, matching the aesthetics of tools like Cursor and Linear.",
           "Global Vanishing Scrollbars: Engineered a customized, ultra-thin webkit scrollbar system that blends flawlessly into both light and dark modes."
         ]
+      },
+      {
+        title: "Authentication Flow Redesign",
+        description: "Completely rebuilt the Login, Signup, and Forgot Password pages into an ultra-minimalist, single-column OLED layout.",
+        bullets: [
+          "Floating Architecture: Eradicated heavy split-pane borders. The auth forms now float elegantly in the absolute center of a pure black abyss.",
+          "Microscopic Input Glows: Form inputs use completely transparent backgrounds with faint `white/10` borders, emitting a hyper-subtle soft glow upon focus.",
+          "Enterprise AI Feature Pitch: Replaced generic startup quotes with a modern, high-contrast AI feature pitch (RAG Architecture, Zero-Knowledge Security, Low-Latency Inference)."
+        ]
+      },
+      {
+        title: "Landing & Legal Page Upgrades",
+        description: "Stripped away all 'gamified' saturated red aesthetics and thick borders across the public website.",
+        bullets: [
+          "High-Contrast Typography: Transformed the main Hero sections into massive, tightly-tracked OLED gradients (white to zinc) reminiscent of Vercel and Linear.",
+          "Stark Monochrome Palette: Upgraded the Terms & Conditions and Privacy Policy pages to feature pitch-black backgrounds with extremely faint, microscopic 1px borders.",
+          "Data-Science Diagrams: Re-engineered the React Flow architectural diagrams on the landing page into sleek, professional white-on-black mesh wireframes."
+        ]
       }
     ]
   },
