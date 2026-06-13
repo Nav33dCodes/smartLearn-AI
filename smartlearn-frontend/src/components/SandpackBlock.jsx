@@ -22,6 +22,8 @@ export default function SandpackBlock({ code, language, viewMode = "preview" }) 
   if (template === "react") mainFile = "/App.js";
   else if (template === "react-ts") mainFile = "/App.tsx";
   else if (template === "vue") mainFile = "/src/App.vue";
+  else if (language === "html") mainFile = "/index.html";
+  else if (language === "css") mainFile = "/styles.css";
 
   return (
     <div className="w-full h-full bg-[#09090b]">
