@@ -32,19 +32,19 @@ export default function SandpackBlock({ code, language, viewMode = "preview" }) 
           [mainFile]: code
         }}
       >
-        <SandpackLayout style={{ border: 'none', height: '100vh', background: 'transparent' }}>
+        <SandpackLayout style={{ border: 'none', height: '100%', minHeight: '100%', background: 'transparent' }}>
           {viewMode === "code" && (
             <SandpackCodeEditor 
               showTabs={true} 
               showLineNumbers={true}
-              style={{ height: "100vh" }} 
+              style={{ height: "100%", minHeight: "100%" }} 
             />
           )}
           {viewMode === "preview" && (
             <SandpackPreview 
               showNavigator={true} 
               showOpenInCodeSandbox={false}
-              style={{ height: "100vh", flexGrow: 1 }} 
+              style={{ height: "100%", minHeight: "100%", flexGrow: 1 }} 
             />
           )}
         </SandpackLayout>

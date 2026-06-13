@@ -382,8 +382,8 @@ function ChatDashboard() {
         isChatsLoading={isChatsLoading}
       />
 
-      <div className="flex-1 flex flex-row h-full relative overflow-hidden transition-all duration-300">
-        <main className={`flex flex-col relative h-full overflow-hidden transition-all duration-300 ${activeArtifact && !isMobile ? 'w-1/2 shrink-0 border-r border-white/5' : 'w-full flex-1'}`}>
+      <div className="flex-1 flex flex-row h-full relative overflow-hidden bg-background">
+        <main className={`flex flex-col relative h-full overflow-hidden transition-all duration-300 ease-in-out ${activeArtifact && !isMobile ? 'w-1/2 shrink-0' : 'w-full flex-1'}`}>
           <header className="absolute top-0 left-0 right-0 h-14 px-4 flex items-center justify-between z-40 glass border-b border-border/50">
           <div className="flex items-center gap-2">
             {(!sidebarOpen || isMobile) && (
@@ -527,12 +527,13 @@ function ChatDashboard() {
         )}
         </main>
         
-        {/* The Right-Hand Artifact Canvas Panel */}
-        {activeArtifact && !isMobile && (
-          <div className="w-1/2 shrink-0 h-full">
-            <ArtifactCanvas />
+        {/* The Right-Hand Artifact Canvas Panel (Smooth Transition Wrapper) */}
+        {!isMobile && (
+          <div className={`shrink-0 h-full transition-all duration-300 ease-in-out bg-[#0d0d0d] ${activeArtifact ? 'w-1/2 border-l border-white/5' : 'w-0 border-transparent overflow-hidden'}`}>
+            {activeArtifact && <ArtifactCanvas />}
           </div>
         )}
+        
         {/* Mobile Artifact Overlay (Full screen) */}
         {activeArtifact && isMobile && (
           <div className="absolute inset-0 z-50">
