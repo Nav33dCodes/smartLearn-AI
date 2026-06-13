@@ -2,6 +2,36 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 14, 2026 — Ultimate OLED UI Overhaul & Premium Aesthetics (Phase 12)",
+    features: [
+      {
+        title: "Dynamic OLED Chat Input",
+        description: "Re-engineered the primary interaction point to rival the industry's most premium AI tools.",
+        bullets: [
+          "Ultra-Minimalist Flat Design: The input box now functions as a completely borderless OLED element that dynamically 'lifts' up with a deep shadow when focused.",
+          "Advanced Voice Mode Upgrade: Replaced the standard mic icon with a stunning, glowing 'Headphones' circular disk to match ChatGPT's premium advanced voice aesthetics.",
+          "Crisp Typography: Refined the footer warning text and icons to feature tighter tracking and smaller, hyper-professional bounds."
+        ]
+      },
+      {
+        title: "Side-by-Side Layout Engine & Dashboard UI",
+        description: "Completely solved mobile and desktop UI overlapping issues.",
+        bullets: [
+          "Flawless Flex Engine: The Context & Sources drawer now elegantly squishes the chat messages and the input box side-by-side perfectly, functioning exactly like a native IDE.",
+          "Dashboard Empty States: Upgraded the 'No Videos' and generic web source areas into a premium dashed-border dashboard style with dynamic hover physics."
+        ]
+      },
+      {
+        title: "Ghost Action Buttons & Glass Menus",
+        description: "Removed all clunky borders for a seamless, distraction-free reading experience.",
+        bullets: [
+          "Sleek Action Row: AI message action buttons (Copy, Context, Read Aloud, Regenerate) are now ultra-minimalist 'ghost' buttons that fade in smoothly.",
+          "Floating Glass Menu: Redesigned the User Settings popup with a stunning backdrop-blur floating canvas, soft drop shadows, and a sleek Rocket icon."
+        ]
+      }
+    ]
+  },
+  {
     date: "June 14, 2026 — Infinite Generative UI / v0 Clone (Phase 11)",
     features: [
       {
