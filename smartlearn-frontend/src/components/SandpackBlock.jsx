@@ -25,13 +25,28 @@ export default function SandpackBlock({ code, language, viewMode = "preview" }) 
   else if (language === "html") mainFile = "/index.html";
   else if (language === "css") mainFile = "/styles.css";
 
+  // Construct robust file system
+  const files = {
+    [mainFile]: { code, active: true }
+  };
+
+  // If AI generates raw JS, ensure the HTML root exists and hide it from the user's tabs
+  if (template === "vanilla" && mainFile === "/index.js") {
+    files["/index.html"] = {
+      code: `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8" />\n  <meta name="viewport" content="width=device-width, initial-scale=1.0" />\n  <title>App</title>\n</head>\n<body>\n  <div id="app"></div>\n  <script src="/index.js"></script>\n</body>\n</html>`,
+      hidden: true
+    };
+  }
+
   return (
     <div className="w-full h-full bg-[#09090b]">
       <SandpackProvider
         template={template}
         theme="dark"
-        files={{
-          [mainFile]: code
+        files={files}
+        options={{
+          visibleFiles: [mainFile],
+          activeFile: mainFile
         }}
       >
         <SandpackLayout style={{ border: 'none', height: 'calc(100vh - 56px)', minHeight: 'calc(100vh - 56px)', background: 'transparent' }}>
