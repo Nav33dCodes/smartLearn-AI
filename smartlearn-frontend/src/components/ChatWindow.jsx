@@ -302,6 +302,7 @@ export default function ChatWindow({ messages, loading, streamStatus, isChatsLoa
                 {streamStatus === 'evaluating' && "Thinking..."}
                 {streamStatus === 'searching_web' && "Searching the web..."}
                 {streamStatus === 'search_complete' && "Reading results..."}
+                {streamStatus === 'browsing' && "Browsing website..."}
               </div>
             ) : (
               <div className="flex items-center gap-1.5 pt-2 ml-1">

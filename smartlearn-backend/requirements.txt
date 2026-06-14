@@ -1,4 +1,4 @@
-﻿fastapi==0.136.1
+fastapi==0.136.1
 uvicorn==0.30.6
 
 pypdf==4.2.0
@@ -21,3 +21,4 @@ langchain-text-splitters==0.2.1
 requests==2.31.0
 numpy==1.26.4
 psycopg2-binary
+playwright

@@ -24,6 +24,7 @@ from services.pdf import extract_text, get_pdf_metadata
 from services.rag import store_pdf, search, clear_session, get_stats
 from services.voice import transcribe_audio, generate_speech
 from services.youtube import get_youtube_recommendations
+from services.browser import scrape_and_screenshot
 from services.redis_client import get_cache, set_cache, delete_cache, check_rate_limit, clear_all_cache
 from database import SessionLocal, Chat, get_db, get_async_db, User, ChatMetadata
 from routers import auth
@@ -32,6 +33,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
+import re
+from fastapi.staticfiles import StaticFiles
 
 security = HTTPBearer()
 
@@ -188,6 +191,8 @@ app.add_middleware(
 
 app.include_router(auth.router)
 
+os.makedirs("static/screenshots", exist_ok=True)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # ────────────────────────────────────────────────────
 # SCHEMA
@@ -304,6 +309,26 @@ def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_user: Use
         nonlocal context
         full_response = []
         try:
+            # 2.5 Check for URL to scrape
+            url_match = re.search(r'(https?://[^\s]+)', message)
+            if url_match:
+                url = url_match.group(1)
+                yield f"data: {json.dumps({'status': 'browsing', 'url': url})}\n\n"
+                
+                if os.name == 'nt':
+                    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+                
+                scraped_text, screenshot_filename = asyncio.run(scrape_and_screenshot(url))
+                
+                if screenshot_filename:
+                    # Append screenshot to LLM response immediately
+                    screenshot_markdown = f"![Screenshot of {url}](http://localhost:8000/static/screenshots/{screenshot_filename})\n\n"
+                    full_response.append(screenshot_markdown)
+                    yield f"data: {json.dumps({'token': screenshot_markdown})}\n\n"
+                    
+                if scraped_text:
+                    context = (context + f"\n\n### 🌐 Live Scraped Context from {url}:\n" + scraped_text) if context else (f"### 🌐 Live Scraped Context from {url}:\n" + scraped_text)
+
             # 3. Evaluate web search
             search_query = "NO_SEARCH"
             if data.search_web == "on":
