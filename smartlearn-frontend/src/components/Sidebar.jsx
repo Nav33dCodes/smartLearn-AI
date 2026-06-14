@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { Plus, Trash2, MessageSquare, Search, PanelLeftClose, LogOut, Edit2, Pin, PinOff, Archive, MoreHorizontal, Sparkles, Settings, ExternalLink, Database, ShieldAlert, Rocket } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import * as ContextMenu from '@radix-ui/react-context-menu';
 import { useChats, useDeleteChat, useRenameChat, usePinChat, useArchiveChat } from "../hooks/useChats";
 import { useAuth } from "../context/AuthContext";
 import Logo from "./Logo";
@@ -28,8 +29,6 @@ function Sidebar({
 
   const [editingChatId, setEditingChatId] = useState(null);
   const [editTitle, setEditTitle] = useState("");
-  const [openDropdownId, setOpenDropdownId] = useState(null);
-  const dropdownRef = useRef(null);
   
   const [isHistoryHidden, setIsHistoryHidden] = useState(() => {
     return localStorage.getItem('sl_history_hidden') === 'true';
@@ -46,9 +45,6 @@ function Sidebar({
     const handleClickOutside = (event) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setShowUserMenu(false);
-      }
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setOpenDropdownId(null);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -90,7 +86,6 @@ function Sidebar({
       setActiveChatId(nextChat ? nextChat.id : null);
     }
     deleteChatMutation.mutate(id);
-    setOpenDropdownId(null);
   };
 
   const handlePinToggle = (e, chat) => {
@@ -128,89 +123,77 @@ function Sidebar({
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.15 }}
             >
-              <div
-                onClick={() => { if (editingChatId !== chat.id) handleSelectChat(chat.id) }}
-                className={`group flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer mb-0.5 transition-all duration-300 ${
-                  String(chat.id) === String(activeChatId) && currentView !== "chats"
-                    ? 'bg-black/5 dark:bg-white/10 text-zinc-900 dark:text-zinc-100 font-medium shadow-sm' 
-                    : 'text-zinc-500 dark:text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-zinc-100'
-                }`}
-              >
-                <div className="flex items-center gap-2 overflow-hidden flex-1">
-                  {editingChatId === chat.id ? (
-                    <input
-                      autoFocus
-                      value={editTitle}
-                      onChange={(e) => setEditTitle(e.target.value)}
-                      onBlur={() => handleRename(chat.id)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") handleRename(chat.id);
-                        if (e.key === "Escape") setEditingChatId(null);
-                      }}
-                      className="bg-background border border-primary text-foreground text-sm rounded px-1 w-full outline-none shadow-sm"
-                    />
-                  ) : (
-                    <span className="truncate text-[15px] font-medium tracking-tight">{chat.title}</span>
-                  )}
-                </div>
-                
-                {editingChatId !== chat.id && (
-                  <div 
-                    className={`flex items-center gap-1 transition-all shrink-0 relative ${openDropdownId === chat.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
-                    ref={openDropdownId === chat.id ? dropdownRef : null}
+              <ContextMenu.Root>
+                <ContextMenu.Trigger asChild>
+                  <div
+                    onClick={() => { if (editingChatId !== chat.id) handleSelectChat(chat.id) }}
+                    className={`group flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer mb-0.5 transition-all duration-300 select-none ${
+                      String(chat.id) === String(activeChatId) && currentView !== "chats"
+                        ? 'bg-black/5 dark:bg-white/10 text-zinc-900 dark:text-zinc-100 font-medium shadow-sm' 
+                        : 'text-zinc-500 dark:text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-zinc-100'
+                    }`}
                   >
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setOpenDropdownId(openDropdownId === chat.id ? null : chat.id); }}
-                      className="text-muted-foreground hover:text-foreground p-1 rounded-md transition-colors"
-                      title="Options"
-                    >
-                      <MoreHorizontal size={16} />
-                    </button>
-                    <AnimatePresence>
-                      {openDropdownId === chat.id && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.95, y: -5 }}
-                          animate={{ opacity: 1, scale: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0.95, y: -5 }}
-                          transition={{ duration: 0.1 }}
-                          className="absolute right-0 top-8 w-36 bg-popover border border-border rounded-md shadow-md z-50 p-1 flex flex-col"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <button
-                            onClick={(e) => { handlePinToggle(e, chat); setOpenDropdownId(null); }}
-                            className="flex items-center gap-2 px-2 py-1.5 text-xs text-foreground hover:bg-muted rounded-sm transition-colors text-left"
-                          >
-                            {chat.is_pinned ? <PinOff size={14} /> : <Pin size={14} />}
-                            {chat.is_pinned ? "Unpin chat" : "Pin chat"}
-                          </button>
-                          <button
-                            onClick={(e) => { startEditing(e, chat); setOpenDropdownId(null); }}
-                            className="flex items-center gap-2 px-2 py-1.5 text-xs text-foreground hover:bg-muted rounded-sm transition-colors text-left"
-                          >
-                            <Edit2 size={14} />
-                            Rename
-                          </button>
-                          <button
-                            onClick={(e) => { handleArchive(e, chat.id); setOpenDropdownId(null); }}
-                            className="flex items-center gap-2 px-2 py-1.5 text-xs text-foreground hover:bg-muted rounded-sm transition-colors text-left"
-                          >
-                            <Archive size={14} />
-                            Archive
-                          </button>
-                          <div className="h-px bg-border my-1" />
-                          <button
-                            onClick={(e) => handleDelete(e, chat.id)}
-                            className="flex items-center gap-2 px-2 py-1.5 text-xs text-destructive hover:bg-destructive/10 rounded-sm transition-colors text-left"
-                          >
-                            <Trash2 size={14} />
-                            Delete
-                          </button>
-                        </motion.div>
+                    <div className="flex items-center gap-2 overflow-hidden flex-1">
+                      {editingChatId === chat.id ? (
+                        <input
+                          autoFocus
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          onBlur={() => handleRename(chat.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") handleRename(chat.id);
+                            if (e.key === "Escape") setEditingChatId(null);
+                          }}
+                          className="bg-background border border-primary text-foreground text-sm rounded px-1 w-full outline-none shadow-sm"
+                        />
+                      ) : (
+                        <span className="truncate text-[15px] font-medium tracking-tight">{chat.title}</span>
                       )}
-                    </AnimatePresence>
+                    </div>
                   </div>
+                </ContextMenu.Trigger>
+
+                {editingChatId !== chat.id && (
+                  <ContextMenu.Portal>
+                    <ContextMenu.Content 
+                      className="min-w-[160px] bg-popover border border-border rounded-md shadow-md z-50 p-1 flex flex-col data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+                      alignOffset={5}
+                    >
+                      <ContextMenu.Item 
+                        className="flex items-center gap-2 px-2 py-1.5 text-xs text-foreground hover:bg-muted rounded-sm transition-colors cursor-pointer outline-none focus:bg-muted"
+                        onClick={(e) => handlePinToggle(e, chat)}
+                      >
+                        {chat.is_pinned ? <PinOff size={14} /> : <Pin size={14} />}
+                        {chat.is_pinned ? "Unpin chat" : "Pin chat"}
+                      </ContextMenu.Item>
+                      <ContextMenu.Item 
+                        className="flex items-center gap-2 px-2 py-1.5 text-xs text-foreground hover:bg-muted rounded-sm transition-colors cursor-pointer outline-none focus:bg-muted"
+                        onClick={(e) => startEditing(e, chat)}
+                      >
+                        <Edit2 size={14} />
+                        Rename
+                      </ContextMenu.Item>
+                      <ContextMenu.Item 
+                        className="flex items-center gap-2 px-2 py-1.5 text-xs text-foreground hover:bg-muted rounded-sm transition-colors cursor-pointer outline-none focus:bg-muted"
+                        onClick={(e) => handleArchive(e, chat.id)}
+                      >
+                        <Archive size={14} />
+                        Archive
+                      </ContextMenu.Item>
+                      
+                      <ContextMenu.Separator className="h-px bg-border my-1" />
+                      
+                      <ContextMenu.Item 
+                        className="flex items-center gap-2 px-2 py-1.5 text-xs text-destructive hover:bg-destructive/10 rounded-sm transition-colors cursor-pointer outline-none focus:bg-destructive/10"
+                        onClick={(e) => handleDelete(e, chat.id)}
+                      >
+                        <Trash2 size={14} />
+                        Delete
+                      </ContextMenu.Item>
+                    </ContextMenu.Content>
+                  </ContextMenu.Portal>
                 )}
-              </div>
+              </ContextMenu.Root>
             </motion.div>
           ))}
         </AnimatePresence>
