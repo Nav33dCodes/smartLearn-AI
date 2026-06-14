@@ -198,6 +198,7 @@ class ChatRequest(BaseModel):
     search_web: Optional[str] = "auto"
     model: Optional[str] = "groq:llama-3.1-8b-instant"
     image_data: Optional[str] = None
+    is_private: Optional[bool] = False
 
 class RenameRequest(BaseModel):
     title: str
@@ -361,7 +362,11 @@ def chat(data: ChatRequest, background_tasks: BackgroundTasks, current_user: Use
                     import json as _json
                     hidden_data = _json.dumps(urls)
                     complete += f"\n\n<!-- SOURCES_JSON: {hidden_data} -->"
-                background_tasks.add_task(save_to_db, current_user.id, chat_id, message, complete)
+                
+                if not data.is_private:
+                    background_tasks.add_task(save_to_db, current_user.id, chat_id, message, complete)
+                else:
+                    logger.info(f"👻 Private Mode: Skipped DB save for chat_id={chat_id}")
             yield f"data: {json.dumps({'done': True})}\n\n"
 
     return StreamingResponse(

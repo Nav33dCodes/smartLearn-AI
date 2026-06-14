@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef, Suspense, lazy } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Moon, Sun, PanelLeftOpen } from "lucide-react";
-import { Layers, BrainCircuit, Network } from "lucide-react";
+import { Layers, BrainCircuit, Network, Ghost } from "lucide-react";
 import { Toaster, toast } from 'sonner';
 import { Routes, Route } from 'react-router-dom';
 
@@ -55,6 +55,7 @@ function ChatDashboard() {
   const [abortController, setAbortController] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isVoiceModeActive, setIsVoiceModeActive] = useState(false);
+  const [isPrivateMode, setIsPrivateMode] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem("sl_theme_pro");
     return savedTheme !== null ? savedTheme === "true" : true;
@@ -194,7 +195,7 @@ function ChatDashboard() {
             "Content-Type": "application/json",
             "Authorization": token ? `Bearer ${token}` : ""
         },
-        body: JSON.stringify({ message: textToSend, chat_id: currentChatId, search_web: searchWeb, model: selectedModelId, image_data: imageData }),
+        body: JSON.stringify({ message: textToSend, chat_id: currentChatId, search_web: searchWeb, model: selectedModelId, image_data: imageData, is_private: isPrivateMode }),
         signal: controller.signal,
       });
 
@@ -380,9 +381,9 @@ function ChatDashboard() {
         isChatsLoading={isChatsLoading}
       />
 
-      <div className="flex-1 flex flex-row h-full relative overflow-hidden bg-background">
+      <div className={`flex-1 flex flex-row h-full relative overflow-hidden transition-colors duration-500 ${isPrivateMode ? "bg-red-50/50 dark:bg-red-950/20" : "bg-background"}`}>
         <main className={`flex flex-col relative h-full overflow-hidden transition-all duration-300 ease-in-out ${activeArtifact && !isMobile ? 'w-1/2 shrink-0' : 'w-full flex-1'}`}>
-          <header className="absolute top-0 left-0 right-0 h-14 px-4 flex items-center justify-between z-40 bg-white/70 dark:bg-[#000000]/70 backdrop-blur-md border-b border-black/5 dark:border-white/5 transition-colors duration-300">
+          <header className={`absolute top-0 left-0 right-0 h-14 px-4 flex items-center justify-between z-40 backdrop-blur-md border-b transition-colors duration-300 ${isPrivateMode ? "bg-red-100/30 dark:bg-red-900/20 border-red-500/20" : "bg-white/70 dark:bg-[#000000]/70 border-black/5 dark:border-white/5"}`}>
           <div className="flex items-center gap-2">
             {(!sidebarOpen || isMobile) && (
               <button 
@@ -395,33 +396,50 @@ function ChatDashboard() {
             )}
           </div>
 
-          {activeChatId && activeMessages.length > 0 && (
+          <div className="flex items-center gap-2 ml-auto">
             <button
-              onClick={() => {
-                const chat = chatsData.find(c => c.id === activeChatId);
-                if (!chat) return;
-                
-                if (chat.is_shared && chat.share_id) {
-                  const url = `${window.location.origin}/share/${chat.share_id}`;
-                  navigator.clipboard.writeText(url);
-                  toast.success("Link copied to clipboard!");
-                } else {
-                  shareChatMutation.mutate(activeChatId, {
-                    onSuccess: (data) => {
-                      const url = `${window.location.origin}/share/${data.share_id}`;
-                      navigator.clipboard.writeText(url);
-                      toast.success("Link generated and copied to clipboard!");
-                    }
-                  });
-                }
-              }}
-              disabled={shareChatMutation.isPending}
-              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground border border-border rounded-lg hover:bg-muted transition-colors"
+              onClick={() => setIsPrivateMode(!isPrivateMode)}
+              className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-all ${
+                isPrivateMode 
+                  ? "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.15)]" 
+                  : "text-muted-foreground hover:text-foreground border border-border hover:bg-muted"
+              }`}
+              title="Zero-Retention Private Mode"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
-              {shareChatMutation.isPending ? "Sharing..." : (chatsData.find(c => c.id === activeChatId)?.is_shared ? "Copy Link" : "Share")}
+              <Ghost size={16} className={isPrivateMode ? "animate-pulse" : ""} />
+              <span className="hidden sm:inline">{isPrivateMode ? "Incognito" : "Private Mode"}</span>
             </button>
-          )}
+
+            {activeChatId && activeMessages.length > 0 && (
+              <button
+                onClick={() => {
+                  const chat = chatsData.find(c => c.id === activeChatId);
+                  if (!chat) return;
+                  
+                  if (chat.is_shared && chat.share_id) {
+                    const url = `${window.location.origin}/share/${chat.share_id}`;
+                    navigator.clipboard.writeText(url);
+                    toast.success("Link copied to clipboard!");
+                  } else {
+                    shareChatMutation.mutate(activeChatId, {
+                      onSuccess: (data) => {
+                        const url = `${window.location.origin}/share/${data.share_id}`;
+                        navigator.clipboard.writeText(url);
+                        toast.success("Link generated and copied to clipboard!");
+                      }
+                    });
+                  }
+                }}
+                disabled={shareChatMutation.isPending || isPrivateMode}
+                className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                  isPrivateMode ? "opacity-50 cursor-not-allowed text-muted-foreground border border-border" : "text-muted-foreground hover:text-foreground border border-border hover:bg-muted"
+                }`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
+                {shareChatMutation.isPending ? "Sharing..." : (chatsData.find(c => c.id === activeChatId)?.is_shared ? "Copy Link" : "Share")}
+              </button>
+            )}
+          </div>
         </header>
 
         {currentView === "chats" ? (
