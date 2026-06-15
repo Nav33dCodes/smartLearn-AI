@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Environment variables (Railway injects these securely from the dashboard)
+.env
+.env.local
+
+# Databases and Local Storage
+*.sqlite
+*.db
+
+# Git and IDE
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Local generated files
+static/screenshots/
+rag_data/
+.pytest_cache/
