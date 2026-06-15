@@ -212,3 +212,21 @@ def send_delete_account_otp_email(to_email: str, otp: str):
     warning = "If you did not request this deletion, please ignore this email immediately and consider changing your password."
     body = get_premium_template("Account Deletion Request", content, show_warning=True, warning_text=warning)
     return send_email(to_email, subject, body, sender_prefix="security")
+
+def send_bug_report_email(user_email: str, user_name: str, bug_subject: str, bug_description: str):
+    subject = f"🐛 Bug Report: {bug_subject}"
+    
+    content = f"""
+    <p class="text"><strong>From:</strong> {user_name} ({user_email})</p>
+    <p class="text"><strong>Subject:</strong> {bug_subject}</p>
+    <div style="background-color: #18181b; border: 1px solid #3f3f46; border-radius: 8px; padding: 24px; margin: 32px 0;">
+        <p class="text" style="color: #e4e4e7; margin: 0; white-space: pre-wrap;">{bug_description}</p>
+    </div>
+    <p class="text" style="font-size: 14px;">This bug report was submitted directly from the SmartLearn AI platform UI.</p>
+    """
+    
+    body = get_premium_template("New Bug Report Received", content)
+    
+    # Send directly to the admin email
+    admin_email = "iamnaveed.cs@gmail.com"
+    return send_email(admin_email, subject, body, sender_prefix="support")

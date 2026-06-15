@@ -29,6 +29,7 @@ from services.redis_client import get_cache, set_cache, delete_cache, check_rate
 from database import SessionLocal, Chat, get_db, get_async_db, User, ChatMetadata
 from routers import auth
 from services.jwt_handler import verify_token
+from services.email_service import send_bug_report_email
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -759,6 +760,22 @@ async def get_youtube_videos(req: YouTubeRequest):
         logger.error(f"YouTube Route Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# ────────────────────────────────────────────────────
+# BUG REPORT
+# ────────────────────────────────────────────────────
+class BugReportRequest(BaseModel):
+    subject: str
+    description: str
+
+@app.post("/api/bug-report")
+def submit_bug_report(req: BugReportRequest, background_tasks: BackgroundTasks, current_user: User = Depends(get_current_user)):
+    try:
+        background_tasks.add_task(send_bug_report_email, current_user.email, current_user.name, req.subject, req.description)
+        return {"status": "success", "message": "Bug report submitted successfully."}
+    except Exception as e:
+        logger.error(f"Bug Report Error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to submit bug report.")
 
 # ────────────────────────────────────────────────────
 # RAG STATUS
