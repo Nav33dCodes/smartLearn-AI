@@ -1,5 +1,5 @@
 import React from 'react';
-import { Scale, AlertTriangle, FileSignature, Landmark, Globe } from 'lucide-react';
+import { Scale, AlertTriangle, FileSignature, Landmark, Globe, CheckCircle } from 'lucide-react';
 import Logo from '../components/Logo';
 
 export default function Terms() {
@@ -16,19 +16,19 @@ export default function Terms() {
             Terms & Conditions
           </h1>
           <div className="flex items-center gap-4 text-xs text-zinc-500 font-medium tracking-widest uppercase">
-            <span>Effective: June 11, 2026</span>
+            <span>Effective: June 15, 2026</span>
             <span className="w-1 h-1 rounded-full bg-white/20"></span>
-            <span>v3.1.0</span>
+            <span>v3.2.0</span>
           </div>
         </div>
 
         {/* Introduction */}
         <section className="mb-16">
           <p className="text-lg leading-relaxed mb-6">
-            These Terms and Conditions ("Terms", "Agreement") govern your access to and use of the SmartLearn AI platform, applications, APIs, and related services (collectively, the "Service"). Please read them carefully.
+            These Terms and Conditions ("Terms", "Agreement") constitute a legally binding agreement between you ("User", "you") and SmartLearn AI ("Company", "we", "us") governing your access to and use of the SmartLearn AI platform, applications, APIs, and related services (collectively, the "Service").
           </p>
           <p className="text-lg leading-relaxed">
-            By accessing or using the Service, you signify that you have read, understood, and agree to be bound by this Agreement. If you are entering into this Agreement on behalf of a corporation, university, or other legal entity, you represent that you have the authority to bind such entity and its affiliates to these Terms.
+            By accessing, registering for, or using the Service, you expressly acknowledge that you have read, understood, and agree to be bound by this Agreement. If you are entering into this Agreement on behalf of a corporation, university, or other legal entity, you represent and warrant that you possess the requisite authority to bind such entity to these Terms.
           </p>
         </section>
 
@@ -37,17 +37,17 @@ export default function Terms() {
           <section>
             <h2 className="text-2xl font-bold tracking-tight text-zinc-100 mb-6 flex items-center gap-4 border-b border-white/[0.04] pb-4">
               <Scale className="text-zinc-600" size={20} />
-              1. Acceptable Use Policy
+              1. Acceptable Use & Conduct
             </h2>
             <div className="bg-[#050505] border border-white/[0.04] rounded-2xl p-6 mb-6 shadow-sm">
               <p className="leading-relaxed mb-4 text-[15px]">
-                You agree not to engage in any of the following prohibited activities while using the Service:
+                We grant you a limited, non-exclusive, non-transferable license to access the Service. You explicitly agree NOT to engage in any of the following prohibited activities:
               </p>
               <ul className="list-disc pl-6 space-y-3 text-[14px]">
-                <li>Uploading classified, illegal, or illicit materials.</li>
-                <li>Attempting to reverse engineer, decompile, or bypass the platform's security mechanisms or rate limits.</li>
-                <li>Utilizing the platform for automated scraping, mass data extraction, or to train competing artificial intelligence models.</li>
-                <li>Impersonating another user, attempting to breach tenant isolation, or violating applicable intellectual property laws.</li>
+                <li><strong>Illegal Content:</strong> Uploading, processing, or generating classified, illicit, explicit, or legally restricted materials.</li>
+                <li><strong>System Abuse:</strong> Attempting to reverse engineer, decompile, or maliciously bypass the platform's security mechanisms, firewalls, or API rate limits.</li>
+                <li><strong>Model Scraping:</strong> Utilizing the platform for automated scraping, mass data extraction, or generating outputs specifically to train competing artificial intelligence models.</li>
+                <li><strong>Impersonation & Fraud:</strong> Impersonating another user, attempting to breach tenant cryptographic isolation, or violating applicable intellectual property laws.</li>
               </ul>
             </div>
           </section>
@@ -58,48 +58,61 @@ export default function Terms() {
               2. Intellectual Property Rights
             </h2>
             <p className="leading-relaxed mb-4">
-              <strong>Your Content:</strong> You retain full ownership of all documents, text, and media you upload to SmartLearn AI. We claim absolutely no ownership rights over your proprietary files or the specific outputs generated directly from your prompts.
+              <strong>Your Content & Outputs:</strong> You retain full and exclusive ownership of all documents, text, media, and data you upload to SmartLearn AI. Furthermore, we claim absolutely no copyright or ownership rights over the specific text, code, or image outputs generated by the AI directly resulting from your prompts. You are free to use your AI-generated outputs for commercial purposes.
             </p>
             <p className="leading-relaxed">
-              <strong>Our IP:</strong> The SmartLearn AI platform—including its source code, RAG pipeline architecture, branding, logos, and UI/UX design—is the exclusive property of SmartLearn AI Inc. and is protected by international copyright and trademark laws.
+              <strong>Our Intellectual Property:</strong> The SmartLearn AI platform—including its source code, RAG pipeline architecture, branding, logos, proprietary algorithms, and UI/UX design—is the exclusive property of SmartLearn AI Inc. and is protected by international copyright, trademark, and trade secret laws.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold text-zinc-100 mb-6 flex items-center gap-3">
               <Landmark className="text-zinc-500" size={24} />
-              3. Service Tiers & Subscription Billing
+              3. Service Tiers, Billing & Fair Use
             </h2>
             <p className="leading-relaxed mb-4">
-              Access to advanced premium features, such as the <strong>Founder's Edition</strong>, requires a paid subscription. Billing occurs on a recurring basis as outlined during the checkout process.
+              Access to advanced premium features, priority compute clusters, and elevated API limits requires a paid subscription. Billing occurs on a recurring basis as outlined during the checkout process.
             </p>
             <ul className="list-disc pl-6 space-y-2 text-zinc-400">
-              <li>All payments are non-refundable unless legally mandated in your jurisdiction.</li>
-              <li>We reserve the right to modify pricing with 30 days prior notice.</li>
-              <li>Accounts that violate the Acceptable Use Policy may be terminated without refund.</li>
+              <li><strong>Fair Use Policy:</strong> "Unlimited" AI generation plans are subject to reasonable human-use limits to prevent automated abuse and degradation of service for other users.</li>
+              <li><strong>Refunds:</strong> All payments are strictly non-refundable unless legally mandated by consumer protection laws in your local jurisdiction.</li>
+              <li><strong>Termination:</strong> We reserve the right to immediately suspend or terminate accounts that egregiously violate the Acceptable Use Policy without refund or prior notice.</li>
             </ul>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold tracking-tight text-zinc-100 mb-6 flex items-center gap-4 border-b border-white/[0.04] pb-4">
+              <CheckCircle className="text-zinc-600" size={20} />
+              4. Disclaimer of Warranties
+            </h2>
+            <p className="leading-relaxed mb-4">
+              THE SERVICE IS PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS. WE EXPRESSLY DISCLAIM ALL WARRANTIES OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+            </p>
+            <p className="leading-relaxed">
+              <strong>AI Hallucinations:</strong> Artificial Intelligence models are probabilistic engines. We do not guarantee the factual accuracy, mathematical correctness, or reliability of any AI-generated outputs. You are strictly responsible for independently verifying critical information, especially concerning medical, legal, or financial advice.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-bold tracking-tight text-zinc-100 mb-6 flex items-center gap-4 border-b border-white/[0.04] pb-4">
               <AlertTriangle className="text-zinc-600" size={20} />
-              4. Limitation of Liability
+              5. Limitation of Liability
             </h2>
             <p className="leading-relaxed text-zinc-500 border-l-2 border-white/20 pl-6 italic text-[14px]">
               TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL SMARTLEARN AI INC., ITS AFFILIATES, AGENTS, DIRECTORS, EMPLOYEES, OR SUPPLIERS BE LIABLE FOR ANY DIRECT, INDIRECT, PUNITIVE, INCIDENTAL, SPECIAL, CONSEQUENTIAL OR EXEMPLARY DAMAGES, INCLUDING WITHOUT LIMITATION DAMAGES FOR LOSS OF PROFITS, GOODWILL, USE, DATA OR OTHER INTANGIBLE LOSSES, ARISING OUT OF OR RELATING TO THE USE OF, OR INABILITY TO USE, THIS SERVICE.
-            </p>
-            <p className="leading-relaxed mt-6">
-              AI-generated content is provided for informational purposes only. We do not guarantee the factual accuracy, completeness, or reliability of any outputs generated by the models. Users must independently verify critical information.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold text-zinc-100 mb-6 flex items-center gap-3">
               <Globe className="text-zinc-500" size={24} />
-              5. Governing Law
+              6. Governing Law & Dispute Resolution
             </h2>
+            <p className="leading-relaxed mb-4">
+              This Agreement shall be governed by the laws of the State of Delaware, without respect to its conflict of laws principles. 
+            </p>
             <p className="leading-relaxed">
-              This Agreement shall be governed by the laws of the State of Delaware, without respect to its conflict of laws principles. Any disputes arising out of this Agreement shall be resolved in the state or federal courts located in New Castle County, Delaware.
+              Any disputes arising out of this Agreement shall be resolved through binding arbitration, rather than in court, except that you may assert claims in small claims court if your claims qualify. The arbitration will be conducted by the American Arbitration Association (AAA) under its rules.
             </p>
           </section>
         </div>
@@ -107,7 +120,7 @@ export default function Terms() {
         {/* Footer */}
         <div className="mt-32 pt-12 border-t border-white/[0.04] flex flex-col sm:flex-row items-center justify-between gap-4 text-[13px] text-zinc-600 font-medium">
           <p>© {new Date().getFullYear()} SmartLearn AI Inc. All rights reserved.</p>
-          <p>Contact legal at <span className="text-zinc-400 hover:text-white transition-colors cursor-pointer">legal@smartlearn-ai.com</span></p>
+          <p>Contact legal at: <span className="text-zinc-400 hover:text-white transition-colors cursor-pointer select-all">naveedahmed.soical@gmail.com</span></p>
         </div>
       </div>
     </div>
