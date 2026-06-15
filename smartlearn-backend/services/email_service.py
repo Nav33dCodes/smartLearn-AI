@@ -33,7 +33,7 @@ def send_email(to_email: str, subject: str, body: str, sender_prefix: str = "nor
 
 def get_premium_template(title: str, content_html: str, show_warning: bool = False, warning_text: str = "") -> str:
     warning_block = f"""
-    <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #27272a; color: #71717a; font-size: 13px; line-height: 20px;">
+    <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 13px; line-height: 20px;">
         {warning_text}
     </div>
     """ if show_warning else ""
@@ -47,20 +47,20 @@ def get_premium_template(title: str, content_html: str, show_warning: bool = Fal
         <style>
             body {{
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background-color: #09090b;
+                background-color: #f9fafb;
                 margin: 0;
                 padding: 60px 20px;
                 -webkit-font-smoothing: antialiased;
-                color: #e4e4e7;
+                color: #374151;
             }}
             .container {{
                 max-width: 540px;
                 margin: 0 auto;
-                background-color: #121214;
-                border: 1px solid #27272a;
+                background-color: #ffffff;
+                border: 1px solid #e5e7eb;
                 border-radius: 12px;
                 padding: 48px;
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+                box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
             }}
             .logo {{
                 display: flex;
@@ -68,7 +68,7 @@ def get_premium_template(title: str, content_html: str, show_warning: bool = Fal
                 margin-bottom: 40px;
                 font-size: 24px;
                 font-weight: 700;
-                color: #ffffff;
+                color: #111827;
                 letter-spacing: -0.5px;
             }}
             .logo span {{
@@ -76,7 +76,7 @@ def get_premium_template(title: str, content_html: str, show_warning: bool = Fal
                 margin-left: 4px;
             }}
             .title {{
-                color: #ffffff;
+                color: #111827;
                 font-size: 24px;
                 font-weight: 600;
                 margin-top: 0;
@@ -84,14 +84,14 @@ def get_premium_template(title: str, content_html: str, show_warning: bool = Fal
                 letter-spacing: -0.5px;
             }}
             .text {{
-                color: #a1a1aa;
+                color: #4b5563;
                 font-size: 15px;
                 line-height: 26px;
                 margin-bottom: 24px;
             }}
             .otp-box {{
-                background-color: #18181b;
-                border: 1px solid #3f3f46;
+                background-color: #fef2f2;
+                border: 1px solid #fecaca;
                 border-radius: 8px;
                 padding: 28px;
                 text-align: center;
@@ -120,7 +120,7 @@ def get_premium_template(title: str, content_html: str, show_warning: bool = Fal
             .footer {{
                 text-align: center;
                 margin-top: 40px;
-                color: #52525b;
+                color: #6b7280;
                 font-size: 13px;
                 line-height: 18px;
             }}
@@ -139,6 +139,127 @@ def get_premium_template(title: str, content_html: str, show_warning: bool = Fal
         <div class="footer">
             &copy; 2026 SmartLearn AI Inc. All rights reserved.<br>
             Strictly confidential & secure automated communication.
+        </div>
+    </body>
+    </html>
+    """
+
+def get_bug_report_template(user_email: str, user_name: str, bug_subject: str, bug_description: str) -> str:
+    return f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {{
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background-color: #f9fafb;
+                margin: 0;
+                padding: 40px 20px;
+                color: #374151;
+            }}
+            .wrapper {{
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                border: 1px solid #e5e7eb;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            }}
+            .header {{
+                background-color: #ff3131;
+                color: #ffffff;
+                padding: 30px 40px;
+                text-align: center;
+            }}
+            .header h1 {{
+                margin: 0;
+                font-size: 22px;
+                font-weight: 600;
+                letter-spacing: -0.5px;
+            }}
+            .content {{
+                padding: 40px;
+            }}
+            .meta-box {{
+                background-color: #f9fafb;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                padding: 20px;
+                margin-bottom: 30px;
+            }}
+            .meta-item {{
+                margin-bottom: 12px;
+                font-size: 14px;
+            }}
+            .meta-item:last-child {{
+                margin-bottom: 0;
+            }}
+            .meta-label {{
+                font-weight: 600;
+                color: #111827;
+                display: inline-block;
+                width: 80px;
+            }}
+            .meta-value {{
+                color: #4b5563;
+            }}
+            .description-box {{
+                background-color: #ffffff;
+                border: 1px solid #e5e7eb;
+                border-left: 4px solid #ff3131;
+                border-radius: 4px;
+                padding: 24px;
+                margin-bottom: 20px;
+            }}
+            .description-text {{
+                font-size: 15px;
+                line-height: 1.6;
+                color: #111827;
+                margin: 0;
+                white-space: pre-wrap;
+            }}
+            .footer {{
+                background-color: #f9fafb;
+                padding: 20px;
+                text-align: center;
+                border-top: 1px solid #e5e7eb;
+                color: #6b7280;
+                font-size: 12px;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="wrapper">
+            <div class="header">
+                <h1>🚨 System Bug Report</h1>
+            </div>
+            <div class="content">
+                <div class="meta-box">
+                    <div class="meta-item">
+                        <span class="meta-label">From:</span>
+                        <span class="meta-value">{user_name} ({user_email})</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Subject:</span>
+                        <span class="meta-value" style="font-weight: 500;">{bug_subject}</span>
+                    </div>
+                </div>
+                
+                <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 16px; color: #111827;">Issue Description</h3>
+                <div class="description-box">
+                    <p class="description-text">{bug_description}</p>
+                </div>
+                
+                <p style="font-size: 13px; color: #6b7280; margin-top: 30px;">
+                    This report was automatically generated from the SmartLearn AI platform UI.
+                </p>
+            </div>
+            <div class="footer">
+                SmartLearn AI Automated Support System
+            </div>
         </div>
     </body>
     </html>
@@ -214,18 +335,8 @@ def send_delete_account_otp_email(to_email: str, otp: str):
     return send_email(to_email, subject, body, sender_prefix="security")
 
 def send_bug_report_email(user_email: str, user_name: str, bug_subject: str, bug_description: str):
-    subject = f"🐛 Bug Report: {bug_subject}"
-    
-    content = f"""
-    <p class="text"><strong>From:</strong> {user_name} ({user_email})</p>
-    <p class="text"><strong>Subject:</strong> {bug_subject}</p>
-    <div style="background-color: #18181b; border: 1px solid #3f3f46; border-radius: 8px; padding: 24px; margin: 32px 0;">
-        <p class="text" style="color: #e4e4e7; margin: 0; white-space: pre-wrap;">{bug_description}</p>
-    </div>
-    <p class="text" style="font-size: 14px;">This bug report was submitted directly from the SmartLearn AI platform UI.</p>
-    """
-    
-    body = get_premium_template("New Bug Report Received", content)
+    subject = f"🚨 Bug Report: {bug_subject}"
+    body = get_bug_report_template(user_email, user_name, bug_subject, bug_description)
     
     # Send directly to the admin email
     admin_email = "iamnaveed.cs@gmail.com"
