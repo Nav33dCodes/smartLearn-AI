@@ -7,14 +7,20 @@ if RESEND_API_KEY:
     resend.api_key = RESEND_API_KEY.strip()
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173").rstrip("/")
 
-def send_email(to_email: str, subject: str, body: str):
+def send_email(to_email: str, subject: str, body: str, sender_prefix: str = "noreply"):
     if not resend.api_key:
         print(f"Warning: RESEND_API_KEY not set. Would have sent email to {to_email}: {subject}")
         return False
         
     try:
+        if SMTP_EMAIL == "onboarding@resend.dev":
+            from_address = f"SmartLearn AI <{SMTP_EMAIL}>"
+        else:
+            domain = SMTP_EMAIL.split('@')[-1] if '@' in SMTP_EMAIL else 'smartlearn.work'
+            from_address = f"SmartLearn AI <{sender_prefix}@{domain}>"
+
         params = {
-            "from": f"SmartLearn AI <{SMTP_EMAIL}>",
+            "from": from_address,
             "to": [to_email],
             "subject": subject,
             "html": body
@@ -150,7 +156,7 @@ def send_welcome_email(to_email: str, name: str):
     <p class="text" style="font-size: 14px;">If you have any questions or need assistance, simply reply to this email. We're here to help.</p>
     """
     body = get_premium_template("Welcome to SmartLearn!", content)
-    return send_email(to_email, subject, body)
+    return send_email(to_email, subject, body, sender_prefix="hello")
 
 def send_otp_email(to_email: str, otp: str):
     subject = "Your SmartLearn AI Password Reset Code"
@@ -164,7 +170,7 @@ def send_otp_email(to_email: str, otp: str):
     """
     warning = "If you did not request a password reset, please ignore this email or contact support immediately."
     body = get_premium_template("Password Reset Request", content, show_warning=True, warning_text=warning)
-    return send_email(to_email, subject, body)
+    return send_email(to_email, subject, body, sender_prefix="security")
 
 def send_password_reset_success_email(to_email: str):
     subject = "Your SmartLearn AI Password Has Been Reset"
@@ -177,7 +183,7 @@ def send_password_reset_success_email(to_email: str):
     """
     warning = "Security Notice: If you did not authorize this change, please contact our support team immediately."
     body = get_premium_template("Password Reset Successful", content, show_warning=True, warning_text=warning)
-    return send_email(to_email, subject, body)
+    return send_email(to_email, subject, body, sender_prefix="security")
 
 def send_verification_email(to_email: str, name: str, otp: str):
     subject = "Verify Your SmartLearn AI Account"
@@ -191,7 +197,7 @@ def send_verification_email(to_email: str, name: str, otp: str):
     """
     warning = "If you didn't attempt to create an account, you can safely ignore this email."
     body = get_premium_template("Verify Your Account", content, show_warning=True, warning_text=warning)
-    return send_email(to_email, subject, body)
+    return send_email(to_email, subject, body, sender_prefix="noreply")
 
 def send_delete_account_otp_email(to_email: str, otp: str):
     subject = "⚠️ SmartLearn AI Account Deletion Request"
@@ -205,4 +211,4 @@ def send_delete_account_otp_email(to_email: str, otp: str):
     """
     warning = "If you did not request this deletion, please ignore this email immediately and consider changing your password."
     body = get_premium_template("Account Deletion Request", content, show_warning=True, warning_text=warning)
-    return send_email(to_email, subject, body)
+    return send_email(to_email, subject, body, sender_prefix="security")

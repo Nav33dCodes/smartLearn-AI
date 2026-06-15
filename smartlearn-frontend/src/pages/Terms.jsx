@@ -120,7 +120,7 @@ export default function Terms() {
         {/* Footer */}
         <div className="mt-32 pt-12 border-t border-white/[0.04] flex flex-col sm:flex-row items-center justify-between gap-4 text-[13px] text-zinc-600 font-medium">
           <p>© {new Date().getFullYear()} SmartLearn AI Inc. All rights reserved.</p>
-          <p>Contact legal at: <span className="text-zinc-400 hover:text-white transition-colors cursor-pointer select-all">noreply@smartlearn.work</span></p>
+          <p>Contact legal at: <span className="text-zinc-400 hover:text-white transition-colors cursor-pointer select-all">legal@smartlearn.work</span></p>
         </div>
       </div>
     </div>

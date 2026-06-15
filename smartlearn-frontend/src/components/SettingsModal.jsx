@@ -629,7 +629,7 @@ export default function SettingsModal({
                     <p>Version <span className="font-medium text-foreground">14.0.0 (BETA)</span></p>
                     <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800/50 mt-6">
                       <p>For support or inquiries, please contact:</p>
-                      <p className="mt-1 font-medium text-foreground select-all">noreply@smartlearn.work</p>
+                      <p className="mt-1 font-medium text-foreground select-all">support@smartlearn.work</p>
                     </div>
                   </div>
                 </motion.div>
