@@ -36,4 +36,4 @@ email-validator
 resend
 
 # Missing TTS
-edge-tt
+edge-tts
