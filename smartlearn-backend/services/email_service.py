@@ -157,108 +157,97 @@ def get_bug_report_template(user_email: str, user_name: str, bug_subject: str, b
                 background-color: #f9fafb;
                 margin: 0;
                 padding: 40px 20px;
-                color: #374151;
+                color: #111827;
             }}
-            .wrapper {{
-                max-width: 600px;
+            .container {{
+                max-width: 500px;
                 margin: 0 auto;
                 background-color: #ffffff;
                 border: 1px solid #e5e7eb;
-                border-radius: 12px;
-                overflow: hidden;
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-            }}
-            .header {{
-                background-color: #ff3131;
-                color: #ffffff;
-                padding: 30px 40px;
-                text-align: center;
-            }}
-            .header h1 {{
-                margin: 0;
-                font-size: 22px;
-                font-weight: 600;
-                letter-spacing: -0.5px;
-            }}
-            .content {{
+                border-radius: 8px;
                 padding: 40px;
             }}
-            .meta-box {{
-                background-color: #f9fafb;
-                border: 1px solid #e5e7eb;
-                border-radius: 8px;
-                padding: 20px;
-                margin-bottom: 30px;
+            .header {{
+                display: flex;
+                align-items: center;
+                margin-bottom: 32px;
             }}
-            .meta-item {{
-                margin-bottom: 12px;
-                font-size: 14px;
-            }}
-            .meta-item:last-child {{
-                margin-bottom: 0;
-            }}
-            .meta-label {{
+            .badge {{
+                background-color: #fef2f2;
+                color: #ff3131;
+                font-size: 12px;
                 font-weight: 600;
-                color: #111827;
+                padding: 4px 10px;
+                border-radius: 100px;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+                margin-bottom: 16px;
                 display: inline-block;
-                width: 80px;
             }}
-            .meta-value {{
-                color: #4b5563;
-            }}
-            .description-box {{
-                background-color: #ffffff;
-                border: 1px solid #e5e7eb;
-                border-left: 4px solid #ff3131;
-                border-radius: 4px;
-                padding: 24px;
-                margin-bottom: 20px;
-            }}
-            .description-text {{
-                font-size: 15px;
-                line-height: 1.6;
-                color: #111827;
+            .title {{
+                font-size: 20px;
+                font-weight: 600;
                 margin: 0;
+                color: #111827;
+            }}
+            .divider {{
+                height: 1px;
+                background-color: #f3f4f6;
+                margin: 24px 0;
+            }}
+            .row {{
+                margin-bottom: 16px;
+            }}
+            .label {{
+                font-size: 13px;
+                color: #6b7280;
+                font-weight: 500;
+                margin-bottom: 4px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }}
+            .value {{
+                font-size: 15px;
+                color: #111827;
+                font-weight: 500;
+            }}
+            .description {{
+                background-color: #f9fafb;
+                border-radius: 6px;
+                padding: 16px;
+                font-size: 14px;
+                line-height: 1.6;
+                color: #374151;
                 white-space: pre-wrap;
+                margin-top: 8px;
+                border: 1px solid #f3f4f6;
             }}
             .footer {{
-                background-color: #f9fafb;
-                padding: 20px;
-                text-align: center;
-                border-top: 1px solid #e5e7eb;
-                color: #6b7280;
-                font-size: 12px;
+                margin-top: 32px;
+                font-size: 13px;
+                color: #9ca3af;
             }}
         </style>
     </head>
     <body>
-        <div class="wrapper">
-            <div class="header">
-                <h1>🚨 System Bug Report</h1>
+        <div class="container">
+            <span class="badge">Bug Report</span>
+            <h1 class="title">{bug_subject}</h1>
+            
+            <div class="divider"></div>
+            
+            <div class="row">
+                <div class="label">Reported By</div>
+                <div class="value">{user_name} &middot; <a href="mailto:{user_email}" style="color: #6b7280; text-decoration: none; font-weight: 400;">{user_email}</a></div>
             </div>
-            <div class="content">
-                <div class="meta-box">
-                    <div class="meta-item">
-                        <span class="meta-label">From:</span>
-                        <span class="meta-value">{user_name} ({user_email})</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Subject:</span>
-                        <span class="meta-value" style="font-weight: 500;">{bug_subject}</span>
-                    </div>
-                </div>
-                
-                <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 16px; color: #111827;">Issue Description</h3>
-                <div class="description-box">
-                    <p class="description-text">{bug_description}</p>
-                </div>
-                
-                <p style="font-size: 13px; color: #6b7280; margin-top: 30px;">
-                    This report was automatically generated from the SmartLearn AI platform UI.
-                </p>
+            
+            <div class="row" style="margin-top: 24px;">
+                <div class="label">Issue Description</div>
+                <div class="description">{bug_description}</div>
             </div>
+            
             <div class="footer">
-                SmartLearn AI Automated Support System
+                Submitted directly from SmartLearn AI Interface.
             </div>
         </div>
     </body>
