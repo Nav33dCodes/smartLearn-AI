@@ -33,6 +33,7 @@ PyJWT
 passlib[bcrypt]
 bcrypt==3.2.2
 email-validator
+resend
 
 # Missing TTS
 edge-tts
