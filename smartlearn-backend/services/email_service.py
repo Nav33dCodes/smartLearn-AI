@@ -1,30 +1,32 @@
 import os
-import resend
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
-RESEND_API_KEY = os.getenv("RESEND_API_KEY")
-if RESEND_API_KEY:
-    resend.api_key = RESEND_API_KEY
-
-# If you don't have a verified domain on Resend, you MUST use their testing email: onboarding@resend.dev
-SMTP_EMAIL = os.getenv("SMTP_EMAIL", "onboarding@resend.dev")
+SMTP_EMAIL = os.getenv("SMTP_EMAIL")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173").rstrip("/")
 
 def send_email(to_email: str, subject: str, body: str):
-    if not RESEND_API_KEY:
-        print(f"Warning: RESEND_API_KEY not set. Would have sent email to {to_email}: {subject}")
+    if not SMTP_EMAIL or not SMTP_PASSWORD:
+        print(f"Warning: SMTP credentials not set. Would have sent email to {to_email}: {subject}")
         return False
         
     try:
-        params = {
-            "from": f"SmartLearn AI <{SMTP_EMAIL}>",
-            "to": [to_email],
-            "subject": subject,
-            "html": body
-        }
-        resend.Emails.send(params)
+        msg = MIMEMultipart()
+        msg['From'] = SMTP_EMAIL
+        msg['To'] = to_email
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'html'))
+        
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(SMTP_EMAIL, SMTP_PASSWORD)
+        server.send_message(msg)
+        server.quit()
         return True
     except Exception as e:
-        print(f"Failed to send email via Resend: {e}")
+        print(f"Failed to send email: {e}")
         return False
 
 def get_premium_template(title: str, content_html: str, show_warning: bool = False, warning_text: str = "") -> str:
