@@ -2,6 +2,37 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
+    date: "June 14, 2026 — Autonomous Browsing & Private Mode (v14.0.0)",
+    features: [
+      {
+        title: "Autonomous Web Browsing (Playwright)",
+        description: "The AI is no longer confined to text APIs. It can now literally launch a browser to see the web.",
+        bullets: [
+          "Headless Browser Engine: Integrates Microsoft Playwright to boot a Chromium instance in the background for any URL detected in chat.",
+          "Live Viewport Screenshots: Automatically navigates, waits for rendering, and snaps a high-definition screenshot directly into the chat bubble.",
+          "SSE Stream Hijacking: Streams a dynamic 'Browsing website...' indicator to the UI during the 2-4 second browser boot latency."
+        ]
+      },
+      {
+        title: "Zero-Retention Private Mode",
+        description: "Strict SOC2-compliant hardware-level privacy for sensitive enterprise conversations.",
+        bullets: [
+          "Complete Database Bypass: When toggled on, the backend forcefully aborts the save mechanisms. Conversations exist exclusively in RAM.",
+          "Visual Ghost Mode: The UI shifts to a dark red/purple 'mesh-bg' tint and activates a glowing Ghost icon to confirm you are completely off-the-record.",
+          "Permanent Data Destruction: The moment the session ends or the tab is closed, all traces of the conversation are permanently wiped."
+        ]
+      },
+      {
+        title: "Zustand Global State Architecture",
+        description: "Completely ripped out legacy React Context prop-drilling for massive performance gains.",
+        bullets: [
+          "Decoupled Rendering: The sidebar, theme settings, and chat inputs now operate independently, preventing massive re-renders of the main chat window.",
+          "Locked 60 FPS: Heavy markdown and code syntax highlighters no longer recompute when toggling simple UI settings, saving significant battery life."
+        ]
+      }
+    ]
+  },
+  {
     date: "June 14, 2026 — Ultimate OLED UI Overhaul & Premium Aesthetics (Phase 12)",
     features: [
       {
