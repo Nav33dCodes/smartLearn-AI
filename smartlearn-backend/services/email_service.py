@@ -5,6 +5,9 @@ from email.mime.multipart import MIMEMultipart
 
 SMTP_EMAIL = os.getenv("SMTP_EMAIL")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
+if RESEND_API_KEY:
+    RESEND_API_KEY = RESEND_API_KEY.strip()
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173").rstrip("/")
 
 def send_email(to_email: str, subject: str, body: str):
