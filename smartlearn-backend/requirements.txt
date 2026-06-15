@@ -24,3 +24,13 @@ psycopg2-binary
 playwright
 openai
 tavily-python
+
+# Missing Database & Auth
+sqlalchemy
+asyncpg
+redis
+PyJWT
+passlib[bcrypt]
+
+# Missing TTS
+edge-tts
