@@ -443,6 +443,42 @@ export default function Landing() {
                 </div>
               </div>
             </div>
+
+            {/* Bento 5: Autonomous Web Browsing (Spans 2 columns) */}
+            <div className="md:col-span-2 relative bg-[#050505] border border-white/[0.04] rounded-3xl p-8 overflow-hidden group hover:border-white/10 transition-colors">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/[0.02] rounded-full blur-[80px] -z-10 group-hover:bg-blue-500/[0.04] transition-colors" />
+              <div className="relative z-10 h-full flex flex-col justify-between w-full md:w-[60%]">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center mb-6">
+                  <Globe size={24} className="text-zinc-300" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">Autonomous Web Browsing</h3>
+                  <p className="text-zinc-400 font-medium text-sm leading-relaxed">Powered by Playwright, the AI launches a headless browser to navigate URLs, scrape data, and snap live viewport screenshots directly into the chat.</p>
+                </div>
+              </div>
+              <div className="absolute right-[-5%] bottom-[-5%] w-[45%] h-[60%] hidden md:flex flex-col bg-[#111] border border-white/10 rounded-tl-2xl shadow-2xl opacity-50 group-hover:opacity-100 group-hover:-translate-y-2 group-hover:-translate-x-2 transition-all duration-500 overflow-hidden">
+                <div className="h-6 w-full bg-black border-b border-white/5 flex items-center px-2 gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
+                </div>
+                <div className="flex-1 bg-[url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Wikipedia-logo-v2.svg/1200px-Wikipedia-logo-v2.svg.png')] bg-contain bg-center bg-no-repeat opacity-20 m-4" />
+              </div>
+            </div>
+
+            {/* Bento 6: Private Mode (Spans 1 column) */}
+            <div className="md:col-span-1 relative bg-[#050505] border border-white/[0.04] rounded-3xl p-8 overflow-hidden group hover:border-red-500/20 transition-colors">
+              <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-500/[0.02] to-transparent -z-10 group-hover:from-red-500/[0.05] transition-colors" />
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center mb-6 group-hover:border-red-500/20 group-hover:bg-red-500/5 transition-colors">
+                  <Lock size={24} className="text-zinc-300 group-hover:text-red-400 transition-colors" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2 tracking-tight group-hover:text-red-100 transition-colors">Zero-Retention Mode</h3>
+                  <p className="text-zinc-400 font-medium text-sm leading-relaxed relative z-20 group-hover:text-zinc-300 transition-colors">Strict SOC2-compliant hardware-level privacy. Bypasses the database entirely. Data exists only in RAM and is destroyed on exit.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
