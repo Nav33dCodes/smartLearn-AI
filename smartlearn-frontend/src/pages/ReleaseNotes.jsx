@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 const releases = [
   {
-    date: "June 14, 2026 — Autonomous Browsing & Private Mode (v14.0.0)",
+    date: "June 14, 2026 — Autonomous Browsing & Private Mode (v14.0.0 BETA)",
     features: [
       {
         title: "Autonomous Web Browsing (Playwright)",
