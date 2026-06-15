@@ -8,6 +8,7 @@ import Logo from "./Logo";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import SettingsModal from "./SettingsModal";
+import BugReportModal from "./BugReportModal";
 import { Link } from "react-router-dom";
 
 function Sidebar({
@@ -25,6 +26,8 @@ function Sidebar({
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [chatToDelete, setChatToDelete] = useState(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showHelpMenu, setShowHelpMenu] = useState(false);
+  const [showBugReportModal, setShowBugReportModal] = useState(false);
   const userMenuRef = useRef(null);
 
   const [editingChatId, setEditingChatId] = useState(null);
@@ -45,6 +48,7 @@ function Sidebar({
     const handleClickOutside = (event) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setShowUserMenu(false);
+        setShowHelpMenu(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -312,40 +316,106 @@ function Sidebar({
                     transition={{ type: "spring", stiffness: 400, damping: 25 }}
                     className="absolute bottom-full left-2 right-2 mb-2 bg-[#fcfcfd]/90 dark:bg-[#111111]/90 backdrop-blur-2xl border border-black/10 dark:border-[#222] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] dark:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.8)] rounded-2xl overflow-hidden z-50 flex flex-col p-1.5"
                   >
-                    <button
-                      onClick={() => { setIsSettingsOpen(true); setShowUserMenu(false); }}
-                      className="flex items-center gap-3 px-2.5 py-2 text-[13px] hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors duration-200 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 text-left group"
-                    >
-                      <Settings size={15} className="text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors duration-200" />
-                      <span className="font-medium">Settings</span>
-                    </button>
-                    
-                    <button
-                      onClick={() => { window.open('/releases', '_blank'); setShowUserMenu(false); }}
-                      className="flex items-center justify-between px-2.5 py-2 text-[13px] hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors duration-200 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 text-left group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Rocket size={15} className="text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors duration-200" />
-                        <span className="font-medium">Release notes</span>
-                      </div>
-                      <ExternalLink size={13} className="text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors duration-200" />
-                    </button>
+                    <AnimatePresence mode="wait">
+                      {!showHelpMenu ? (
+                        <motion.div
+                          key="main-menu"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          transition={{ duration: 0.15 }}
+                          className="flex flex-col"
+                        >
+                          <button
+                            onClick={() => { setIsSettingsOpen(true); setShowUserMenu(false); }}
+                            className="flex items-center gap-3 px-2.5 py-2 text-[13px] hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors duration-200 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 text-left group"
+                          >
+                            <Settings size={15} className="text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors duration-200" />
+                            <span className="font-medium">Settings</span>
+                          </button>
+                          
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setShowHelpMenu(true); }}
+                            className="flex items-center justify-between px-2.5 py-2 text-[13px] hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors duration-200 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 text-left group"
+                          >
+                            <div className="flex items-center gap-3">
+                              <Sparkles size={15} className="text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors duration-200" />
+                              <span className="font-medium">Help</span>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400"><path d="m9 18 6-6-6-6"/></svg>
+                          </button>
 
-                    <div className="h-[1px] bg-black/5 dark:bg-[#222] my-1 mx-2" />
-                    
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setShowLogoutModal(true); setShowUserMenu(false); }}
-                      className="flex items-center gap-3 px-2.5 py-2 text-[13px] hover:bg-red-500/10 text-red-600 dark:text-red-500 rounded-lg transition-colors duration-200 text-left group"
-                    >
-                      <LogOut size={15} className="text-red-600/70 dark:text-red-500/70 group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors duration-200" />
-                      <span className="font-medium">Log out</span>
-                    </button>
+                          <div className="h-[1px] bg-black/5 dark:bg-[#222] my-1 mx-2" />
+                          
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setShowLogoutModal(true); setShowUserMenu(false); }}
+                            className="flex items-center gap-3 px-2.5 py-2 text-[13px] hover:bg-red-500/10 text-red-600 dark:text-red-500 rounded-lg transition-colors duration-200 text-left group"
+                          >
+                            <LogOut size={15} className="text-red-600/70 dark:text-red-500/70 group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors duration-200" />
+                            <span className="font-medium">Log out</span>
+                          </button>
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="help-menu"
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 20 }}
+                          transition={{ duration: 0.15 }}
+                          className="flex flex-col"
+                        >
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setShowHelpMenu(false); }}
+                            className="flex items-center gap-3 px-2.5 py-2 text-[13px] hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors duration-200 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 text-left group"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100"><path d="m15 18-6-6 6-6"/></svg>
+                            <span className="font-medium">Back</span>
+                          </button>
+                          
+                          <div className="h-[1px] bg-black/5 dark:bg-[#222] my-1 mx-2" />
+
+                          <button
+                            onClick={() => { window.open('/releases', '_blank'); setShowUserMenu(false); setShowHelpMenu(false); }}
+                            className="flex items-center justify-between px-2.5 py-2 text-[13px] hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors duration-200 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 text-left group"
+                          >
+                            <span className="font-medium">Release notes</span>
+                            <ExternalLink size={13} className="text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100" />
+                          </button>
+                          
+                          <button
+                            onClick={() => { window.open('/privacy', '_blank'); setShowUserMenu(false); setShowHelpMenu(false); }}
+                            className="flex items-center justify-between px-2.5 py-2 text-[13px] hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors duration-200 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 text-left group"
+                          >
+                            <span className="font-medium">Privacy policy</span>
+                            <ExternalLink size={13} className="text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100" />
+                          </button>
+
+                          <button
+                            onClick={() => { window.open('/terms', '_blank'); setShowUserMenu(false); setShowHelpMenu(false); }}
+                            className="flex items-center justify-between px-2.5 py-2 text-[13px] hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors duration-200 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 text-left group"
+                          >
+                            <span className="font-medium">Terms of service</span>
+                            <ExternalLink size={13} className="text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100" />
+                          </button>
+
+                          <div className="h-[1px] bg-black/5 dark:bg-[#222] my-1 mx-2" />
+
+                          <button
+                            onClick={() => { setShowBugReportModal(true); setShowUserMenu(false); setShowHelpMenu(false); }}
+                            className="flex items-center gap-3 px-2.5 py-2 text-[13px] hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors duration-200 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 text-left group"
+                          >
+                            <ShieldAlert size={15} className="text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100" />
+                            <span className="font-medium">Report a bug</span>
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </motion.div>
                 )}
               </AnimatePresence>
 
               <div 
-                onClick={() => setShowUserMenu(!showUserMenu)}
+                onClick={() => { setShowUserMenu(!showUserMenu); setShowHelpMenu(false); }}
                 className="flex items-center justify-between p-1.5 pl-2 pr-3 rounded-full cursor-pointer bg-transparent hover:bg-black/5 dark:hover:bg-[#111111] transition-colors border border-transparent group"
               >
                 <div className="flex items-center gap-3 overflow-hidden">
@@ -406,6 +476,11 @@ function Sidebar({
         )}
       </AnimatePresence>
 
+      {/* Bug Report Modal */}
+      <BugReportModal 
+        isOpen={showBugReportModal} 
+        onClose={() => setShowBugReportModal(false)} 
+      />
 
     </>
   );
