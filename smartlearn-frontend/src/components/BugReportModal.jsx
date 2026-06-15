@@ -17,7 +17,7 @@ export default function BugReportModal({ isOpen, onClose }) {
 
     setIsSubmitting(true);
     try {
-      const token = localStorage.getItem("sl_token");
+      const token = localStorage.getItem("access_token");
       const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
       
       // We will automatically extract a short subject from the description
