@@ -142,7 +142,7 @@ export default function Privacy() {
             <p className="leading-relaxed">
               For legal inquiries, data deletion requests, or questions regarding our privacy architecture, please contact our Data Protection Officer directly at:
               <br /><br />
-              <strong className="text-white select-all">naveedahmed.social@gmail.com</strong>
+              <strong className="text-white select-all">privacy@smartlearn.work</strong>
             </p>
           </section>
         </div>
@@ -150,7 +150,7 @@ export default function Privacy() {
         {/* Footer */}
         <div className="mt-32 pt-12 border-t border-white/[0.04] flex flex-col sm:flex-row items-center justify-between gap-4 text-[13px] text-zinc-600 font-medium">
           <p>© {new Date().getFullYear()} SmartLearn AI Inc. All rights reserved.</p>
-          <p>For urgent inquiries: <span className="text-zinc-400 hover:text-white transition-colors cursor-pointer select-all">naveedahmed.social@gmail.com</span></p>
+          <p>For urgent inquiries: <span className="text-zinc-400 hover:text-white transition-colors cursor-pointer select-all">privacy@smartlearn.work</span></p>
         </div>
       </div>
     </div>
