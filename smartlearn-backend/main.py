@@ -178,7 +178,7 @@ async def lifespan(app: FastAPI):
     yield
     logger.info("=== SmartLearn AI shutting down ===")
 
-app = FastAPI(title="SmartLearn AI", version="14.0.0", lifespan=lifespan)
+app = FastAPI(title="SmartLearn AI", version="14.0.0 (BETA)", lifespan=lifespan)
 
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000").split(",")
 app.add_middleware(
@@ -222,7 +222,7 @@ class ExpandNodeRequest(BaseModel):
 # ────────────────────────────────────────────────────
 @app.get("/")
 def root():
-    return {"status": "SmartLearn AI Running 🚀", "version": "14.0.0"}
+    return {"status": "SmartLearn AI Running 🚀", "version": "14.0.0 (BETA)"}
 
 @app.get("/health")
 def health():
