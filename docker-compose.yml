@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./smartlearn-backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./smartlearn-backend/.env
+    # The backend handles its own port 8000 internally
+
+  frontend:
+    build:
+      context: ./smartlearn-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80" # Exposing Nginx port 80 to localhost:5173
+    env_file:
+      - ./smartlearn-frontend/.env
+    depends_on:
+      - backend
