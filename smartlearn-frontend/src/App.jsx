@@ -4,6 +4,7 @@ import { Moon, Sun, PanelLeftOpen } from "lucide-react";
 import { Layers, BrainCircuit, Network, Ghost } from "lucide-react";
 import { Toaster, toast } from 'sonner';
 import { Routes, Route } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 
 import Sidebar from "./components/Sidebar";
 import ChatWindow from "./components/ChatWindow";
@@ -619,6 +620,7 @@ export default function App() {
           } />
         </Routes>
       </Suspense>
+      <Analytics />
     </>
   );
 }
