@@ -18,6 +18,7 @@ import { MessageSquare, LayoutDashboard, Settings, LogOut, PanelLeftClose, Searc
 
 import { ArtifactProvider, useArtifacts } from "./context/ArtifactContext";
 import ArtifactCanvas from "./components/ArtifactCanvas";
+import { Analytics } from '@vercel/analytics/react';
 
 // Lazy Loaded Routes & Heavy Components
 const Login = lazy(() => import("./pages/Login"));
@@ -619,6 +620,7 @@ export default function App() {
           } />
         </Routes>
       </Suspense>
+      <Analytics />
     </>
   );
 }
