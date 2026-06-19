@@ -20,6 +20,18 @@ const savedColor = localStorage.getItem("sl_theme_color") || "#ff3131";
 document.documentElement.style.setProperty("--primary", savedColor);
 document.documentElement.style.setProperty("--ring", savedColor);
 
+// ── Railway Keep-Alive Ping ──────────────────────────────────────────────────
+// Railway spins down the backend after ~5min of inactivity (cold start = ~1.5s TTFB).
+// We ping /ping every 4 minutes to keep the container warm for all users.
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const warmUpBackend = () => {
+  fetch(`${API_URL}/ping`, { method: 'GET', signal: AbortSignal.timeout(5000) }).catch(() => {});
+};
+// Warm up immediately on page load (before user clicks anything)
+warmUpBackend();
+// Then keep warm every 4 minutes
+setInterval(warmUpBackend, 4 * 60 * 1000);
+
 
 const queryClient = new QueryClient({
   defaultOptions: {

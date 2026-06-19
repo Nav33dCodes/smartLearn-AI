@@ -229,6 +229,11 @@ def root():
 def health():
     return {"ok": True}
 
+@app.get("/ping")
+def ping():
+    """Keep-alive endpoint. Called every 4 minutes by the frontend to prevent Railway cold starts."""
+    return {"pong": True}
+
 
 # ────────────────────────────────────────────────────
 # BACKGROUND DB SAVE
