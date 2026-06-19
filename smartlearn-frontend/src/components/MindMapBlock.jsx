@@ -138,63 +138,134 @@ export default function MindMapBlock({ data, activeChatId }) {
 
   useEffect(() => {
     try {
-      // Clean up potential LLM markdown artifacts
-      let cleanData = data;
-      if (typeof cleanData === 'string') {
-        cleanData = cleanData.replace(/```json/g, '').replace(/```/g, '').trim();
-        
-        // Extract just the JSON object if the AI hallucinated conversational text around it
-        const jsonMatch = cleanData.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          cleanData = jsonMatch[0];
+      let nodesArr = [];
+      let edgesArr = [];
+      let idCounter = 0;
+
+      // ── Universal recursive tree converter ───────────────────────────
+      const treeToGraph = (obj, parentId = null) => {
+        const currentId = String(idCounter++);
+        const label =
+          obj.label || obj.node || obj.title || obj.topic ||
+          obj.name || obj.text || obj.concept || String(obj) || 'Node';
+        nodesArr.push({ id: currentId, label });
+        if (parentId !== null) {
+          edgesArr.push({ id: `e${parentId}-${currentId}`, source: parentId, target: currentId });
         }
-        
-        // Remove trailing commas that LLMs sometimes generate
-        cleanData = cleanData.replace(/,\s*([\]}])/g, '$1');
-        cleanData = JSON.parse(cleanData);
+        const kids =
+          obj.children || obj.subtopics || obj.branches ||
+          obj.sub || obj.items || obj.subTopics || [];
+        if (Array.isArray(kids)) kids.forEach(k => treeToGraph(k, currentId));
+      };
+
+      // ── Plain object map converter ({"Root": ["Child1", "Child2"]}) ──
+      const mapToGraph = (obj, parentId = null) => {
+        Object.entries(obj).forEach(([key, value]) => {
+          const currentId = String(idCounter++);
+          nodesArr.push({ id: currentId, label: key });
+          if (parentId !== null) {
+            edgesArr.push({ id: `e${parentId}-${currentId}`, source: parentId, target: currentId });
+          }
+          if (Array.isArray(value)) {
+            value.forEach(child => {
+              if (typeof child === 'string') {
+                const childId = String(idCounter++);
+                nodesArr.push({ id: childId, label: child });
+                edgesArr.push({ id: `e${currentId}-${childId}`, source: currentId, target: childId });
+              } else if (typeof child === 'object') {
+                treeToGraph(child, currentId);
+              }
+            });
+          } else if (typeof value === 'object' && value !== null) {
+            mapToGraph(value, currentId);
+          }
+        });
+      };
+
+      // ── Mermaid graph syntax fallback ────────────────────────────────
+      const parseMermaid = (text) => {
+        const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+        const nodeMap = {};
+        lines.forEach(line => {
+          // Match: A[Label] --> B[Label2]  or  A --> B
+          const match = line.match(/^([A-Za-z0-9_]+)(?:\[[^\]]*\])?\s*--?>+\s*([A-Za-z0-9_]+)(?:\[[^\]]*\])?/);
+          if (match) {
+            const [, src, tgt] = match;
+            const srcLabel = line.match(new RegExp(`${src}\\[([^\\]]+)\\]`))?.[1] || src;
+            const tgtLabel = line.match(new RegExp(`${tgt}\\[([^\\]]+)\\]`))?.[1] || tgt;
+            if (!nodeMap[src]) { nodeMap[src] = srcLabel; nodesArr.push({ id: src, label: srcLabel }); }
+            if (!nodeMap[tgt]) { nodeMap[tgt] = tgtLabel; nodesArr.push({ id: tgt, label: tgtLabel }); }
+            edgesArr.push({ id: `e${src}-${tgt}`, source: src, target: tgt });
+          }
+        });
+        return nodesArr.length > 0;
+      };
+
+      // ── STEP 1: Clean raw string ─────────────────────────────────────
+      let raw = data;
+      if (typeof raw !== 'string') raw = JSON.stringify(raw);
+      raw = raw.replace(/```[\w]*/g, '').replace(/```/g, '').trim();
+      // Remove trailing commas before ] or }
+      raw = raw.replace(/,\s*([\]}])/g, '$1');
+
+      // ── STEP 2: Try JSON parse ───────────────────────────────────────
+      let parsed = null;
+      const jsonMatch = raw.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+      if (jsonMatch) {
+        try { parsed = JSON.parse(jsonMatch[0]); } catch {}
+      }
+      if (!parsed) {
+        try { parsed = JSON.parse(raw); } catch {}
       }
 
-      if (!cleanData || !cleanData.nodes) {
-        // Try to handle alternative format: {node: "root", children: [...]}
-        if (cleanData && cleanData.node) {
-          // Convert tree format to nodes/edges format
-          const nodesArr = [];
-          const edgesArr = [];
-          let idCounter = 0;
-
-          const traverse = (obj, parentId) => {
-            const currentId = String(idCounter++);
-            nodesArr.push({ id: currentId, label: obj.node || obj.label || obj.title || 'Node' });
-            if (parentId !== null) {
-              edgesArr.push({ id: `e${parentId}-${currentId}`, source: parentId, target: currentId });
-            }
-            const children = obj.children || obj.subtopics || [];
-            children.forEach(child => traverse(child, currentId));
-          };
-
-          traverse(cleanData, null);
-          cleanData = { nodes: nodesArr, edges: edgesArr };
-        } else {
-          throw new Error("Invalid Mind Map Format");
+      if (parsed) {
+        // ── Format A: {nodes: [...], edges: [...]} ──────────────────
+        if (Array.isArray(parsed.nodes) && parsed.nodes.length > 0) {
+          nodesArr = parsed.nodes.map(n => ({ id: String(n.id), label: n.label || n.data?.label || String(n.id) }));
+          edgesArr = (parsed.edges || []).map(e => ({ id: e.id || `e${e.source}-${e.target}`, source: String(e.source), target: String(e.target) }));
+        }
+        // ── Format B: {node/title/topic: "...", children: [...]} ────
+        else if (parsed.node || parsed.title || parsed.topic || parsed.name || parsed.concept) {
+          treeToGraph(parsed, null);
+        }
+        // ── Format C: {elements: [...]} ─────────────────────────────
+        else if (Array.isArray(parsed.elements)) {
+          parsed.elements.forEach(el => {
+            if (el.group === 'nodes') nodesArr.push({ id: String(el.data.id), label: el.data.label || el.data.id });
+            if (el.group === 'edges') edgesArr.push({ id: el.data.id || `e${el.data.source}-${el.data.target}`, source: String(el.data.source), target: String(el.data.target) });
+          });
+        }
+        // ── Format D: plain object map {"Root": ["A","B"]} ──────────
+        else if (typeof parsed === 'object' && !Array.isArray(parsed)) {
+          mapToGraph(parsed, null);
+        }
+        // ── Format E: array of nodes ─────────────────────────────────
+        else if (Array.isArray(parsed)) {
+          parsed.forEach((item, i) => {
+            if (typeof item === 'string') nodesArr.push({ id: String(i), label: item });
+            else treeToGraph(item, i > 0 ? '0' : null);
+          });
+        }
+      } else {
+        // ── STEP 3: Mermaid graph syntax fallback ────────────────────
+        if (!parseMermaid(raw)) {
+          throw new Error('No parseable mind map structure found');
         }
       }
 
-      // Format nodes nicely
-      const initialNodes = cleanData.nodes.map(n => ({
+      if (nodesArr.length === 0) throw new Error('Empty mind map — no nodes produced');
+
+      // ── STEP 4: Build ReactFlow nodes & edges ────────────────────────
+      const initialNodes = nodesArr.map(n => ({
         id: String(n.id),
         type: 'custom',
-        data: { 
-          label: n.label || n.data?.label || n.id,
-          onExpand: handleExpand,
-          isExpanding: false
-        }
+        data: { label: n.label, onExpand: handleExpand, isExpanding: false }
       }));
 
-      const initialEdges = (cleanData.edges || []).map(e => ({
+      const initialEdges = edgesArr.map(e => ({
         id: e.id || `e${e.source}-${e.target}`,
         source: String(e.source),
         target: String(e.target),
-        label: e.label || '',
         animated: true,
         style: { stroke: '#888', strokeWidth: 2 },
       }));
@@ -203,10 +274,11 @@ export default function MindMapBlock({ data, activeChatId }) {
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);
     } catch (err) {
-      console.error("Mind Map Parse Error:", err);
-      setError(`Failed to generate mind map: ${err.message}. Data: ${String(data).substring(0, 100)}`);
+      console.error('Mind Map Parse Error:', err.message, '\nRaw data:', String(data).substring(0, 300));
+      setError(err.message);
     }
   }, [data]);
+
 
   const onNodesChange = useCallback(
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
