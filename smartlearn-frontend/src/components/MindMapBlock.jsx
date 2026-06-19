@@ -155,7 +155,28 @@ export default function MindMapBlock({ data, activeChatId }) {
       }
 
       if (!cleanData || !cleanData.nodes) {
-        throw new Error("Invalid Mind Map Format");
+        // Try to handle alternative format: {node: "root", children: [...]}
+        if (cleanData && cleanData.node) {
+          // Convert tree format to nodes/edges format
+          const nodesArr = [];
+          const edgesArr = [];
+          let idCounter = 0;
+
+          const traverse = (obj, parentId) => {
+            const currentId = String(idCounter++);
+            nodesArr.push({ id: currentId, label: obj.node || obj.label || obj.title || 'Node' });
+            if (parentId !== null) {
+              edgesArr.push({ id: `e${parentId}-${currentId}`, source: parentId, target: currentId });
+            }
+            const children = obj.children || obj.subtopics || [];
+            children.forEach(child => traverse(child, currentId));
+          };
+
+          traverse(cleanData, null);
+          cleanData = { nodes: nodesArr, edges: edgesArr };
+        } else {
+          throw new Error("Invalid Mind Map Format");
+        }
       }
 
       // Format nodes nicely
@@ -198,8 +219,20 @@ export default function MindMapBlock({ data, activeChatId }) {
 
   if (error) {
     return (
+      <div className="bg-[#0f0f0f] border border-red-500/30 rounded-2xl overflow-hidden shadow-lg h-[250px] w-full my-6 flex flex-col items-center justify-center gap-4 text-muted-foreground relative">
+        <Network size={32} className="text-red-400/70" />
+        <div className="flex flex-col items-center gap-2 px-6 text-center">
+          <span className="font-semibold text-sm text-red-400 tracking-wide">Mind Map could not render</span>
+          <span className="text-xs text-zinc-500">The AI returned an unexpected format. Try asking again with a clearer prompt.</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (nodes.length === 0) {
+    return (
       <div className="bg-[#0f0f0f] border border-border/50 rounded-2xl overflow-hidden shadow-lg h-[250px] w-full my-6 flex flex-col items-center justify-center gap-4 text-muted-foreground relative">
-        <div className="absolute inset-0 bg-primary/5 animate-pulse"></div>
+        <div className="absolute inset-0 bg-primary/5 animate-pulse" />
         <Network size={32} className="text-primary/50 animate-bounce" />
         <div className="flex items-center gap-2">
           <Loader2 size={16} className="animate-spin text-primary" />
