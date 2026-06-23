@@ -65,7 +65,7 @@ export default function SandpackBlock({ code, language, viewMode = "preview" }) 
   <div id="root"></div>
 </body>
 </html>`,
-      hidden
+      hidden: tr
     };
   }
 
