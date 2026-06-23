@@ -69,7 +69,7 @@ export default function SandpackBlock({ code, language, viewMode = "preview" }) 
     };
   }
 
-  return (
+  retur (
     <div className="w-full h-full bg-[#09090b]">
       <SandpackProvider
         template={template}
