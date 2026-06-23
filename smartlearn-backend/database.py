@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, Column, Integer, Text, DateTime, func, Boo
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from datetime import datetime, timezone
-import os
+import 
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
