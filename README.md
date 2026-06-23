@@ -16,7 +16,7 @@ SmartLearn AI is a next-generation cognitive architecture and educational assist
 
 SmartLearn AI transcends traditional chatbot interfaces by offering a suite of industry-level tools designed for deep analytical research and interactive learning.
 
-### Core Capabilitie
+### Core Capabilities
 
 - **Zero-Latency Live Code Execution:** An integrated browser-based IDE powered by Sandpack. Users can write, execute, edit, and hot-reload React and JavaScript applications directly inside the chat interface without external dependencies.
 - **Autonomous Web Browsing (Playwright):** SmartLearn launches a headless Chromium browser in the background to navigate URLs, wait for page renders, scrape content, and snap live viewport screenshots directly into the chat stream.
